@@ -24,13 +24,19 @@
   margin-top: 50px;
   height: calc(100vh - 50px);
   overflow: auto;
+  background-color: var(--bg-color);
 }
 
 .content{
-  background-color: var(--bg-color);
   padding: 20px;
 }
 
+.center{
+  position: absolute;
+  left:50%;
+  top:50%;
+  transform: translate(-50%,-50%)
+}
 .blink {
 	animation: blinker 2s cubic-bezier(0.075, 0.82, 1, 1) infinite;
 }

@@ -7,7 +7,7 @@ import { setUserData } from './Reducers/userDataSlice';
 import LoginPage from './pages/LoginPage';
 import NotFoundPage from './pages/NotFoundPage';
 import Home from './pages/Home';
-import Image from './pages/Image';
+import ImageDisplay from './pages/ImageDisplay';
 import Layout from './pages/Layout';
 import Images from './pages/Images';
 import Requests from './pages/Requests';
@@ -52,7 +52,7 @@ function App() {
             <Route path='/home/requests' element={<Requests/>}/>
             <Route path='/home/approved' element={<Approved/>}/>
           </Route>
-          <Route path='image/:id' element={<Image/>}/>
+          <Route path='image/:id' element={<ImageDisplay/>}/>
         </Route>
         <Route path='/*' element={<NotFoundPage/>}/>
       </Route>

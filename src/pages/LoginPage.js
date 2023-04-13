@@ -14,7 +14,7 @@ function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [status, setStatus] = useState({msg:"",severity:"success", open:false});
     const [loading, setLoading] = useState(false);
-    
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -42,8 +42,6 @@ function LoginPage() {
         }, { withCredentials: true })
         .then(function (response) {
             var data = response.data
-            const object = {_id: data.others._id,username: data.others.username, email: data.others.email, role: data.others.role, availability:data.others.availability, permissions: data.others.permissions, reg_no: data.others.reg_no, atoken: data.accessToken.token }
-            sessionStorage.setItem("info",JSON.stringify(object))
             
             dispatch(setUserData({
                 _id: data.others._id,

@@ -150,7 +150,7 @@ const Canvas = ({data}) => {
   const [defaultSettings, setDefaultSettings] = useState({type:"Oral Cavity", color: stringToColor("Oral Cavity") });
   const [togglePanel, setTogglePanel] = useState(false);
   const [opacity, setOpacity] = useState(true);
-  const [state, setState] = useState(0);
+  const [coordinates, setCoordinates] = useState([]);
   const [status, setStatus] = useState({msg:"",severity:"success", open:false}) 
   const [content, setContent] = useState("Action");
   const [labelVisibility, setLabelVisibility] = useState(false);
@@ -176,10 +176,7 @@ const Canvas = ({data}) => {
     setAnchorEl(null);
   };
 
-  const handleSave = ()=>{
-
-    setState(1);
-
+  const getCoordinates = ()=>{
     var updated = [];
 
     [...regions].forEach((region, index) =>{
@@ -203,37 +200,8 @@ const Canvas = ({data}) => {
       }
     })
 
-    
-
-    // axios.post(`${config['path']}/image/update`,
-    //   {
-    //     _id: data[imageIndex]._id,
-    //     location:location,
-    //     clinical_diagnosis:clinicalDiagnosis,
-    //     lesions_appear:lesion,
-    //     annotation: updated
-
-    //   },
-    //   { headers: {
-    //       'Authorization': 'BEARER '+ JSON.parse(sessionStorage.getItem("info")).atoken,
-    //       'email': JSON.parse(sessionStorage.getItem("info")).email,
-    //   }}).then(res=>{
-    //     showMsg("Image Data Updated", "success")
-    //     // var temp = [...data]
-    //     // temp[imageIndex].annotation = updated
-    //     // temp[imageIndex].location= location
-    //     // temp[imageIndex].clinical_diagnosis = clinicalDiagnosis
-    //     // temp[imageIndex].lesions_appear = lesion
-    //     // setData(temp);
-    //     setOpen(false);
-    //   }).catch(err=>{
-    //       if(err.response) showMsg(err.response.data.message, "error")
-    //       else alert(err)
-    //   }).finally(()=>{
-    //       setState(0);
-    //   })
-    
-    setState(0);
+    setCoordinates(updated);
+    setTogglePanel(true);
   }
 
   const showMsg = (msg, severity)=>{
@@ -275,13 +243,12 @@ const Canvas = ({data}) => {
       )
     )
 
-    // if(type.length === 0) return
     setTogglePanel(true)
   }
 
   const show_actions = ()=>{
     setContent("Action");
-    setTogglePanel(true);
+    getCoordinates();
   }
 
   const show_history = ()=>{
@@ -715,7 +682,7 @@ const Canvas = ({data}) => {
           
           <div style={{flex: 1}}></div>
           <Button variant='contained' onClick={show_actions}>Action</Button>
-          <Button variant='contained' color='inherit' onClick={goBack}>Cancle</Button>
+          <Button variant='outlined' color='inherit' onClick={goBack}>Cancle</Button>
           </Stack>
         </div>
         {/********************** working area **********************/}
