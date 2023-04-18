@@ -17,3 +17,5 @@ export function stringToColor(string) {
 
     return 'rgb('+r+','+g+','+b+')';
 }
+
+export const stringToSum = str => [...str||"A"].reduce((a, x) => a += x.codePointAt(0), 0);

@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import Canvas from '../components/Annotation/Canvas';
 import { useParams } from 'react-router-dom';
 import { useSelector} from 'react-redux';
-import { Box, CircularProgress, Typography} from '@mui/material';
+import { Box, CircularProgress} from '@mui/material';
 import NotificationBar from '../components/NotificationBar';
 import axios from 'axios';
 import config from '../config.json';
 import ImageIcon from '@mui/icons-material/Image';
-import { ImageNotSupported } from '@mui/icons-material';
+import { stringToSum } from '../components/Utils';
 
 function ImageDisplay() {
 
@@ -27,7 +27,7 @@ function ImageDisplay() {
             },
             withCredentials: true
         }).then(res=>{
-            res.data.img = 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/150150/bug-7.jpg'
+            res.data.img = `https://s3-us-west-2.amazonaws.com/s.cdpn.io/150150/bug-${stringToSum(res.data._id)%18 + 1}.jpg`
             setData(res.data);
             setLoading(false);
             if(res.data.status == "Review Requested"||
@@ -47,7 +47,7 @@ function ImageDisplay() {
     
     return (
         <div>
-            <Box className='body' sx={{display: { xs: 'none', sm: 'block' } }} >
+            <Box className='body'>
                 {loading? 
                 <Box sx={{ display: 'flex', justifyContent:'center', alignItems:'center', height:'100%' }}>
                 <Box sx={{position: 'relative'}}>
@@ -57,14 +57,14 @@ function ImageDisplay() {
                 </Box>
                 :<Canvas data={data} readOnly={readOnly} />}
             </Box>
-            <Box className='body' sx={{display: { xs: 'block', sm: 'none' } }} >
+            {/* <Box className='body' sx={{display: { xs: 'block', sm: 'none' } }} >
                 <Box sx={{ display: 'flex', justifyContent:'center', alignItems:'center', height:'100%' }}>
                 <Box sx={{position: 'relative', textAlign:'center'}}>
                     <ImageNotSupported fontSize='large' color='primary' />
                     <Typography>Not available for mobile view</Typography>
                 </Box>
                 </Box>
-            </Box>
+            </Box> */}
             <NotificationBar status={status} setStatus={setStatus}/>
         </div>
     );

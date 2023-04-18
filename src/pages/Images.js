@@ -8,6 +8,7 @@ import NotificationBar from '../components/NotificationBar';
 import axios from 'axios';
 import config from '../config.json';
 import { StyledMenu } from '../components/StyledMenu';
+import { stringToSum } from '../components/Utils';
 
 function Images() {
 
@@ -224,7 +225,7 @@ function Images() {
                     <Typography noWrap variant='body2'>{item.clinical_diagnosis}</Typography>
                 </Box> 
                 <div className='grid_item' onClick={()=>handleClick(item._id)} style={{
-                    background:`url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/150150/bug-${index%18 + 1}.jpg)`,
+                    background:`url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/150150/bug-${stringToSum(item._id)%18 + 1}.jpg)`,
                     backgroundRepeat: "no-repeat",
                     backgroundSize: "cover",
                     backgroundPosition: "center"

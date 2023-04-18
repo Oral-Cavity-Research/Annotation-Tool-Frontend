@@ -73,6 +73,7 @@ const ButtonPanel = ({func, labelVisibility, readOnly}) => {
               onClick={handleCloseNavMenu}
               sx={{
                 display: { xs: 'block', md: 'none' },
+                maxHeight:'400px'
               }}
             >
               

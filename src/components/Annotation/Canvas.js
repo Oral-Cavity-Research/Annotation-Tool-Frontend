@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {Box, Button, ButtonBase, Chip, Menu, Select, Stack, Typography} from '@mui/material';
+import {Box, Button, ButtonBase, Chip, IconButton, Menu, Select, Stack, Typography} from '@mui/material';
 import RegionTable from './RegionTable';
 import Help from './Help';
 import ButtonPanel from './ButtonPanel';
@@ -10,6 +10,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { stringToColor } from '../Utils';
 import Actions from './Actions';
 import EditHistory from './EditHistory';
+import { Cancel, Close, ImageSearch, Label, SaveAs } from '@mui/icons-material';
 
 // global variables 
 // todo: check whether we could use useStates instead
@@ -254,6 +255,11 @@ const Canvas = ({data, readOnly}) => {
     setContent("Action");
     const coor = getCoordinates();
     setCoordinates(coor);
+    setTogglePanel(true);
+  }
+
+  const show_image_annotations = ()=>{
+    setContent("Image Label");
     setTogglePanel(true);
   }
 
@@ -780,17 +786,35 @@ const Canvas = ({data, readOnly}) => {
           <ButtonPanel func={{finish_drawing,show_regions,show_history, zoom_in, zoom_out, zoom_reset, move_selected, 
           delete_selected, show_help, clear_all, show_label, label_type, opacity_change, show_actions}} labelVisibility={labelVisibility} readOnly={readOnly}/>
           
-          {!readOnly && <Chip size='small' label={
-            (changed.added?.length === 0 && changed.deleted?.length === 0)?
-            "Saved": "Unsaved changes"}
-            color={(changed.added?.length === 0 && changed.deleted?.length === 0)?
-              "success": "warning"}
-            onClick={show_diff}
-          />}
+          <Box sx={{display: { xs: 'none', sm: 'block' } }} >
+            {!readOnly && <Chip size='small' label={
+              (changed.added?.length === 0 && changed.deleted?.length === 0)?
+              "Saved": "Unsaved changes"}
+              color={(changed.added?.length === 0 && changed.deleted?.length === 0)?
+                "success": "warning"}
+              onClick={show_diff}
+            />}
+          </Box>
+          <Box sx={{display: { xs: 'block', sm: 'none' } }} >
+            {!readOnly && <IconButton onClick={show_diff} color={(changed.added?.length === 0 && changed.deleted?.length === 0)?
+                "success": "warning"}><ImageSearch/></IconButton>}
+          </Box>
 
           <div style={{flex: 1}}></div>
-          <Button size='small' variant='contained' onClick={show_actions}>Action</Button>
-          <Button size='small' variant='outlined' color='inherit' onClick={goBack}>Cancle</Button>
+          <Box sx={{display: { xs: 'none', sm: 'block' } }} >
+            <Stack direction='row' spacing={1}>
+              <Button size='small' variant='contained' onClick={show_actions}>Action</Button>
+              <Button size='small' variant='outlined' color='inherit' onClick={goBack}>Cancle</Button>
+            </Stack>
+          </Box>
+          <Box sx={{display: { xs: 'block', sm: 'none' } }} >
+            <Stack direction='row' spacing={1}>
+              <IconButton size='small' onClick={show_image_annotations}><Label color='primary' /></IconButton>
+              <IconButton size='small' onClick={show_actions}><SaveAs/></IconButton>
+              <IconButton size='small' onClick={goBack}><Cancel/></IconButton>
+            </Stack>
+          </Box>
+
           </Stack>
         </div>
         {/********************** working area **********************/}
@@ -803,33 +827,32 @@ const Canvas = ({data, readOnly}) => {
           
           </div>
         </div>
-        <div className='right_bar'>
-        <div style={{padding:'10px'}}>
-        
         {/******************** image annotation ************************/} 
-        
+        <Box className='right_bar' sx={{display: { xs: 'none', sm: 'block' } }}>
+        <div style={{padding:'10px'}}>
+                
           <Typography fontSize='small'>Location</Typography>
         
-          <Select disabled={readOnly} fullWidth size='small' value={location} onChange={(e)=>setLocation(e.target.value)} sx={{backgroundColor: "white", mb:1}}>
+          <Select disabled={readOnly} fullWidth size='small' value={location} onChange={(e)=>setLocation(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
             {locations.map((name, index) =>{
               return (<MenuItem key={index} value={name}>{name}</MenuItem>)
             })}
           </Select>
         
           <Typography fontSize='small'>Clinical Diagnosis</Typography>
-          <Select disabled={readOnly} fullWidth size='small' value={clinicalDiagnosis} onChange={(e)=>setClinicalDiagnosis(e.target.value)} sx={{backgroundColor: "white", mb:1}}>
+          <Select disabled={readOnly} fullWidth size='small' value={clinicalDiagnosis} onChange={(e)=>setClinicalDiagnosis(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
             {diagnosis.map((name, index) =>{
               return (<MenuItem key={index} value={name}>{name}</MenuItem>)
             })}
           </Select>
 
           <Typography fontSize='small'>Lesion Present</Typography>
-          <Select disabled={readOnly} fullWidth size='small'  value={lesion} onChange={(e)=>setLesion(e.target.value)} sx={{backgroundColor: "white", mb:1}}>
+          <Select disabled={readOnly} fullWidth size='small'  value={lesion} onChange={(e)=>setLesion(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
               <MenuItem value={false}>False</MenuItem>
               <MenuItem value={true}>True</MenuItem>
           </Select>
           </div>
-        </div>
+        </Box>
         </div>
         {/********************** info panel **********************/}
         {
@@ -837,10 +860,12 @@ const Canvas = ({data, readOnly}) => {
           <Box className='content_panel'>
            
             <div className='top_bar sticky'>
+            
             <Stack direction='row' sx={{width:'100%', paddingInline:'10px'}} justifyContent='space-between' alignItems='center' spacing={1}>
               <Typography noWrap variant='h5' sx={{width:'200px'}}>{content}</Typography>
-              <Button variant='contained' sx={{m:1}} onClick={()=>setTogglePanel(false)}>Back To Annotation</Button>
+              <IconButton sx={{m:1}} onClick={()=>setTogglePanel(false)}><Close/></IconButton>
             </Stack>
+            
             </div>
             <Box sx={{p:2}}>
             {content === "Help" && <Help/>}
@@ -853,6 +878,31 @@ const Canvas = ({data, readOnly}) => {
             location={location} clinicalDiagnosis={clinicalDiagnosis}  lesion={lesion}
             />}
             {content === "History" && <EditHistory image={data}/>}
+            {content === "Image Label" &&
+            <div style={{padding:'10px'}}>
+                
+            <Typography fontSize='small'>Location</Typography>
+          
+            <Select disabled={readOnly} fullWidth size='small' value={location} onChange={(e)=>setLocation(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
+              {locations.map((name, index) =>{
+                return (<MenuItem key={index} value={name}>{name}</MenuItem>)
+              })}
+            </Select>
+          
+            <Typography fontSize='small'>Clinical Diagnosis</Typography>
+            <Select disabled={readOnly} fullWidth size='small' value={clinicalDiagnosis} onChange={(e)=>setClinicalDiagnosis(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
+              {diagnosis.map((name, index) =>{
+                return (<MenuItem key={index} value={name}>{name}</MenuItem>)
+              })}
+            </Select>
+  
+            <Typography fontSize='small'>Lesion Present</Typography>
+            <Select disabled={readOnly} fullWidth size='small'  value={lesion} onChange={(e)=>setLesion(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
+                <MenuItem value={false}>False</MenuItem>
+                <MenuItem value={true}>True</MenuItem>
+            </Select>
+            </div>
+            }
             </Box>
           </Box>
         }
