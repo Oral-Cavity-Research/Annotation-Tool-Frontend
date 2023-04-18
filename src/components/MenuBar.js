@@ -13,8 +13,6 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import logo from '../Assets/note.png';
 
-const pages = ['Home'];
-
 function MenuBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -41,6 +39,10 @@ function MenuBar() {
 
   const handleGoToHome = ()=>{
     navigate('/home');
+  };
+
+  const handleGoToMyWork = ()=>{
+    navigate('/mywork');
   };
 
   return (
@@ -83,12 +85,15 @@ function MenuBar() {
               <MenuItem onClick={handleGoToHome}>
                 <Typography textAlign="center">Home</Typography>
               </MenuItem>
-           
+              <MenuItem onClick={handleGoToMyWork}>
+                <Typography textAlign="center">My Work</Typography>
+              </MenuItem>
             </Menu>
           </Box>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
            
-              <Button onClick={handleGoToHome} sx={{ my: 2, color: 'white', display: 'block' }}>Home</Button>
+            <Button onClick={handleGoToHome} sx={{ my: 2, color: 'white', display: 'block' }}>Home</Button>
+            <Button onClick={handleGoToMyWork} sx={{ my: 2, color: 'white', display: 'block' }}>My Work</Button>
          
           </Box>
 

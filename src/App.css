@@ -66,10 +66,26 @@
 	right: 0;
 }
 
-.overlay svg {
+.nooverlay svg{
+  display: none;
+}
+
+.orange svg {
 	height: 70px;
 	width: 70px;
-	fill: orange;
+  fill: orange;
+}
+
+.red svg{
+	height: 70px;
+	width: 70px;
+	fill: red;
+}
+
+.green svg{
+	height: 70px;
+	width: 70px;
+	fill: lightgreen;
 }
 
 .sticky{
@@ -202,4 +218,17 @@
   border-radius: 3px;
   display: inline-block;
   margin-right: 5px;
+}
+
+.image_list{
+  margin: 10px 0;
+  border-radius: 5px;
+  border: 1px solid #ececec;
+  background-color: #fbfbfb;
+  padding:10px;
+  cursor: pointer;
+}
+
+.image_list:hover{
+  background-color: #ececec;
 }

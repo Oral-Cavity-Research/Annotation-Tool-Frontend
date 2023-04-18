@@ -13,6 +13,7 @@ import Images from './pages/Images';
 import Requests from './pages/Requests';
 import Approved from './pages/Approved';
 import './App.css';
+import MyWork from './pages/MyWork';
 
 function App() { 
   const dispatch = useDispatch();
@@ -52,7 +53,13 @@ function App() {
             <Route path='/home/requests' element={<Requests/>}/>
             <Route path='/home/approved' element={<Approved/>}/>
           </Route>
-          <Route path='image/:id' element={<ImageDisplay/>}/>
+          <Route path='/mywork' element={<MyWork/>}>
+            <Route index element={<Images/>}/>
+            <Route path='/mywork/images' element={<Images/>}/>
+            <Route path='/mywork/requests' element={<Requests/>}/>
+            <Route path='/mywork/approved' element={<Approved/>}/>
+          </Route>
+          <Route path='/image/:id' element={<ImageDisplay/>}/>
         </Route>
         <Route path='/*' element={<NotFoundPage/>}/>
       </Route>

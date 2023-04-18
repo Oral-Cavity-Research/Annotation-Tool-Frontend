@@ -14,11 +14,12 @@ function ImageDisplay() {
     const [data, setData] = useState({});
     const [loading, setLoading] = useState(true);
     const [status, setStatus] = useState({msg:"",severity:"success", open:false});
+    const [readOnly, setReadOnly] = useState(false);
     const userData = useSelector(state => state.data);
 
     useEffect(()=>{
         setLoading(true);
-        axios.get(`${config['path']}/image/${id}`,{
+        axios.get(`${config['path']}/image/data/${id}`,{
             headers: {
                 'Authorization': `Bearer ${userData.accessToken.token}`,
                 'email': userData.email,
@@ -28,6 +29,10 @@ function ImageDisplay() {
             res.data.img = 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/150150/bug-7.jpg'
             setData(res.data);
             setLoading(false);
+            if(res.data.status == "Review Requested"||
+            res.data.status == "Approved"){
+                setReadOnly(true);
+            }
         }).catch(err=>{
             if(err.response) showMsg(err.response.data.message, "error")
             else alert(err)
@@ -49,12 +54,9 @@ function ImageDisplay() {
                     <CircularProgress size={100}/>
                 </Box>
                 </Box>
-                :<Canvas data={data}/>}
+                :<Canvas data={data} readOnly={readOnly} />}
             </div>
             <NotificationBar status={status} setStatus={setStatus}/>
-
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-    </Box>
         </div>
     );
 }

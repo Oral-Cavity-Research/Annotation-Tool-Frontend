@@ -1,13 +1,12 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {Box, Button, ButtonBase, Menu, Select, Stack, Typography} from '@mui/material';
+import {Box, Button, ButtonBase, Chip, Menu, Select, Stack, Typography} from '@mui/material';
 import RegionTable from './RegionTable';
 import Help from './Help';
 import ButtonPanel from './ButtonPanel';
 import MenuItem from '@mui/material/MenuItem';
 // import axios from 'axios';
-import config from '../../config.json';
-import NotificationBar from '../NotificationBar';
+// import config from '../../config.json';
 import { stringToColor } from '../Utils';
 import Actions from './Actions';
 import EditHistory from './EditHistory';
@@ -138,9 +137,19 @@ class Polygon{
       this.mouse.lx = (mouse.x)/this.scale;
       this.mouse.ly = (mouse.y)/this.scale;
   }
+  show(opacity){
+    this.ctx.beginPath();
+    this.ctx.lineWidth = 1;
+    this.ctx.strokeStyle = this.color;
+    this.ctx.fillStyle = this.color.replace(')', ', 0.6)').replace('rgb', 'rgba');
+    for (const p of this.points) { this.ctx.lineTo((p.x)*this.scale,(p.y)*this.scale) }
+    this.ctx.closePath();
+    if(opacity) this.ctx.fill();
+    this.ctx.stroke();
+  }
 }
 
-const Canvas = ({data}) => {  
+const Canvas = ({data, readOnly}) => {  
   
   const [size, setSize] = useState({width: 1, height:1})
   const [orginalSize, setOriginalSize] = useState({width: 1, height:1})
@@ -151,7 +160,6 @@ const Canvas = ({data}) => {
   const [togglePanel, setTogglePanel] = useState(false);
   const [opacity, setOpacity] = useState(true);
   const [coordinates, setCoordinates] = useState([]);
-  const [status, setStatus] = useState({msg:"",severity:"success", open:false}) 
   const [content, setContent] = useState("Action");
   const [labelVisibility, setLabelVisibility] = useState(false);
   const [location, setLocation] = useState(data.location)
@@ -159,6 +167,7 @@ const Canvas = ({data}) => {
   const [lesion, setLesion] = useState(data.lesions_appear);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [changed, setChanged] = useState({added:[], same:[], deleted:[]});
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
   
@@ -200,12 +209,7 @@ const Canvas = ({data}) => {
       }
     })
 
-    setCoordinates(updated);
-    setTogglePanel(true);
-  }
-
-  const showMsg = (msg, severity)=>{
-    setStatus({msg, severity, open:true})
+   return updated;
   }
 
   const canvaRef = useRef(null)
@@ -248,7 +252,9 @@ const Canvas = ({data}) => {
 
   const show_actions = ()=>{
     setContent("Action");
-    getCoordinates();
+    const coor = getCoordinates();
+    setCoordinates(coor);
+    setTogglePanel(true);
   }
 
   const show_history = ()=>{
@@ -279,8 +285,9 @@ const Canvas = ({data}) => {
       selectedRegion.markedForDeletion = true;
       isSelected = false;
     }
-    redraw_canvas()
-    redraw_ids()
+    redraw_canvas();
+    redraw_ids();
+    check_changes();
   }
 
   const finish_drawing = () =>{
@@ -295,11 +302,14 @@ const Canvas = ({data}) => {
     regions.push(polygon)
     redraw_canvas()
     redraw_ids()
+    check_changes();
   }
 
   const handle_keyup = (e) =>{
   
     e.preventDefault()
+
+    if(readOnly) return;
     
     if(e.key === "Enter") {
       finish_drawing()
@@ -335,14 +345,15 @@ const Canvas = ({data}) => {
       move_selected(e.key, del);
     }
 
-    if(e.key === ' '){
-      if(togglePanel) {
-        setTogglePanel(false)
-        return
-      }
-      show_actions();
-    } 
+    // if(e.key === ' '){
+    //   if(togglePanel) {
+    //     setTogglePanel(false)
+    //     return
+    //   }
+    //   show_actions();
+    // } 
 
+    check_changes(); 
   }
 
   const deselect_all = (e) =>{
@@ -401,6 +412,8 @@ const Canvas = ({data}) => {
   }
 
   const handle_mouse = (e)=>{
+
+    if(readOnly) return;
   
     var rect = canvas.getBoundingClientRect();
 
@@ -410,7 +423,11 @@ const Canvas = ({data}) => {
     if(e.type === "mousedown"){
         handleSelect()  
     }
-    
+
+    if(e.type === "mouseup"){
+      check_changes()
+    } 
+
     mouse.button = e.type === "mousedown" ? true : e.type === "mouseup" ? false : mouse.button;
     redraw_canvas()
     redraw_ids()
@@ -425,12 +442,42 @@ const Canvas = ({data}) => {
     };
   }, [handle_keyup]);
 
+  const check_changes = ()=>{
+    const newCoor = getCoordinates();
+    const originalCoor = data.annotation;
+    const same = []
+    const deleted = []
+    const added =[]
+
+    originalCoor.forEach(element => {
+      if(newCoor.some(e => 
+        e.name === element.name &&
+        e.annotations?.join("") === element.annotations?.join(""))
+      ){
+        same.push(element);
+      }else{
+        deleted.push(element);
+      }
+    });
+
+    newCoor.forEach(element => {
+      if(!originalCoor.some(e => 
+        e.name === element.name && 
+        e.annotations?.join("") === element.annotations?.join(""))
+      ){
+        added.push(element);
+      }
+    });
+
+    setChanged({added, same, deleted});
+  }
 
   // redraw the canvas
   const redraw_canvas = () =>{
 
     ctx.clearRect(0,0, canvas.width, canvas.height);
     mouse.cursor = "crosshair";
+    if(readOnly) {mouse.cursor = "default"};
 
     regions = regions.filter(region => !region.markedForDeletion);
 
@@ -497,6 +544,7 @@ const Canvas = ({data}) => {
 
   redraw_canvas()
   redraw_ids()
+  check_changes();
 
   }, [data]);
 
@@ -590,6 +638,7 @@ const Canvas = ({data}) => {
     selectedRegion.points = moved
     redraw_canvas()
     redraw_ids()
+    check_changes();
   }
 
   // validate move
@@ -642,10 +691,61 @@ const Canvas = ({data}) => {
     polygon.scale = zoomLevel;
     regions.push(polygon)
     redraw_canvas()
+    check_changes();
+  }
+
+  const show_diff = ()=>{
+    ctx.clearRect(0,0, canvas.width, canvas.height);
+    
+    var diff = [];
+
+    [...changed.added].forEach(region=>{
+      var type = region.name
+      polygon = new Polygon(ctx,'rgb(0, 255, 0)', type)
+      polygon.scale = zoomLevel;
+      var points = []
+      var oldAnnotations = region.annotations
+      for(var i=0; i< oldAnnotations.length; i+=2){
+        points.push(point(region.annotations[i], region.annotations[i+1]))
+      }
+      polygon.points = points
+      polygon.completed = true;
+      diff.push(polygon)    
+    });
+
+    [...changed.deleted].forEach(region=>{
+      var type = region.name
+      polygon = new Polygon(ctx,'rgb(255, 0, 0)', type)
+      polygon.scale = zoomLevel;
+      var points = []
+      var oldAnnotations = region.annotations
+      for(var i=0; i< oldAnnotations.length; i+=2){
+        points.push(point(region.annotations[i], region.annotations[i+1]))
+      }
+      polygon.points = points
+      polygon.completed = true;
+      diff.push(polygon)    
+    });
+
+    [...changed.same].forEach(region=>{
+      var type = region.name
+      polygon = new Polygon(ctx,'rgb(224, 224, 224)', type)
+      polygon.scale = zoomLevel;
+      var points = []
+      var oldAnnotations = region.annotations
+      for(var i=0; i< oldAnnotations.length; i+=2){
+        points.push(point(region.annotations[i], region.annotations[i+1]))
+      }
+      polygon.points = points
+      polygon.completed = true;
+      diff.push(polygon)    
+    });
+
+    diff.forEach(region => {region.show(opacity)});
   }
 
   const goBack = ()=>{
-    navigate('/home/images');
+    navigate(-1)
   }
 
   return (
@@ -678,8 +778,16 @@ const Canvas = ({data}) => {
 
           {/******************* button pannel *************************/}
           <ButtonPanel func={{finish_drawing,show_regions,show_history, zoom_in, zoom_out, zoom_reset, move_selected, 
-          delete_selected, show_help, clear_all, show_label, label_type, opacity_change, show_actions}} labelVisibility={labelVisibility}/>
+          delete_selected, show_help, clear_all, show_label, label_type, opacity_change, show_actions}} labelVisibility={labelVisibility} readOnly={readOnly}/>
           
+          {!readOnly && <Chip size='small' label={
+            (changed.added?.length === 0 && changed.deleted?.length === 0)?
+            "Saved": "Unsaved changes"}
+            color={(changed.added?.length === 0 && changed.deleted?.length === 0)?
+              "success": "warning"}
+            onClick={show_diff}
+          />}
+
           <div style={{flex: 1}}></div>
           <Button variant='contained' onClick={show_actions}>Action</Button>
           <Button variant='outlined' color='inherit' onClick={goBack}>Cancle</Button>
@@ -702,21 +810,21 @@ const Canvas = ({data}) => {
         
           <Typography fontSize='small'>Location</Typography>
         
-          <Select fullWidth size='small' value={location} onChange={(e)=>setLocation(e.target.value)} sx={{backgroundColor: "white", mb:1}}>
+          <Select disabled={readOnly} fullWidth size='small' value={location} onChange={(e)=>setLocation(e.target.value)} sx={{backgroundColor: "white", mb:1}}>
             {locations.map((name, index) =>{
               return (<MenuItem key={index} value={name}>{name}</MenuItem>)
             })}
           </Select>
         
           <Typography fontSize='small'>Clinical Diagnosis</Typography>
-          <Select fullWidth size='small' value={clinicalDiagnosis} onChange={(e)=>setClinicalDiagnosis(e.target.value)} sx={{backgroundColor: "white", mb:1}}>
+          <Select disabled={readOnly} fullWidth size='small' value={clinicalDiagnosis} onChange={(e)=>setClinicalDiagnosis(e.target.value)} sx={{backgroundColor: "white", mb:1}}>
             {diagnosis.map((name, index) =>{
               return (<MenuItem key={index} value={name}>{name}</MenuItem>)
             })}
           </Select>
 
           <Typography fontSize='small'>Lesion Present</Typography>
-          <Select fullWidth size='small'  value={lesion} onChange={(e)=>setLesion(e.target.value)} sx={{backgroundColor: "white", mb:1}}>
+          <Select disabled={readOnly} fullWidth size='small'  value={lesion} onChange={(e)=>setLesion(e.target.value)} sx={{backgroundColor: "white", mb:1}}>
               <MenuItem value={false}>False</MenuItem>
               <MenuItem value={true}>True</MenuItem>
           </Select>
@@ -737,14 +845,18 @@ const Canvas = ({data}) => {
             <Box sx={{p:2}}>
             {content === "Help" && <Help/>}
             {content === "Regions" && <RegionTable showPoints={showPoints}/>}
-            {content === "Action" && <Actions/>}
-            {content === "History" && <EditHistory/>}
+            {content === "Action" && <Actions 
+            setTogglePanel={setTogglePanel}
+            data={data} 
+            coordinates={coordinates} 
+            unsaved={changed.added?.length !== 0 || changed.deleted?.length !== 0}
+            location={location} clinicalDiagnosis={clinicalDiagnosis}  lesion={lesion}
+            />}
+            {content === "History" && <EditHistory image={data}/>}
             </Box>
           </Box>
         }
     </div>
-
-      <NotificationBar status={status} setStatus={setStatus}/>
     </>
   )
 }

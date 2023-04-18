@@ -8,7 +8,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 const NotificationBar = ({status, setStatus}) => {
     return (
-        <Snackbar open={status.open} autoHideDuration={3000} onClose={()=>setStatus({msg:status.msg,severity:status.severity,open:false})} anchorOrigin={{ vertical: 'top',horizontal: 'right' }}>
+        <Snackbar open={status.open} autoHideDuration={3000} onClose={()=>setStatus({msg:status.msg,severity:status.severity,open:false})} anchorOrigin={{ vertical:'bottom',horizontal: 'right' }}>
             <Alert onClose={()=>setStatus({msg:status.msg,severity:status.severity,open:false})} severity={status.severity} sx={{ width: '100%' }}>{status.msg}</Alert>
         </Snackbar>
     );

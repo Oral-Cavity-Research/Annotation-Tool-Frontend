@@ -54,7 +54,7 @@ function LoginPage() {
             }))
 
            
-            navigate("/home/images");
+            navigate("/home/all/images");
             
         })
         .catch(function (error) {

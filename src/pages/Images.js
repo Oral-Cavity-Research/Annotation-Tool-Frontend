@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {Paper,Typography,Box, Grid, Stack, IconButton, MenuItem, Skeleton} from '@mui/material';
+import {Paper,Typography,Box, Grid, Stack, IconButton, MenuItem, Skeleton, Badge} from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { FilterList } from '@mui/icons-material';
 import { useSelector} from 'react-redux';
@@ -9,8 +9,6 @@ import axios from 'axios';
 import config from '../config.json';
 import { StyledMenu } from '../components/StyledMenu';
 
-const filtOptions = ["All","New","Edited"]
-
 function Images() {
 
     const [data, setData] = useState([]);
@@ -18,9 +16,20 @@ function Images() {
     const [loading, setLoading] = useState(true);
     const [status, setStatus] = useState({msg:"",severity:"success", open:false});
     const userData = useSelector(state => state.data);
-    const [filt, setFilt] = useState("New");
+    const [filt, setFilt] = useState("All");
     const [page, setPage] = useState(1);
+    const [count, setCount] = useState(0);
     const [noMore, setNoMore] = useState(false);
+    const [filtOptions, setFlitOptions] = useState(["All"]);
+
+    useEffect(()=>{
+        const path = window.location.pathname;
+        if(path === "/mywork/images" || path === "/mywork"){
+            setFlitOptions(["All","Edited","Changes Requested","Reviewed"])
+        }else{
+            setFlitOptions(["All","New","Edited","Changes Requested","Reviewed"])
+        }
+    },[])
 
     const open = Boolean(anchorEl);
     const navigate = useNavigate();
@@ -48,48 +57,124 @@ function Images() {
     const loadMore = () => {
         setLoading(true);
         setNoMore(false);
-        axios.get(`${config['path']}/image/all`,{
-            params: { page: page + 1, filter: filt},
-            headers: {
-                'Authorization': `Bearer ${userData.accessToken.token}`,
-                'email': userData.email,
-            },
-            withCredentials: true
-        }).then(res=>{
-            if(res.data?.length < 20) setNoMore(true);
-            setData([...data, ...res.data]);
-            setPage(page+1);
-        }).catch(err=>{
-            if(err.response) showMsg(err.response.data.message, "error")
-            else alert(err)
-        }).finally(()=>{
-            setLoading(false);
-        })
+
+        const path = window.location.pathname;
+        if(path === "/mywork/images" || path === "/mywork"){
+            axios.get(`${config['path']}/image/mywork`,{
+                params: { page: page + 1, filter: filt},
+                headers: {
+                    'Authorization': `Bearer ${userData.accessToken.token}`,
+                    'email': userData.email,
+                },
+                withCredentials: true
+            }).then(res=>{
+                if(res.data?.length < 20) setNoMore(true);
+                setData([...data, ...res.data]);
+                setPage(page+1);
+            }).catch(err=>{
+                if(err.response) showMsg(err.response.data.message, "error")
+                else alert(err)
+            }).finally(()=>{
+                setLoading(false);
+            })
+        }else{
+            axios.get(`${config['path']}/image/all`,{
+                params: { page: page + 1, filter: filt},
+                headers: {
+                    'Authorization': `Bearer ${userData.accessToken.token}`,
+                    'email': userData.email,
+                },
+                withCredentials: true
+            }).then(res=>{
+                if(res.data?.length < 20) setNoMore(true);
+                setData([...data, ...res.data]);
+                setPage(page+1);
+            }).catch(err=>{
+                if(err.response) showMsg(err.response.data.message, "error")
+                else alert(err)
+            }).finally(()=>{
+                setLoading(false);
+            })
+        }
     };
 
     const getData = ()=>{
         setLoading(true);
         setNoMore(false);
-        axios.get(`${config['path']}/image/all`,{
-            params: { page: 1, filter: filt},
-            headers: {
-                'Authorization': `Bearer ${userData.accessToken.token}`,
-                'email': userData.email,
-            },
-            withCredentials: true
-        }).then(res=>{
-            if(res.data?.length < 20) setNoMore(true);
-            setData(res.data);
-        }).catch(err=>{
-            if(err.response) showMsg(err.response.data.message, "error")
-            else alert(err)
-        }).finally(()=>{
-            setLoading(false);
-        })
+        const path = window.location.pathname;
+        if(path === "/mywork/images" || path === "/mywork"){
+            axios.get(`${config['path']}/image/mywork`,{
+                params: { page: 1, filter: filt},
+                headers: {
+                    'Authorization': `Bearer ${userData.accessToken.token}`,
+                    'email': userData.email,
+                },
+                withCredentials: true
+            }).then(res=>{
+                if(res.data?.length < 20) setNoMore(true);
+                setData(res.data);
+            }).catch(err=>{
+                if(err.response) showMsg(err.response.data.message, "error")
+                else alert(err)
+            }).finally(()=>{
+                setLoading(false);
+            })
+        }else{
+            axios.get(`${config['path']}/image/all`,{
+                params: { page: 1, filter: filt},
+                headers: {
+                    'Authorization': `Bearer ${userData.accessToken.token}`,
+                    'email': userData.email,
+                },
+                withCredentials: true
+            }).then(res=>{
+                if(res.data?.length < 20) setNoMore(true);
+                setData(res.data);
+            }).catch(err=>{
+                if(err.response) showMsg(err.response.data.message, "error")
+                else alert(err)
+            }).finally(()=>{
+                setLoading(false);
+            })
+        }
+    }  
+
+    const getCount = ()=>{
+        const path = window.location.pathname;
+        if(path === "/mywork/images" || path === "/mywork"){
+            axios.get(`${config['path']}/image/mywork/count`,{
+                params: {filter: filt},
+                headers: {
+                    'Authorization': `Bearer ${userData.accessToken.token}`,
+                    'email': userData.email,
+                },
+                withCredentials: true
+            }).then(res=>{
+                setCount(res.data.count);
+            }).catch(err=>{
+                if(err.response) showMsg(err.response.data.message, "error")
+                else alert(err)
+            })
+        }else{
+            axios.get(`${config['path']}/image/all/count`,{
+                params: {filter: filt},
+                headers: {
+                    'Authorization': `Bearer ${userData.accessToken.token}`,
+                    'email': userData.email,
+                },
+                withCredentials: true
+            }).then(res=>{
+                setCount(res.data.count);
+            }).catch(err=>{
+                if(err.response) showMsg(err.response.data.message, "error")
+                else alert(err)
+            })
+        }
     }  
     
     useEffect(() => {
         getData();
+        getCount();
     }, [filt]);
 
     return (
@@ -102,7 +187,11 @@ function Images() {
             aria-expanded={open ? 'true' : undefined}
             onClick={handleOpen}
             sx={{my:1}}
-        ><FilterList/></IconButton>
+        >
+        <Badge color='primary' badgeContent={count} max={99}>
+        <FilterList/> 
+        </Badge>
+        </IconButton>
         <Typography variant='body2' color='GrayText'>{filt}</Typography>
         </Stack>
         <StyledMenu id="demo-customized-menu"  MenuListProps={{'aria-labelledby': 'demo-customized-button'}} anchorEl={anchorEl} open={open} onClose={handleClose}>
@@ -131,8 +220,8 @@ function Images() {
             <Grid item xs={6} sm={3} md={2} key={index}>
                 <Paper className='card'>
                 <Box sx={{p:1}}>
-                    <Typography variant='body2'>{item.location}</Typography>
-                    <Typography variant='body2'>{item.clinical_diagnosis}</Typography>
+                    <Typography noWrap variant='body2'>{item.location}</Typography>
+                    <Typography noWrap variant='body2'>{item.clinical_diagnosis}</Typography>
                 </Box> 
                 <div className='grid_item' onClick={()=>handleClick(item._id)} style={{
                     background:`url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/150150/bug-${index%18 + 1}.jpg)`,
@@ -140,8 +229,13 @@ function Images() {
                     backgroundSize: "cover",
                     backgroundPosition: "center"
                 }}>
-                {item.annotation?.length === 0 && 
-                <div className='overlay'>
+                { 
+                <div className={
+                    (item.status === "Changes Requested" && filt === "All")? 'overlay red'
+                    : (item.status === "Reviewed" && filt === "All")? 'overlay green'
+                    : item.annotation?.length === 0? 'overlay orange'
+                    : "nooverlay"
+                }>
                 <svg>
                     <polygon points="0,0,70,0,70,70"/>
                 </svg>
@@ -158,7 +252,7 @@ function Images() {
         { data.length > 0 ?
             <LoadingButton disabled={noMore} loading={loading} sx={{mt:2}} onClick={loadMore}>Load More</LoadingButton>
                 :
-            <Typography sx={{m:3}} variant='body2' color='GrayText'>{loading?"":"No Images"}</Typography>
+            <Typography sx={{m:3}} variant='body2' color='GrayText'>{loading?"":`No ${filt} Images`}</Typography>
         }
         </Stack>
         
