@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import Canvas from '../components/Annotation/Canvas';
 import { useParams } from 'react-router-dom';
 import { useSelector} from 'react-redux';
-import { Box, CircularProgress} from '@mui/material';
+import { Box, CircularProgress, Typography} from '@mui/material';
 import NotificationBar from '../components/NotificationBar';
 import axios from 'axios';
 import config from '../config.json';
 import ImageIcon from '@mui/icons-material/Image';
+import { ImageNotSupported } from '@mui/icons-material';
 
 function ImageDisplay() {
 
@@ -46,7 +47,7 @@ function ImageDisplay() {
     
     return (
         <div>
-            <div className='body'>
+            <Box className='body' sx={{display: { xs: 'none', sm: 'block' } }} >
                 {loading? 
                 <Box sx={{ display: 'flex', justifyContent:'center', alignItems:'center', height:'100%' }}>
                 <Box sx={{position: 'relative'}}>
@@ -55,7 +56,15 @@ function ImageDisplay() {
                 </Box>
                 </Box>
                 :<Canvas data={data} readOnly={readOnly} />}
-            </div>
+            </Box>
+            <Box className='body' sx={{display: { xs: 'block', sm: 'none' } }} >
+                <Box sx={{ display: 'flex', justifyContent:'center', alignItems:'center', height:'100%' }}>
+                <Box sx={{position: 'relative', textAlign:'center'}}>
+                    <ImageNotSupported fontSize='large' color='primary' />
+                    <Typography>Not available for mobile view</Typography>
+                </Box>
+                </Box>
+            </Box>
             <NotificationBar status={status} setStatus={setStatus}/>
         </div>
     );

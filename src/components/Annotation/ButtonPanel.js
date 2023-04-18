@@ -1,13 +1,25 @@
 import React from 'react';
-import {IconButton,Tooltip} from '@mui/material';
-import {Preview,ZoomIn,CropFree,ZoomOut,Close, CancelOutlined, HelpOutline, Style, History} from '@mui/icons-material';
+import {IconButton,Tooltip, Box, Menu, MenuItem, ListItemIcon, ListItemText} from '@mui/material';
+import {Preview,ZoomIn,CropFree,ZoomOut,Close, CancelOutlined, HelpOutline, Style} from '@mui/icons-material';
 import {ArrowUpward, ArrowDownward, ArrowBack, ArrowForward, Opacity, Check} from '@mui/icons-material';
-import {Label, LabelOff} from '@mui/icons-material';
+import {Label, LabelOff, History} from '@mui/icons-material';
+import MenuIcon from '@mui/icons-material/Menu';
 
 const ButtonPanel = ({func, labelVisibility, readOnly}) => {
 
+    const [anchorElNav, setAnchorElNav] = React.useState(null);
+
+    const handleOpenNavMenu = (event) => {
+        setAnchorElNav(event.currentTarget);
+    };
+
+    const handleCloseNavMenu = () => {
+        setAnchorElNav(null);
+    };
+
     return (
-        <div>       
+        <div>
+        <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>     
             {!readOnly && <Tooltip enterNextDelay={1000} title="Clear All" placement="bottom-end" arrow><IconButton size='small' onClick={func.clear_all}><CancelOutlined fontSize='small' sx={{color:"var(--dark-color)"}} /></IconButton></Tooltip>}
             <Tooltip enterNextDelay={1000} title="Show Regions" placement="bottom-end" arrow><IconButton size='small' onClick={func.show_regions}><Preview fontSize='small' sx={{color:"var(--dark-color)"}}/></IconButton></Tooltip>
             {!readOnly && <Tooltip enterNextDelay={1000} title="Finish Drawing" placement="bottom-end" arrow><IconButton size='small' onClick={func.finish_drawing}><Check  fontSize='small' sx={{color:"var(--dark-color)"}}/></IconButton></Tooltip>}
@@ -31,8 +43,117 @@ const ButtonPanel = ({func, labelVisibility, readOnly}) => {
         
             {/* <div style={{flex: 1}}></div> */}
             <Tooltip enterNextDelay={1000} title="Help" placement="bottom-end" arrow><IconButton size='small' onClick={func.show_help}><HelpOutline  fontSize='small' sx={{color:"var(--dark-color)"}}/></IconButton></Tooltip>
-            <Tooltip enterNextDelay={1000} title="History" placement="bottom-end" arrow><IconButton size='small' onClick={func.show_history}><History  fontSize='small' sx={{color:"var(--dark-color)"}}/></IconButton></Tooltip>
-                
+            <Tooltip enterNextDelay={1000} title="History" placement="bottom-end" arrow><IconButton size='small' onClick={func.show_history}><History fontSize='small' sx={{color:"var(--dark-color)"}}/></IconButton></Tooltip>
+        </Box>
+        <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+            <IconButton
+              size="small"
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              onClick={handleOpenNavMenu}
+              color="inherit"
+            >
+              <MenuIcon/>
+            </IconButton>
+            <Menu
+              id="menu-appbar"
+              anchorEl={anchorElNav}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              open={Boolean(anchorElNav)}
+              onClose={handleCloseNavMenu}
+              onClick={handleCloseNavMenu}
+              sx={{
+                display: { xs: 'block', md: 'none' },
+              }}
+            >
+              
+            <MenuItem onClick={func.show_regions}>
+                <ListItemIcon> <Preview fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
+                <ListItemText>Show Regions</ListItemText>
+            </MenuItem>
+            {!readOnly && 
+            <MenuItem onClick={func.finish_drawing}>
+                <ListItemIcon> <Check fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
+                <ListItemText>Finish Drawing</ListItemText>
+            </MenuItem>}
+            {!readOnly && 
+            <MenuItem onClick={func.delete_selected}>
+                <ListItemIcon> <Close fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
+                <ListItemText>Delete Selected</ListItemText>
+            </MenuItem>}
+            {!readOnly && 
+            <MenuItem onClick={func.clear_all}>
+                <ListItemIcon> <CancelOutlined fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
+                <ListItemText>Clear All</ListItemText>
+            </MenuItem>}
+           
+            <MenuItem onClick={func.zoom_in}>
+                <ListItemIcon> <ZoomIn fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
+                <ListItemText>Zoom In</ListItemText>
+            </MenuItem>
+            <MenuItem onClick={func.zoom_out}>
+                <ListItemIcon> <ZoomOut fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
+                <ListItemText>Zoom Out</ListItemText>
+            </MenuItem>
+            <MenuItem onClick={func.zoom_reset}>
+                <ListItemIcon> <CropFree fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
+                <ListItemText>Zoom Reset</ListItemText>
+            </MenuItem>
+            
+            {!readOnly && 
+            <MenuItem onClick={()=>func.move_selected("ArrowUp", 10)}>
+                <ListItemIcon> <ArrowUpward fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
+                <ListItemText>Move up</ListItemText>
+            </MenuItem>}
+            {!readOnly && 
+            <MenuItem onClick={()=>func.move_selected("ArrowDown", 10)}>
+                <ListItemIcon> <ArrowDownward fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
+                <ListItemText>Move down</ListItemText>
+            </MenuItem>}
+            {!readOnly && 
+            <MenuItem onClick={()=>func.move_selected("ArrowLeft", 10)}>
+                <ListItemIcon> <ArrowBack fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
+                <ListItemText>Move Left</ListItemText>
+            </MenuItem>}
+            {!readOnly && 
+            <MenuItem onClick={()=>func.move_selected("ArrowRight", 10)}>
+                <ListItemIcon> <ArrowForward fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
+                <ListItemText>Move Right</ListItemText>
+            </MenuItem>}
+            
+            <MenuItem onClick={func.show_label}>
+                <ListItemIcon> {labelVisibility?<LabelOff  fontSize='small' sx={{color:"var(--dark-color)"}}/>:<Label   fontSize='small' sx={{color:"var(--dark-color)"}}/>}</ListItemIcon>
+                <ListItemText>Label Visibility</ListItemText>
+            </MenuItem>
+            <MenuItem onClick={func.label_type}>
+                <ListItemIcon> <Style fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
+                <ListItemText>Label Type</ListItemText>
+            </MenuItem>
+            <MenuItem onClick={func.opacity_change}>
+                <ListItemIcon> <Opacity fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
+                <ListItemText>Opacity</ListItemText>
+            </MenuItem>
+            
+            <MenuItem onClick={func.show_help}>
+                <ListItemIcon> <HelpOutline fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
+                <ListItemText>Help</ListItemText>
+            </MenuItem>
+            <MenuItem onClick={func.show_history}>
+                <ListItemIcon> <History fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
+                <ListItemText>History</ListItemText>
+            </MenuItem>
+            
+            </Menu>
+          </Box>  
         </div>
     );
 };

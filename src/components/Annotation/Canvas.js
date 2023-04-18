@@ -789,8 +789,8 @@ const Canvas = ({data, readOnly}) => {
           />}
 
           <div style={{flex: 1}}></div>
-          <Button variant='contained' onClick={show_actions}>Action</Button>
-          <Button variant='outlined' color='inherit' onClick={goBack}>Cancle</Button>
+          <Button size='small' variant='contained' onClick={show_actions}>Action</Button>
+          <Button size='small' variant='outlined' color='inherit' onClick={goBack}>Cancle</Button>
           </Stack>
         </div>
         {/********************** working area **********************/}
