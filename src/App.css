@@ -146,6 +146,14 @@
   overflow: auto;
 }
 
+.drawing_area{
+  position: relative;
+  width: calc(100% - 20px);
+  height: calc(100% - 20px);
+  margin: 10px;
+  overflow: auto;
+}
+
 .content_panel{
   height: 100%;
   width: 100%;

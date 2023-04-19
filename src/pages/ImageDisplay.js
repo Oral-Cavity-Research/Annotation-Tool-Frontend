@@ -30,8 +30,8 @@ function ImageDisplay() {
             res.data.img = `https://s3-us-west-2.amazonaws.com/s.cdpn.io/150150/bug-${stringToSum(res.data._id)%18 + 1}.jpg`
             setData(res.data);
             setLoading(false);
-            if(res.data.status == "Review Requested"||
-            res.data.status == "Approved"){
+            if(res.data.status === "Review Requested"||
+            res.data.status === "Approved"){
                 setReadOnly(true);
             }
         }).catch(err=>{

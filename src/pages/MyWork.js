@@ -25,8 +25,8 @@ const MyWork = () => {
     return (
         <div className='body'>
         <div className='content'>
-            <Typography variant='h5'>{userData.username? userData.username:"My Work"}</Typography>
-            <Paper sx={{p:2}}>
+            <Typography variant='h5'textTransform='uppercase' >{userData.username? userData.username:"My Work"}</Typography>
+            <Paper sx={{p:2, my:2}}>
             <Stack direction='row' spacing={1}>
                 <NavButton path={"/mywork/images"} name={"Images"}>Images</NavButton>
                 <NavButton path={"/mywork/requests"} name={"Requests"}>Requests</NavButton>

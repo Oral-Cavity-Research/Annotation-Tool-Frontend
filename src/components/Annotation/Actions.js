@@ -65,10 +65,10 @@ function Actions({coordinates, data, unsaved, location, clinicalDiagnosis, lesio
                 <Avatar/>
                 <ArrowRight fontSize='large' color='disabled'/>
                 <Stack direction='column' spacing={2} sx={{width:'100%'}}>
-                    <TextField fullWidth size='small' placeholder='Title' onChange={(e)=>setTitle(e.target.value)}></TextField>
-                    <TextField fullWidth size='small' multiline rows={4} placeholder='Add an optional description' onChange={(e)=>setComment(e.target.value)}></TextField>
+                    <TextField fullWidth size='small' placeholder='Title' onChange={(e)=>setTitle(e.target.value)} inputProps={{ maxLength: 100 }}></TextField>
+                    <TextField fullWidth size='small' multiline rows={4} placeholder='Add an optional description' onChange={(e)=>setComment(e.target.value)} inputProps={{ maxLength: 1000 }}></TextField>
                     {
-                        (data.status === "New" || data.status === "Marked As Resolved" || data.status === "Reviewed") &&
+                        (data.status === "New" || data.status === "Marked As Resolved" || data.status === "Reviewed" || data.status === "Reopened") &&
                         <RadioGroup name="action" onChange={(e)=>setAction(e.target.value)}>
                             { changed() && <FormControlLabel value="Save" control={<Radio size='small' />} label="Save"/>}
                             <FormControlLabel value="Comment" control={<Radio size='small' />} label="Comment" />

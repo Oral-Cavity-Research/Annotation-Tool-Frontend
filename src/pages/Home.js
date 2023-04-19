@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {Stack, Divider, ListItem, ListItemText, ListItemButton, Typography, Paper} from '@mui/material';
 import {NavLink, Outlet } from 'react-router-dom';
 
@@ -21,8 +21,8 @@ const Home = () => {
     return (
         <div className='body'>
         <div className='content'>
-            <Typography variant='h5'>Home</Typography>
-            <Paper sx={{p:2}}>
+            <Typography variant='h5'textTransform='uppercase' >Home</Typography>
+            <Paper sx={{p:2, my:2}}>
             <Stack direction='row' spacing={1}>
                 <NavButton path={"/home/images"} name={"Images"}>Images</NavButton>
                 <NavButton path={"/home/requests"} name={"Requests"}>Requests</NavButton>

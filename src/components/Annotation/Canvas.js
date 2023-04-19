@@ -11,6 +11,7 @@ import { stringToColor } from '../Utils';
 import Actions from './Actions';
 import EditHistory from './EditHistory';
 import { Cancel, Close, ImageSearch, Label, SaveAs } from '@mui/icons-material';
+import SaveChanges from './SaveChanges';
 
 // global variables 
 // todo: check whether we could use useStates instead
@@ -363,7 +364,7 @@ const Canvas = ({data, readOnly}) => {
   }
 
   const deselect_all = (e) =>{
-    if (e.target.className !== 'page_body')  return;
+    if (e.target.className !== 'drawing_area')  return;
 
     if(selectedRegion){
       selectedRegion.isSelected = false;
@@ -496,10 +497,8 @@ const Canvas = ({data, readOnly}) => {
   // redraw the region ids
   const redraw_ids = () =>{
 
-    if(!labelVisibility){
-      // redraw_canvas()
-      return
-    } 
+    if(!labelVisibility) return;
+    
 
     var text, text_info, height, width;
 
@@ -748,10 +747,16 @@ const Canvas = ({data, readOnly}) => {
     });
 
     diff.forEach(region => {region.show(opacity)});
+    redraw_ids();
   }
 
   const goBack = ()=>{
-    navigate(-1)
+    if(changed.added?.length === 0 && changed.deleted?.length === 0){
+      navigate(-1);
+    }else{
+      setContent("");
+      setTogglePanel(true);
+    }
   }
 
   return (
@@ -820,11 +825,10 @@ const Canvas = ({data, readOnly}) => {
         {/********************** working area **********************/}
         <div className="work_area">
         <div className='drawing'>
-          <div style={{margin: '10px',position: 'relative'}}>
+          <div className='drawing_area'>
           <canvas className='main_canvas' onDoubleClick={(e)=>handle_mouse(e)} onMouseMove={(e)=>{handle_mouse(e)}} onMouseDown={(e)=>{handle_mouse(e)}} onMouseUp={(e)=>{handle_mouse(e)}} ref={canvaRef} width={size.width} height={size.height}>Sorry, Canvas functionality is not supported.</canvas>
   
           <img className="main_img" onLoad={(e)=>{get_dimensions(e)}}  width={size.width} height={size.height} src={data.img} alt="failed to load"/> 
-          
           </div>
         </div>
         {/******************** image annotation ************************/} 
@@ -871,13 +875,14 @@ const Canvas = ({data, readOnly}) => {
             {content === "Help" && <Help/>}
             {content === "Regions" && <RegionTable showPoints={showPoints}/>}
             {content === "Action" && <Actions 
-            setTogglePanel={setTogglePanel}
-            data={data} 
-            coordinates={coordinates} 
-            unsaved={changed.added?.length !== 0 || changed.deleted?.length !== 0}
-            location={location} clinicalDiagnosis={clinicalDiagnosis}  lesion={lesion}
+              setTogglePanel={setTogglePanel}
+              data={data} 
+              coordinates={coordinates} 
+              unsaved={changed.added?.length !== 0 || changed.deleted?.length !== 0}
+              location={location} clinicalDiagnosis={clinicalDiagnosis}  lesion={lesion}
             />}
             {content === "History" && <EditHistory image={data}/>}
+            {content === "" && <SaveChanges setContent={setContent}/>}
             {content === "Image Label" &&
             <div style={{padding:'10px'}}>
                 

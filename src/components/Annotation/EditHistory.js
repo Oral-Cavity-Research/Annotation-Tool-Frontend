@@ -1,20 +1,24 @@
 import React, {useEffect, useState} from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector} from 'react-redux';
-import {List,ListItem , ListItemAvatar, ListItemText, Skeleton, Stack, Typography} from '@mui/material';
+import {List,ListItem , ListItemAvatar,Skeleton, Stack, Typography} from '@mui/material';
 import Avatar from '@mui/material/Avatar';
-import { AddCircle, CheckCircle, Comment, QuestionMark, RateReview, Save } from '@mui/icons-material';
+import { CheckCircle, Comment, LockOpen,QuestionMark, RateReview, Save } from '@mui/icons-material';
 import axios from 'axios';
 import config from '../../config.json';
 import NotificationBar from '../NotificationBar';
 import dayjs from 'dayjs';
 
 const Icon = (name)=>{
-  if(name === "New") return <Avatar sx={{bgcolor: 'purple'}} ><AddCircle/></Avatar>
+  if(name === "New") return <Avatar sx={{bgcolor: 'black'}} ><LockOpen/></Avatar>
   else if(name === "Edited") return <Avatar sx={{bgcolor: 'orange'}} ><Save/></Avatar>
-  else if(name === "Commented") return <Avatar sx={{bgcolor: 'lightblue'}} ><Comment /></Avatar>
+  else if(name === "Commented") return <Avatar sx={{bgcolor:'blueviolet'}} ><Comment /></Avatar>
+  else if(name === "Marked As Resolved") return <Avatar sx={{bgcolor: 'blueviolet'}} ><CheckCircle/></Avatar>
   else if(name === "Approved") return <Avatar sx={{bgcolor: 'green'}} ><CheckCircle/></Avatar>
   else if(name === "Reviewed") return <Avatar sx={{bgcolor: 'red'}} ><RateReview/></Avatar>
+  else if(name === "Reopened") return <Avatar sx={{bgcolor: 'black'}} ><LockOpen/></Avatar>
+  else if(name === "Review Requested") return <Avatar sx={{bgcolor: 'green'}} ><QuestionMark/></Avatar>
+  else if(name === "Changes Requested") return <Avatar sx={{bgcolor: 'red'}} ><QuestionMark/></Avatar>
   else return <Avatar sx={{bgcolor: 'gray'}} ><QuestionMark/></Avatar>
 }
 
