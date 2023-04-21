@@ -27,7 +27,7 @@ function ImageDisplay() {
             },
             withCredentials: true
         }).then(res=>{
-            res.data.img = `https://s3-us-west-2.amazonaws.com/s.cdpn.io/150150/bug-${stringToSum(res.data._id)%18 + 1}.jpg`
+            res.data.img = `${config['image_path']}/${res.data.image_path}/${res.data.image_name}`
             setData(res.data);
             setLoading(false);
             if(res.data.status === "Review Requested"||
