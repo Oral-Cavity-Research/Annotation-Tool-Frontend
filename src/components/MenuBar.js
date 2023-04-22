@@ -12,11 +12,15 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import logo from '../Assets/note.png';
+import { useSelector} from 'react-redux';
+import config from '../config.json';
+import axios from 'axios';
 
 function MenuBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const navigate = useNavigate();
+  const userData = useSelector(state => state.data);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -34,7 +38,17 @@ function MenuBar() {
   };
 
   const handleLogout = ()=>{
-    navigate('/');
+    axios.post(`${config['path']}/auth/revokeToken`, {},
+    { headers: {
+      'Authorization': `Bearer ${userData.accessToken.token}`,
+      'email': userData.email,
+  },
+      withCredentials: true}
+    )
+    .then(()=>{
+      sessionStorage.removeItem("info")
+      navigate("/");
+    });
   };
 
   const handleGoToHome = ()=>{

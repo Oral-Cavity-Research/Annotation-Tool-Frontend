@@ -38,7 +38,7 @@ function App() {
   useEffect(() => {
     const interval = setInterval(() => {
       silentRefresh();
-  }, 1000*2*60*60);
+  }, 1000*1*60);
   
     return () => clearInterval(interval);
   }, [])
