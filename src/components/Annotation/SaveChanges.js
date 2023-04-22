@@ -16,7 +16,7 @@ function SaveChanges({setContent}) {
 
     return (
         <Stack direction='column' spacing={2} justifyContent='center' alignItems='center' sx={{my:5}}>
-            <Typography noWrap>You have unsaved changes, are you sure you want to leave?</Typography>
+            <Typography>You have unsaved changes, are you sure you want to leave?</Typography>
             <Stack direction='row' spacing={2}>
                 <Button variant='contained' color='primary' onClick={saveChanges}>Save</Button>
                 <Button variant='contained' color='error' onClick={goBack}>Leave</Button>

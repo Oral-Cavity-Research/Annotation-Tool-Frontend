@@ -76,8 +76,8 @@ function LoginPage() {
     return (
         <div className="App">
         <header className="App-header">
-            <Paper sx={{p:3}}>
-            <Box component="form" noValidate onSubmit={handleSignInSubmit} sx={{width:'400px'}}>
+            <Paper sx={{maxWidth:'400px', width:'100%'}}>
+            <Box component="form" noValidate onSubmit={handleSignInSubmit} sx={{p:3}}>
             <Stack direction='column' alignItems='center' spacing={2}>
             <img src={logo} className="App-logo" alt="logo" />
             <TextField margin="normal" size='small' inputProps={{ maxLength: 100 }} required fullWidth id="email" label="Email" name="email" autoComplete="email" autoFocus/>

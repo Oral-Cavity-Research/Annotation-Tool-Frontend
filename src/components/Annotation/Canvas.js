@@ -10,7 +10,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { stringToColor } from '../Utils';
 import Actions from './Actions';
 import EditHistory from './EditHistory';
-import { Cancel, Close, ImageSearch, Label, SaveAs } from '@mui/icons-material';
+import { Cancel, Close, ImageSearch, SaveAs, TextFields } from '@mui/icons-material';
 import SaveChanges from './SaveChanges';
 
 // global variables 
@@ -27,7 +27,7 @@ var isSelected = false;
 var isDrawing = true ;
 var polygon
 var canvas
-var ctx
+var ctx = null
 var selectedRegion
 
 // return points as Json
@@ -420,7 +420,7 @@ const Canvas = ({data, readOnly}) => {
 
   const handle_mouse = (e)=>{
 
-    if(readOnly) return;
+    if(readOnly || ctx == null) return;
   
     var rect = canvas.getBoundingClientRect();
 
@@ -520,42 +520,42 @@ const Canvas = ({data, readOnly}) => {
 
 
   // initial run
-  useEffect(() => {
+  const init_run = (initZoomLevel) => {
    
-  canvas = canvaRef.current;
-  ctx = canvas.getContext('2d');
+    canvas = canvaRef.current;
+    ctx = canvas.getContext('2d');
 
-  regions = [];
+    regions = [];
 
-  if(data){
-    [...data.annotation].forEach(region=>{
-      var type = region.name
-      polygon = new Polygon(ctx, stringToColor(type), type)
-      polygon.scale = zoomLevel;
-      var points = []
-      var oldAnnotations = region.annotations
-      for(var i=0; i< oldAnnotations.length; i+=2){
-        points.push(point(region.annotations[i], region.annotations[i+1]))
-      }
-      polygon.points = points
-      polygon.completed = true;
-      regions.push(polygon)    
-    })
-  }
+    if(data){
+      [...data.annotation].forEach(region=>{
+        var type = region.name
+        polygon = new Polygon(ctx, stringToColor(type), type)
+        polygon.scale = initZoomLevel;
+        var points = []
+        var oldAnnotations = region.annotations
+        for(var i=0; i< oldAnnotations.length; i+=2){
+          points.push(point(region.annotations[i], region.annotations[i+1]))
+        }
+        polygon.points = points
+        polygon.completed = true;
+        regions.push(polygon)    
+      })
+    }
 
-  polygon = new Polygon(ctx, defaultSettings.color, defaultSettings.type)
-  polygon.scale = zoomLevel;
-  regions.push(polygon)
+    polygon = new Polygon(ctx, defaultSettings.color, defaultSettings.type)
+    polygon.scale = initZoomLevel;
+    regions.push(polygon)
 
-  redraw_canvas()
-  redraw_ids()
-  check_changes();
+    redraw_canvas()
+    redraw_ids()
+    check_changes();
 
-  }, [data]);
+  };
 
   // redraw if canvas size changed
   useEffect(()=>{
-    if(size.height > 1  && size.width> 1){
+    if(ctx != null && size.height > 1  && size.width> 1){
       redraw_canvas()
       redraw_ids()
     }
@@ -563,7 +563,7 @@ const Canvas = ({data, readOnly}) => {
  
   // zoom in
   const zoom_in = ()=>{
-    if(zoomLevel > 4) return
+    if(zoomLevel > Math.pow(1.5, 3)) return
 
     setSize({
       width: orginalSize.width * zoomLevel *1.5,
@@ -579,7 +579,7 @@ const Canvas = ({data, readOnly}) => {
 
   // zoom out
   const zoom_out = ()=>{
-    if(zoomLevel < 0.25) return
+    if(zoomLevel < 1/Math.pow(1.5, 7)) return
 
     setSize({
       width: orginalSize.width * zoomLevel /1.5 ,
@@ -683,10 +683,28 @@ const Canvas = ({data, readOnly}) => {
       width: img.nativeEvent.srcElement.naturalWidth,
       height: img.nativeEvent.srcElement.naturalHeight,
     })
+  
+    var initZoomLevel = 1;
+
+    var image_w = img.nativeEvent.srcElement.naturalWidth
+    var window_w = window.screen.width
+
+    while(window_w < image_w){
+      image_w = image_w / 1.5
+      initZoomLevel = initZoomLevel / 1.5
+    } 
+
+    if(initZoomLevel < 1/Math.pow(1.5, 7)){
+      initZoomLevel = 1/Math.pow(1.5, 7)
+    }
+
     setSize({
-      width: img.nativeEvent.srcElement.naturalWidth,
-      height: img.nativeEvent.srcElement.naturalHeight,
-    })
+      width: img.nativeEvent.srcElement.naturalWidth * initZoomLevel,
+      height: img.nativeEvent.srcElement.naturalHeight * initZoomLevel
+    });
+
+    setZoomLevel(initZoomLevel);
+    init_run(initZoomLevel);
   }
 
   // clear all regions
@@ -700,6 +718,9 @@ const Canvas = ({data, readOnly}) => {
   }
 
   const show_diff = ()=>{
+
+    if(ctx == null) return;
+
     ctx.clearRect(0,0, canvas.width, canvas.height);
     
     var diff = [];
@@ -800,23 +821,19 @@ const Canvas = ({data, readOnly}) => {
               onClick={show_diff}
             />}
           </Box>
-          <Box sx={{display: { xs: 'block', sm: 'none' } }} >
-            {!readOnly && <IconButton onClick={show_diff} color={(changed.added?.length === 0 && changed.deleted?.length === 0)?
-                "success": "warning"}><ImageSearch/></IconButton>}
-          </Box>
 
           <div style={{flex: 1}}></div>
           <Box sx={{display: { xs: 'none', sm: 'block' } }} >
             <Stack direction='row' spacing={1}>
               <Button size='small' variant='contained' onClick={show_actions}>Action</Button>
-              <Button size='small' variant='outlined' color='inherit' onClick={goBack}>Cancle</Button>
+              <Button size='small' variant='outlined' color='inherit' onClick={goBack}>Close</Button>
             </Stack>
           </Box>
           <Box sx={{display: { xs: 'block', sm: 'none' } }} >
             <Stack direction='row' spacing={1}>
-              <IconButton size='small' onClick={show_image_annotations}><Label color='primary' /></IconButton>
-              <IconButton size='small' onClick={show_actions}><SaveAs/></IconButton>
-              <IconButton size='small' onClick={goBack}><Cancel/></IconButton>
+              <IconButton size='small' onClick={show_image_annotations}><TextFields color='primary' /></IconButton>
+              <IconButton size='small' onClick={show_actions}><SaveAs color='warning'/></IconButton>
+              <IconButton size='small' onClick={goBack}><Cancel color='error'/></IconButton>
             </Stack>
           </Box>
 
@@ -863,7 +880,7 @@ const Canvas = ({data, readOnly}) => {
           togglePanel &&
           <Box className='content_panel'>
            
-            <div className='top_bar sticky'>
+            <div className='top_bar'>
             
             <Stack direction='row' sx={{width:'100%', paddingInline:'10px'}} justifyContent='space-between' alignItems='center' spacing={1}>
               <Typography noWrap variant='h5' sx={{width:'200px'}}>{content}</Typography>
@@ -871,6 +888,7 @@ const Canvas = ({data, readOnly}) => {
             </Stack>
             
             </div>
+            <div className='content_area'>
             <Box sx={{p:2}}>
             {content === "Help" && <Help/>}
             {content === "Regions" && <RegionTable showPoints={showPoints}/>}
@@ -909,6 +927,7 @@ const Canvas = ({data, readOnly}) => {
             </div>
             }
             </Box>
+            </div>
           </Box>
         }
     </div>

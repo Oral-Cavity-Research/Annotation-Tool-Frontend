@@ -45,7 +45,6 @@ export default function EditHistory({image}) {
     }).then(res=>{
         setData(res.data);
         setLoading(false);
-        console.log(res.data);
     }).catch(err=>{
         if(err.response) showMsg(err.response.data.message, "error")
         else alert(err)

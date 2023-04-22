@@ -36,10 +36,12 @@ function App() {
   }
 
   useEffect(() => {
-    setTimeout(() => {
+    const interval = setInterval(() => {
       silentRefresh();
-    }, 1000*60*2);
-  });
+  }, 1000*2*60*60);
+  
+    return () => clearInterval(interval);
+  }, [])
 
   const router = createBrowserRouter(
     createRoutesFromElements(

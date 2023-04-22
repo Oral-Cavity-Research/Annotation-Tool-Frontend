@@ -39,7 +39,7 @@ export default function Approved() {
                 },
                 withCredentials: true
             }).then(res=>{
-                if(res.data?.length < 20) setNoMore(true);
+                if(res.data?.length < 18) setNoMore(true);
                 setData([...data, ...res.data]);
                 setPage(page+1);
             }).catch(err=>{
@@ -57,7 +57,7 @@ export default function Approved() {
                 },
                 withCredentials: true
             }).then(res=>{
-                if(res.data?.length < 20) setNoMore(true);
+                if(res.data?.length < 18) setNoMore(true);
                 setData([...data, ...res.data]);
                 setPage(page+1);
             }).catch(err=>{
@@ -82,7 +82,7 @@ export default function Approved() {
                 },
                 withCredentials: true
             }).then(res=>{
-                if(res.data?.length < 20) setNoMore(true);
+                if(res.data?.length < 18) setNoMore(true);
                 setData(res.data);
             }).catch(err=>{
                 if(err.response) showMsg(err.response.data?.message, "error")
@@ -99,7 +99,7 @@ export default function Approved() {
                 },
                 withCredentials: true
             }).then(res=>{
-                if(res.data?.length < 20) setNoMore(true);
+                if(res.data?.length < 18) setNoMore(true);
                 setData(res.data);
             }).catch(err=>{
                 if(err.response) showMsg(err.response.data?.message, "error")
@@ -118,7 +118,7 @@ export default function Approved() {
   return (
     <>
     {
-      loading?
+      (loading && data.length === 0)?
       <Stack direction='column' spacing={2} sx={{my:5}}>
         <Skeleton variant='rounded' width={'100%'} height={70} />
         <Skeleton variant='rounded' width={'100%'} height={70} />

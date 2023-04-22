@@ -8,7 +8,6 @@ import NotificationBar from '../components/NotificationBar';
 import axios from 'axios';
 import config from '../config.json';
 import { StyledMenu } from '../components/StyledMenu';
-import { stringToSum } from '../components/Utils';
 
 function Images() {
 
@@ -69,7 +68,7 @@ function Images() {
                 },
                 withCredentials: true
             }).then(res=>{
-                if(res.data?.length < 20) setNoMore(true);
+                if(res.data?.length < 18) setNoMore(true);
                 setData([...data, ...res.data]);
                 setPage(page+1);
             }).catch(err=>{
@@ -87,7 +86,7 @@ function Images() {
                 },
                 withCredentials: true
             }).then(res=>{
-                if(res.data?.length < 20) setNoMore(true);
+                if(res.data?.length < 18) setNoMore(true);
                 setData([...data, ...res.data]);
                 setPage(page+1);
             }).catch(err=>{
@@ -112,7 +111,7 @@ function Images() {
                 },
                 withCredentials: true
             }).then(res=>{
-                if(res.data?.length < 20) setNoMore(true);
+                if(res.data?.length < 18) setNoMore(true);
                 setData(res.data);
             }).catch(err=>{
                 if(err.response) showMsg(err.response.data.message, "error")
@@ -129,7 +128,7 @@ function Images() {
                 },
                 withCredentials: true
             }).then(res=>{
-                if(res.data?.length < 20) setNoMore(true);
+                if(res.data?.length < 18) setNoMore(true);
                 setData(res.data);
             }).catch(err=>{
                 if(err.response) showMsg(err.response.data.message, "error")
@@ -199,7 +198,7 @@ function Images() {
             {filtOptions.map((item,index)=>{ return(<MenuItem key={index} onClick={()=>handleFilter(item)}>{item}</MenuItem>)})}
         </StyledMenu>
         {
-            loading?
+            (loading && data.length === 0)?
             <Grid container spacing={{ xs: 2, md: 3 }}>
             {Array.from(Array(12)).map((_, index) => (
             <Grid item xs={6} sm={3} md={2} key={index}>

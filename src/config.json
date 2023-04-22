@@ -1,12 +1,12 @@
 {
-    "//path":"http://localhost:5000/api",
-    "//image_path":"http://localhost:5000/Storage/images",
-    "//report_path":"http://localhost:5000/Storage/reports",
-    "//consentform_path":"http://localhost:5000/Storage/consentform",
+    "path":"http://localhost:5000/api",
+    "image_path":"http://localhost:5000/Storage/images",
+    "report_path":"http://localhost:5000/Storage/reports",
+    "consentform_path":"http://localhost:5000/Storage/consentform",
     
     
-    "path":"https://10.40.184.8:5050/api",
-    "image_path":"https://10.40.184.8:5050/Storage/images",
-    "report_path":"https://10.40.184.8:5050/Storage/reports",
-    "consentform_path":"https://10.40.184.8:5050/Storage/consentform"
+    "//path":"https://10.40.184.8:5050/api",
+    "//image_path":"https://10.40.184.8:5050/Storage/images",
+    "//report_path":"https://10.40.184.8:5050/Storage/reports",
+    "//consentform_path":"https://10.40.184.8:5050/Storage/consentform"
 }

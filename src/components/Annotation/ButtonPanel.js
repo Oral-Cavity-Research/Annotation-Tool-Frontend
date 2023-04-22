@@ -1,5 +1,5 @@
 import React from 'react';
-import {IconButton,Tooltip, Box, Menu, MenuItem, ListItemIcon, ListItemText} from '@mui/material';
+import {IconButton,Tooltip, Box, Menu, MenuItem, ListItemIcon, ListItemText, Divider} from '@mui/material';
 import {Preview,ZoomIn,CropFree,ZoomOut,Close, CancelOutlined, HelpOutline, Style} from '@mui/icons-material';
 import {ArrowUpward, ArrowDownward, ArrowBack, ArrowForward, Opacity, Check} from '@mui/icons-material';
 import {Label, LabelOff, History} from '@mui/icons-material';
@@ -77,10 +77,6 @@ const ButtonPanel = ({func, labelVisibility, readOnly}) => {
               }}
             >
               
-            <MenuItem onClick={func.show_regions}>
-                <ListItemIcon> <Preview fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
-                <ListItemText>Show Regions</ListItemText>
-            </MenuItem>
             {!readOnly && 
             <MenuItem onClick={func.finish_drawing}>
                 <ListItemIcon> <Check fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
@@ -91,12 +87,8 @@ const ButtonPanel = ({func, labelVisibility, readOnly}) => {
                 <ListItemIcon> <Close fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
                 <ListItemText>Delete Selected</ListItemText>
             </MenuItem>}
-            {!readOnly && 
-            <MenuItem onClick={func.clear_all}>
-                <ListItemIcon> <CancelOutlined fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
-                <ListItemText>Clear All</ListItemText>
-            </MenuItem>}
-           
+            
+            <Divider/>
             <MenuItem onClick={func.zoom_in}>
                 <ListItemIcon> <ZoomIn fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
                 <ListItemText>Zoom In</ListItemText>
@@ -109,7 +101,8 @@ const ButtonPanel = ({func, labelVisibility, readOnly}) => {
                 <ListItemIcon> <CropFree fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
                 <ListItemText>Zoom Reset</ListItemText>
             </MenuItem>
-            
+
+            <Divider/>
             {!readOnly && 
             <MenuItem onClick={()=>func.move_selected("ArrowUp", 10)}>
                 <ListItemIcon> <ArrowUpward fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
@@ -130,7 +123,8 @@ const ButtonPanel = ({func, labelVisibility, readOnly}) => {
                 <ListItemIcon> <ArrowForward fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
                 <ListItemText>Move Right</ListItemText>
             </MenuItem>}
-            
+
+            <Divider/>
             <MenuItem onClick={func.show_label}>
                 <ListItemIcon> {labelVisibility?<LabelOff  fontSize='small' sx={{color:"var(--dark-color)"}}/>:<Label   fontSize='small' sx={{color:"var(--dark-color)"}}/>}</ListItemIcon>
                 <ListItemText>Label Visibility</ListItemText>
@@ -143,7 +137,19 @@ const ButtonPanel = ({func, labelVisibility, readOnly}) => {
                 <ListItemIcon> <Opacity fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
                 <ListItemText>Opacity</ListItemText>
             </MenuItem>
-            
+
+            <Divider/>
+            <MenuItem onClick={func.show_regions}>
+                <ListItemIcon> <Preview fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
+                <ListItemText>Show Regions</ListItemText>
+            </MenuItem>
+            {!readOnly && 
+            <MenuItem onClick={func.clear_all}>
+                <ListItemIcon> <CancelOutlined fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
+                <ListItemText>Clear All</ListItemText>
+            </MenuItem>}
+
+            <Divider/>
             <MenuItem onClick={func.show_help}>
                 <ListItemIcon> <HelpOutline fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
                 <ListItemText>Help</ListItemText>
@@ -154,6 +160,7 @@ const ButtonPanel = ({func, labelVisibility, readOnly}) => {
             </MenuItem>
             
             </Menu>
+            {!readOnly && <Tooltip enterNextDelay={1000} title="Finish Drawing" placement="bottom-end" arrow><IconButton size='small' onClick={func.finish_drawing}><Check  fontSize='small' sx={{color:"var(--dark-color)"}}/></IconButton></Tooltip>}
           </Box>  
         </div>
     );
