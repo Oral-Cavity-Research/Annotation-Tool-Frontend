@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
+import {useNavigate } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -15,18 +15,31 @@ import logo from '../Assets/note.png';
 import { useSelector} from 'react-redux';
 import config from '../config.json';
 import axios from 'axios';
+import { Badge, Divider, ListItem, ListItemAvatar, ListItemIcon, ListItemText, Stack } from '@mui/material';
+import { Logout, Notifications, QuestionMark, RateReview } from '@mui/icons-material';
 
 function MenuBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
-  const navigate = useNavigate();
+  const [anchorElNotification, setAnchorElNotification] = React.useState(null);
+  const [data, setData] = React.useState({});
   const userData = useSelector(state => state.data);
+  const navigate = useNavigate();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
+
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
+  };
+
+  const handleOpenNotification = (event) => {
+    setAnchorElNotification(event.currentTarget);
+  };
+
+  const handleCloseNotification = () => {
+    setAnchorElNotification(null);
   };
 
   const handleCloseNavMenu = () => {
@@ -58,6 +71,34 @@ function MenuBar() {
   const handleGoToMyWork = ()=>{
     navigate('/mywork');
   };
+
+  const handleGoToOptions = ()=>{
+    navigate('/options');
+  };
+
+  const goToImages = ()=>{
+    navigate('/mywork/images');
+    handleCloseNotification();
+  }
+
+  const goToRequests = ()=>{
+    navigate('/home/requests');
+    handleCloseNotification();
+  }
+
+  React.useEffect(()=>{
+    axios.get(`${config['path']}/image/notification`,{
+      headers: {
+          'Authorization': `Bearer ${userData.accessToken.token}`,
+          'email': userData.email,
+      },
+      withCredentials: true
+    }).then(res=>{
+        setData(res.data);
+    }).catch(err=>{
+        console.log(err)
+    })
+  },[])
 
   return (
     <AppBar position="fixed" sx={{background:'var(--dark-color)'}}>
@@ -102,44 +143,87 @@ function MenuBar() {
               <MenuItem onClick={handleGoToMyWork}>
                 <Typography textAlign="center">My Work</Typography>
               </MenuItem>
+              <MenuItem onClick={handleGoToOptions}>
+                <Typography textAlign="center">Options</Typography>
+              </MenuItem>
             </Menu>
           </Box>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
            
             <Button onClick={handleGoToHome} sx={{ my: 2, color: 'white', display: 'block' }}>Home</Button>
             <Button onClick={handleGoToMyWork} sx={{ my: 2, color: 'white', display: 'block' }}>My Work</Button>
+            <Button onClick={handleGoToOptions} sx={{ my: 2, color: 'white', display: 'block' }}>Options</Button>
          
           </Box>
 
-          <Box sx={{ flexGrow: 0 }}>
-            
+          <Stack direction='row' alignItems='flex-end' justifyContent='center' spacing={3}>
+              
+              <IconButton size='small' onClick={handleOpenNotification}>
+                <Badge color='error' badgeContent={(data.changes || data.reviews)? data.changes + data.reviews: 0}>
+                  <Notifications color='secondary' />
+                </Badge>
+              </IconButton>
+              <Menu
+                sx={{ mt: '35px' }}
+                id="notification-bar"
+                PaperProps={{style:{minWidth:'200px', maxWidth:'300px'}}}
+                anchorEl={anchorElNotification}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(anchorElNotification)}
+                onClose={handleCloseNotification}
+              >
+                
+                <MenuItem onClick={goToRequests}>
+                    <ListItemAvatar><Badge color='error' max={999} badgeContent={data.reviews > 0? data.reviews:0}><RateReview color='success'/></Badge></ListItemAvatar>
+                    <ListItemText primary="Review Requests" secondary={<Typography variant='body2' color='text.secondary' noWrap>{data.reviews > 0? `${data.reviews} image${data.reviews>1?'s':''} need review requests`:'No review requested'}</Typography>} />
+                </MenuItem>
+                <MenuItem onClick={goToImages}>
+                    <ListItemAvatar><Badge color='error' max={999} badgeContent={data.changes > 0? data.changes:0}><QuestionMark color='error' /></Badge></ListItemAvatar>
+                    <ListItemText primary="Changes Requests" secondary={<Typography variant='body2' color='text.secondary' noWrap>{data.changes > 0? `${data.changes} image${data.changes>1?'s':''} need changes`:'No changes requested'}</Typography>}/>
+                </MenuItem>
+                
+              </Menu>
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                <Avatar>{userData.username?userData.username[0]:""}</Avatar>
               </IconButton>
            
-            <Menu
-              sx={{ mt: '45px' }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              
-              <MenuItem onClick={handleLogout}>
-                <Typography textAlign="center">Logout</Typography>
-              </MenuItem>
-              
-            </Menu>
-          </Box>
+              <Menu
+                sx={{ mt: '35px'}}
+                PaperProps={{style:{minWidth:'200px', maxWidth:'300px'}}}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                
+                <MenuItem>
+                  <Typography noWrap><b>{userData.username}</b></Typography>
+                </MenuItem>
+                <Divider/>
+                <MenuItem onClick={handleLogout}>
+                  <ListItemIcon><Logout/></ListItemIcon>
+                  <ListItemText>Logout</ListItemText>
+                </MenuItem>
+                
+              </Menu>
+          </Stack>
         </Toolbar>
       </Container>
     </AppBar>

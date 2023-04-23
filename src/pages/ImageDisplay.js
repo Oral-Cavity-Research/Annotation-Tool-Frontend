@@ -7,7 +7,6 @@ import NotificationBar from '../components/NotificationBar';
 import axios from 'axios';
 import config from '../config.json';
 import ImageIcon from '@mui/icons-material/Image';
-import { stringToSum } from '../components/Utils';
 
 function ImageDisplay() {
 
@@ -15,10 +14,19 @@ function ImageDisplay() {
     const [data, setData] = useState({});
     const [loading, setLoading] = useState(true);
     const [status, setStatus] = useState({msg:"",severity:"success", open:false});
+    const [regions, setRegions] = useState([]);
+    const [locations, setLocations] = useState([]);
+    const [diagnosis, setDiagnosis] = useState([]);
     const [readOnly, setReadOnly] = useState(false);
     const userData = useSelector(state => state.data);
 
+
     useEffect(()=>{
+        getData();
+        getOptions();
+    },[])
+
+    const getData = ()=>{
         setLoading(true);
         axios.get(`${config['path']}/image/data/${id}`,{
             headers: {
@@ -38,8 +46,40 @@ function ImageDisplay() {
             if(err.response) showMsg(err.response.data.message, "error")
             else alert(err)
         })
+    }
 
-    },[])
+    const getOptions = ()=>{
+        axios.post(`${config['path']}/option/get`,
+        {
+            option_names:["regions","diagnosis","locations"]
+        },
+        {
+            headers: {
+                'Authorization': `Bearer ${userData.accessToken.token}`,
+                'email': userData.email,
+            },
+            withCredentials: true
+        }).then(res=>{
+            var option1 = res.data.find(item=>item.name=="regions");
+            // var option2 = res.data.find(item=>item.name=="locations");
+            // var option3 = res.data.find(item=>item.name=="diagnosis");
+            if(option1) {
+                option1 = option1.options.filter(item => item.active);
+                setRegions(option1);
+            }
+            // if(option2){
+            //     option2 = option2.options.filter(item => item.active);
+            //     setLocations(option2);
+            // }
+            // if(option3){
+            //     option3 = option3.options.filter(item => item.active);
+            //     setDiagnosis(option3);
+            // }
+        }).catch(err=>{
+            if(err.response) showMsg(err.response.data.message, "error")
+            else alert(err)
+        })
+    }
 
     const showMsg = (msg, severity)=>{
         setStatus({msg, severity, open:true})
@@ -48,14 +88,14 @@ function ImageDisplay() {
     return (
         <div>
             <Box className='body'>
-                {loading? 
+                {(loading || regions.length === 0)? 
                 <Box sx={{ display: 'flex', justifyContent:'center', alignItems:'center', height:'100%' }}>
                 <Box sx={{position: 'relative'}}>
                     <ImageIcon fontSize='large' color='disabled' className='center'/>
                     <CircularProgress size={100}/>
                 </Box>
                 </Box>
-                :<Canvas data={data} readOnly={readOnly} />}
+                :<Canvas data={data} readOnly={readOnly} regionNames={regions} diagnosis={diagnosis} locations={locations}/>}
             </Box>
             {/* <Box className='body' sx={{display: { xs: 'block', sm: 'none' } }} >
                 <Box sx={{ display: 'flex', justifyContent:'center', alignItems:'center', height:'100%' }}>

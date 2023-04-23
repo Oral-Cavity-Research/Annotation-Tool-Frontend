@@ -14,6 +14,7 @@ import Requests from './pages/Requests';
 import Approved from './pages/Approved';
 import './App.css';
 import MyWork from './pages/MyWork';
+import Options from './pages/Options';
 
 function App() { 
   const dispatch = useDispatch();
@@ -38,7 +39,7 @@ function App() {
   useEffect(() => {
     const interval = setInterval(() => {
       silentRefresh();
-  }, 1000*1*60);
+  }, 1000*2*60);
   
     return () => clearInterval(interval);
   }, [])
@@ -62,6 +63,7 @@ function App() {
             <Route path='/mywork/approved' element={<Approved/>}/>
           </Route>
           <Route path='/image/:id' element={<ImageDisplay/>}/>
+          <Route path='/options' element={<Options/>}/>
         </Route>
         <Route path='/*' element={<NotFoundPage/>}/>
       </Route>

@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {Box, Button, ButtonBase, Chip, IconButton, Menu, Select, Stack, Typography} from '@mui/material';
+import {Box, Button, ButtonBase, Chip, Divider, IconButton, Menu, Select, Stack, TextField, Typography} from '@mui/material';
 import RegionTable from './RegionTable';
 import Help from './Help';
 import ButtonPanel from './ButtonPanel';
@@ -10,15 +10,12 @@ import MenuItem from '@mui/material/MenuItem';
 import { stringToColor } from '../Utils';
 import Actions from './Actions';
 import EditHistory from './EditHistory';
-import { Cancel, Close, ImageSearch, SaveAs, TextFields } from '@mui/icons-material';
+import { Cancel, Close, SaveAs, TextFields} from '@mui/icons-material';
 import SaveChanges from './SaveChanges';
 
 // global variables 
 // todo: check whether we could use useStates instead
-const regionNames = ["Oral Cavity", "Teeth","Enemal","Hard Plate","Mole","Soft Plate","Tongue","Stain","Uvula","Gingiva","Lips"]
-const diagnosis =["Normal","OLP / LR", "OSMF/OSF","VBD", "RAU","MRG","FEP","PVL","SLE","OFG","OCA"]
-const locations = ["Lips","Upper labial mucosa","Lower labial mucosa","L/S Buccal mucosa","R/S Buccal mucosa",
-"Palate","Tongue-dorsum","Tongue-ventral","Alveolar ridge","Gingiva","Flour of the mouth"]
+
 
 const mouse = {x : 0, y : 0, button : 0, cursor: 'crosshair'};
 var regions = []
@@ -151,14 +148,14 @@ class Polygon{
   }
 }
 
-const Canvas = ({data, readOnly}) => {  
+const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {  
   
   const [size, setSize] = useState({width: 1, height:1})
   const [orginalSize, setOriginalSize] = useState({width: 1, height:1})
   const [showPoints, setShowPoints] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [labelType, setLabelType] = useState("name");
-  const [defaultSettings, setDefaultSettings] = useState({type:"Oral Cavity", color: stringToColor("Oral Cavity") });
+  const [defaultSettings, setDefaultSettings] = useState({type:regionNames[0].label, color: stringToColor(regionNames[0].label) });
   const [togglePanel, setTogglePanel] = useState(false);
   const [opacity, setOpacity] = useState(true);
   const [coordinates, setCoordinates] = useState([]);
@@ -180,7 +177,7 @@ const Canvas = ({data, readOnly}) => {
   const handleMenuItemClick = (event, index) => {
     setSelectedIndex(index);
     setAnchorEl(null);
-    set_types(regionNames[index]);
+    set_types(regionNames[index].label);
   };
 
   const handleMenuClose = () => {
@@ -790,20 +787,20 @@ const Canvas = ({data, readOnly}) => {
           <ButtonBase aria-controls="lock-menu" sx={{cursor:'pointer', textAlign:'left', bgcolor:'white',p:1,borderRadius:1}}
             aria-expanded={open ? 'true' : undefined} onClick={handleClickListItem}>
             
-            <div className='color_square' style={{backgroundColor:stringToColor(regionNames[selectedIndex])}}></div>
-            <Typography noWrap sx={{width:'100px'}}>{regionNames[selectedIndex]}</Typography>
+            <div className='color_square' style={{backgroundColor:stringToColor(regionNames[selectedIndex].label)}}></div>
+            <Typography noWrap sx={{width:'100px'}}>{regionNames[selectedIndex].label}</Typography>
           
         </ButtonBase>
 
           <Menu id="lock-menu" anchorEl={anchorEl} open={open} onClose={handleMenuClose}>
             {regionNames.map((option, index) => (
               <MenuItem
-                key={option}
+                key={option.label}
                 selected={index === selectedIndex}
                 onClick={(event) => handleMenuItemClick(event, index)}
                 sx={{width:'200px'}}
               >
-                <div className='color_square' style={{backgroundColor:stringToColor(option)}}></div>{option}
+                <div className='color_square' style={{backgroundColor:stringToColor(option.label)}}></div>{option.label}
               </MenuItem>
             ))}
           </Menu>
@@ -852,26 +849,43 @@ const Canvas = ({data, readOnly}) => {
         <Box className='right_bar' sx={{display: { xs: 'none', sm: 'block' } }}>
         <div style={{padding:'10px'}}>
                 
-          <Typography fontSize='small'>Location</Typography>
+          {/* <Typography fontSize='small'>Location</Typography> */}
         
-          <Select disabled={readOnly} fullWidth size='small' value={location} onChange={(e)=>setLocation(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
-            {locations.map((name, index) =>{
-              return (<MenuItem key={index} value={name}>{name}</MenuItem>)
+          {/* <Select disabled={readOnly} fullWidth size='small' value={location} onChange={(e)=>setLocation(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
+            {locations.map((item, index) =>{
+              return (<MenuItem key={index} value={item.value}>{item.label}</MenuItem>)
             })}
-          </Select>
+          </Select> */}
+          
         
-          <Typography fontSize='small'>Clinical Diagnosis</Typography>
-          <Select disabled={readOnly} fullWidth size='small' value={clinicalDiagnosis} onChange={(e)=>setClinicalDiagnosis(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
-            {diagnosis.map((name, index) =>{
-              return (<MenuItem key={index} value={name}>{name}</MenuItem>)
+          {/* <Typography fontSize='small'>Clinical Diagnosis</Typography> */}
+          {/* <Select disabled={readOnly} fullWidth size='small' value={clinicalDiagnosis} onChange={(e)=>setClinicalDiagnosis(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
+            {diagnosis.map((item, index) =>{
+              return (<MenuItem key={index} value={item.value}>{item.label}</MenuItem>)
             })}
-          </Select>
-
+          </Select> */}
+          
           <Typography fontSize='small'>Lesion Present</Typography>
           <Select disabled={readOnly} fullWidth size='small'  value={lesion} onChange={(e)=>setLesion(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
               <MenuItem value={false}>False</MenuItem>
               <MenuItem value={true}>True</MenuItem>
           </Select>
+
+          <Box sx={{bgcolor:'white', borderRadius:1, p:1}}>
+          <Typography variant='body2'><b>Image Data</b></Typography>
+          <br/>
+          <Typography variant='body2' noWrap>Location:</Typography>
+          <Typography variant='body2' noWrap>{location}</Typography>
+          <br/>
+          <Typography variant='body2' noWrap>Clinical Diagnosis:</Typography>
+          <Typography variant='body2' noWrap>{clinicalDiagnosis}</Typography>
+          <br/>
+          <Typography variant='body2' noWrap>Category:</Typography>
+          <Typography variant='body2' noWrap>{data.category}</Typography>
+          <br/>
+          <Typography variant='body2' noWrap>Image Name:</Typography>
+          <Typography variant='body2' noWrap>{data.image_name}</Typography>
+          </Box>
           </div>
         </Box>
         </div>
@@ -904,26 +918,41 @@ const Canvas = ({data, readOnly}) => {
             {content === "Image Label" &&
             <div style={{padding:'10px'}}>
                 
-            <Typography fontSize='small'>Location</Typography>
+            {/* <Typography fontSize='small'>Location</Typography> */}
           
-            <Select disabled={readOnly} fullWidth size='small' value={location} onChange={(e)=>setLocation(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
-              {locations.map((name, index) =>{
-                return (<MenuItem key={index} value={name}>{name}</MenuItem>)
+            {/* <Select disabled={readOnly} fullWidth size='small' value={location} onChange={(e)=>setLocation(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
+              {locations.map((item, index) =>{
+                return (<MenuItem key={index} value={item.value}>{item.label}</MenuItem>)
               })}
-            </Select>
+            </Select> */}
           
-            <Typography fontSize='small'>Clinical Diagnosis</Typography>
-            <Select disabled={readOnly} fullWidth size='small' value={clinicalDiagnosis} onChange={(e)=>setClinicalDiagnosis(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
-              {diagnosis.map((name, index) =>{
-                return (<MenuItem key={index} value={name}>{name}</MenuItem>)
+            {/* <Typography fontSize='small'>Clinical Diagnosis</Typography> */}
+            {/* <Select disabled={readOnly} fullWidth size='small' value={clinicalDiagnosis} onChange={(e)=>setClinicalDiagnosis(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
+              {diagnosis.map((item, index) =>{
+                return (<MenuItem key={index} value={item.value}>{item.label}</MenuItem>)
               })}
-            </Select>
+            </Select> */}
   
             <Typography fontSize='small'>Lesion Present</Typography>
             <Select disabled={readOnly} fullWidth size='small'  value={lesion} onChange={(e)=>setLesion(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
                 <MenuItem value={false}>False</MenuItem>
                 <MenuItem value={true}>True</MenuItem>
             </Select>
+            <Box sx={{bgcolor:'#fbfbfb', borderRadius:1, p:1}}>
+              <Typography variant='body2'><b>Image Data</b></Typography>
+              <br/>
+              <Typography variant='body2' noWrap>Location:</Typography>
+              <Typography variant='body2' noWrap>{location}</Typography>
+              <br/>
+              <Typography variant='body2' noWrap>Clinical Diagnosis:</Typography>
+              <Typography variant='body2' noWrap>{clinicalDiagnosis}</Typography>
+              <br/>
+              <Typography variant='body2' noWrap>Category:</Typography>
+              <Typography variant='body2' noWrap>{data.category}</Typography>
+              <br/>
+              <Typography variant='body2' noWrap>Image Name:</Typography>
+              <Typography variant='body2' noWrap>{data.image_name}</Typography>
+            </Box>
             </div>
             }
             </Box>
