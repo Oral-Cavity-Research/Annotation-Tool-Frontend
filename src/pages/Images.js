@@ -5,7 +5,6 @@ import { FilterList } from '@mui/icons-material';
 import { useSelector} from 'react-redux';
 import NotificationBar from '../components/NotificationBar';
 import axios from 'axios';
-import config from '../config.json';
 import { StyledMenu } from '../components/StyledMenu';
 
 function Images() {
@@ -57,7 +56,7 @@ function Images() {
         setLoading(true);
         const path = window.location.pathname;
         if(path === "/mywork/images" || path === "/mywork"){
-            axios.get(`${config['path']}/image/mywork`,{
+            axios.get(`${process.env.REACT_APP_BE_URL}/image/mywork`,{
                 params: { page: page, filter: filt},
                 headers: {
                     'Authorization': `Bearer ${userData.accessToken.token}`,
@@ -73,7 +72,7 @@ function Images() {
                 setLoading(false);
             })
         }else{
-            axios.get(`${config['path']}/image/all`,{
+            axios.get(`${process.env.REACT_APP_BE_URL}/image/all`,{
                 params: { page: page, filter: filt},
                 headers: {
                     'Authorization': `Bearer ${userData.accessToken.token}`,
@@ -94,7 +93,7 @@ function Images() {
     const getCount = ()=>{
         const path = window.location.pathname;
         if(path === "/mywork/images" || path === "/mywork"){
-            axios.get(`${config['path']}/image/mywork/count`,{
+            axios.get(`${process.env.REACT_APP_BE_URL}/image/mywork/count`,{
                 params: {filter: filt},
                 headers: {
                     'Authorization': `Bearer ${userData.accessToken.token}`,
@@ -108,7 +107,7 @@ function Images() {
                 else alert(err)
             })
         }else{
-            axios.get(`${config['path']}/image/all/count`,{
+            axios.get(`${process.env.REACT_APP_BE_URL}/image/all/count`,{
                 params: {filter: filt},
                 headers: {
                     'Authorization': `Bearer ${userData.accessToken.token}`,
@@ -183,7 +182,7 @@ function Images() {
                     <Typography noWrap variant='body2'>{item.clinical_diagnosis}</Typography>
                 </Box> 
                 <div className='grid_item' onClick={()=>handleClick(item._id)} style={{
-                    backgroundImage:`url(${config['image_path']}/${item.image_path}/${item.image_name})`,
+                    backgroundImage:`url(${process.env.REACT_APP_IMAGE_PATH}/${item.REACT_APP_IMAGE_PATH}/${item.image_name})`,
                     backgroundRepeat: "no-repeat",
                     backgroundSize: "cover",
                     backgroundPosition: "center"
@@ -211,7 +210,7 @@ function Images() {
         { count === 0 ?
             <Typography sx={{m:3}} variant='body2' color='GrayText'>{loading?"":`No ${filt} Images`}</Typography>
                 :
-            <Pagination count={(Math.floor((count-1)/18)+1)} page={page} onChange={changePage}></Pagination>
+            <Pagination size='small' count={(Math.floor((count-1)/18)+1)} page={page} onChange={changePage}></Pagination>
         }
         </Stack>
         

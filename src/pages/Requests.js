@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import { useSelector} from 'react-redux';
 import {Avatar, Box, Pagination, Skeleton, Stack, Typography} from '@mui/material';
 import axios from 'axios';
-import config from '../config.json';
 import NotificationBar from '../components/NotificationBar';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
@@ -28,8 +27,8 @@ export default function Requests() {
     const getData = ()=>{
         setLoading(true);
         const path = window.location.pathname;
-        if(path === "/mywork/requests" || path === "/mywork"){
-            axios.get(`${config['path']}/image/mywork/requests`,{
+        if(path === "/mywork/requests"){
+            axios.get(`${process.env.REACT_APP_BE_URL}/image/mywork/requests`,{
                 params: { page: page},
                 headers: {
                     'Authorization': `Bearer ${userData.accessToken.token}`,
@@ -45,7 +44,7 @@ export default function Requests() {
                 setLoading(false);
             })
         }else{
-            axios.get(`${config['path']}/image/requests`,{
+            axios.get(`${process.env.REACT_APP_BE_URL}/image/requests`,{
                 params: { page: page},
                 headers: {
                     'Authorization': `Bearer ${userData.accessToken.token}`,
@@ -66,8 +65,8 @@ export default function Requests() {
 
     const getCount = ()=>{
         const path = window.location.pathname;
-        if(path === "/mywork/images" || path === "/mywork"){
-            axios.get(`${config['path']}/image/mywork/count`,{
+        if(path === "/mywork/requests"){
+            axios.get(`${process.env.REACT_APP_BE_URL}/image/mywork/count`,{
                 params: {filter: "Review Requested"},
                 headers: {
                     'Authorization': `Bearer ${userData.accessToken.token}`,
@@ -81,7 +80,7 @@ export default function Requests() {
                 else alert(err)
             })
         }else{
-            axios.get(`${config['path']}/image/all/count`,{
+            axios.get(`${process.env.REACT_APP_BE_URL}/image/all/count`,{
                 params: {filter: "Review Requested"},
                 headers: {
                     'Authorization': `Bearer ${userData.accessToken.token}`,
@@ -139,7 +138,7 @@ export default function Requests() {
         { count === 0 ?
             <Typography sx={{m:3}} variant='body2' color='GrayText'>{loading?"":`No Review Requested Images`}</Typography>
                 :
-            <Pagination count={(Math.floor((count-1)/18)+1)} page={page} onChange={changePage}></Pagination>
+            <Pagination size='small' count={(Math.floor((count-1)/18)+1)} page={page} onChange={changePage}></Pagination>
         }
     </Stack>
     <NotificationBar status={status} setStatus={setStatus}/>

@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import { useSelector} from 'react-redux';
 import {Avatar, Box, Pagination, Skeleton, Stack, Typography} from '@mui/material';
 import axios from 'axios';
-import config from '../config.json';
 import NotificationBar from '../components/NotificationBar';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
@@ -28,8 +27,8 @@ export default function Approved() {
     const getData = ()=>{
         setLoading(true);
         const path = window.location.pathname;
-        if(path === "/mywork/approved" || path === "/mywork"){
-            axios.get(`${config['path']}/image/mywork/approved`,{
+        if(path === "/mywork/approved"){
+            axios.get(`${process.env.REACT_APP_BE_URL}/image/mywork/approved`,{
                 params: { page: page},
                 headers: {
                     'Authorization': `Bearer ${userData.accessToken.token}`,
@@ -45,7 +44,7 @@ export default function Approved() {
                 setLoading(false);
             })
         }else{
-            axios.get(`${config['path']}/image/approved`,{
+            axios.get(`${process.env.REACT_APP_BE_URL}/image/approved`,{
                 params: { page: page},
                 headers: {
                     'Authorization': `Bearer ${userData.accessToken.token}`,
@@ -66,8 +65,8 @@ export default function Approved() {
 
     const getCount = ()=>{
         const path = window.location.pathname;
-        if(path === "/mywork/images" || path === "/mywork"){
-            axios.get(`${config['path']}/image/mywork/count`,{
+        if(path === "/mywork/approved"){
+            axios.get(`${process.env.REACT_APP_BE_URL}/image/mywork/count`,{
                 params: {filter: "Approved"},
                 headers: {
                     'Authorization': `Bearer ${userData.accessToken.token}`,
@@ -81,7 +80,7 @@ export default function Approved() {
                 else alert(err)
             })
         }else{
-            axios.get(`${config['path']}/image/all/count`,{
+            axios.get(`${process.env.REACT_APP_BE_URL}/image/all/count`,{
                 params: {filter: "Approved"},
                 headers: {
                     'Authorization': `Bearer ${userData.accessToken.token}`,
@@ -139,7 +138,7 @@ export default function Approved() {
         { count === 0 ?
             <Typography sx={{m:3}} variant='body2' color='GrayText'>{loading?"":`No Approved Images`}</Typography>
                 :
-            <Pagination count={(Math.floor((count-1)/18)+1)} page={page} onChange={changePage}></Pagination>
+            <Pagination size='small' count={(Math.floor((count-1)/18)+1)} page={page} onChange={changePage}></Pagination>
         }
     </Stack>
     <NotificationBar status={status} setStatus={setStatus}/>

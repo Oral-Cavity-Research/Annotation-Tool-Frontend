@@ -5,7 +5,6 @@ import {List,ListItem , ListItemAvatar,Skeleton, Stack, Typography} from '@mui/m
 import Avatar from '@mui/material/Avatar';
 import { CheckCircle, Comment, LockOpen,QuestionMark, RateReview, Save } from '@mui/icons-material';
 import axios from 'axios';
-import config from '../../config.json';
 import NotificationBar from '../NotificationBar';
 import dayjs from 'dayjs';
 
@@ -36,7 +35,7 @@ export default function EditHistory({image}) {
 
   useEffect(()=>{
     setLoading(true);
-    axios.get(`${config['path']}/image/action/${id}`,{
+    axios.get(`${process.env.REACT_APP_BE_URL}/image/action/${id}`,{
         headers: {
             'Authorization': `Bearer ${userData.accessToken.token}`,
             'email': userData.email,
