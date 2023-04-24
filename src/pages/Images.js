@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {Paper,Typography,Box, Grid, Stack, IconButton, MenuItem, Skeleton, Badge} from '@mui/material';
-import { LoadingButton } from '@mui/lab';
+import {Paper,Typography,Box, Grid, Stack, IconButton, MenuItem, Skeleton, Badge, Pagination} from '@mui/material';
 import { FilterList } from '@mui/icons-material';
 import { useSelector} from 'react-redux';
 import NotificationBar from '../components/NotificationBar';
@@ -19,7 +18,6 @@ function Images() {
     const [filt, setFilt] = useState("All");
     const [page, setPage] = useState(1);
     const [count, setCount] = useState(0);
-    const [noMore, setNoMore] = useState(false);
     const [filtOptions, setFlitOptions] = useState(["All"]);
 
     useEffect(()=>{
@@ -43,6 +41,7 @@ function Images() {
 
     const handleFilter = (name)=>{
         setFilt(name);
+        setPage(1);
         handleClose();
     }
 
@@ -54,64 +53,18 @@ function Images() {
         setStatus({msg, severity, open:true})
     }
 
-    const loadMore = () => {
-        setLoading(true);
-        setNoMore(false);
-
-        const path = window.location.pathname;
-        if(path === "/mywork/images" || path === "/mywork"){
-            axios.get(`${config['path']}/image/mywork`,{
-                params: { page: page + 1, filter: filt},
-                headers: {
-                    'Authorization': `Bearer ${userData.accessToken.token}`,
-                    'email': userData.email,
-                },
-                withCredentials: true
-            }).then(res=>{
-                if(res.data?.length < 18) setNoMore(true);
-                setData([...data, ...res.data]);
-                setPage(page+1);
-            }).catch(err=>{
-                if(err.response) showMsg(err.response.data.message, "error")
-                else alert(err)
-            }).finally(()=>{
-                setLoading(false);
-            })
-        }else{
-            axios.get(`${config['path']}/image/all`,{
-                params: { page: page + 1, filter: filt},
-                headers: {
-                    'Authorization': `Bearer ${userData.accessToken.token}`,
-                    'email': userData.email,
-                },
-                withCredentials: true
-            }).then(res=>{
-                if(res.data?.length < 18) setNoMore(true);
-                setData([...data, ...res.data]);
-                setPage(page+1);
-            }).catch(err=>{
-                if(err.response) showMsg(err.response.data.message, "error")
-                else alert(err)
-            }).finally(()=>{
-                setLoading(false);
-            })
-        }
-    };
-
     const getData = ()=>{
         setLoading(true);
-        setNoMore(false);
         const path = window.location.pathname;
         if(path === "/mywork/images" || path === "/mywork"){
             axios.get(`${config['path']}/image/mywork`,{
-                params: { page: 1, filter: filt},
+                params: { page: page, filter: filt},
                 headers: {
                     'Authorization': `Bearer ${userData.accessToken.token}`,
                     'email': userData.email,
                 },
                 withCredentials: true
             }).then(res=>{
-                if(res.data?.length < 18) setNoMore(true);
                 setData(res.data);
             }).catch(err=>{
                 if(err.response) showMsg(err.response.data.message, "error")
@@ -121,14 +74,13 @@ function Images() {
             })
         }else{
             axios.get(`${config['path']}/image/all`,{
-                params: { page: 1, filter: filt},
+                params: { page: page, filter: filt},
                 headers: {
                     'Authorization': `Bearer ${userData.accessToken.token}`,
                     'email': userData.email,
                 },
                 withCredentials: true
             }).then(res=>{
-                if(res.data?.length < 18) setNoMore(true);
                 setData(res.data);
             }).catch(err=>{
                 if(err.response) showMsg(err.response.data.message, "error")
@@ -171,11 +123,18 @@ function Images() {
             })
         }
     }  
-    
+
+    const changePage = (event, value) => {
+        setPage(value);
+    };
+
     useEffect(() => {
-        getData();
         getCount();
     }, [filt]);
+
+    useEffect(() => {
+        getData();
+    }, [page, filt]);
 
     return (
         <div>
@@ -249,10 +208,10 @@ function Images() {
         }
 
         <Stack direction='row' justifyContent='center' sx={{my:5}}>
-        { data.length > 0 ?
-            <LoadingButton disabled={noMore} loading={loading} sx={{mt:2}} onClick={loadMore}>Load More</LoadingButton>
-                :
+        { count === 0 ?
             <Typography sx={{m:3}} variant='body2' color='GrayText'>{loading?"":`No ${filt} Images`}</Typography>
+                :
+            <Pagination count={(Math.floor((count-1)/18)+1)} page={page} onChange={changePage}></Pagination>
         }
         </Stack>
         
