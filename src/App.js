@@ -4,6 +4,7 @@ import {createBrowserRouter, createRoutesFromElements, Route, RouterProvider , O
 import { useDispatch } from 'react-redux';
 import { trySilentRefresh } from './utils/authUtils';
 import { setUserData } from './Reducers/userDataSlice';
+import { useSelector} from 'react-redux';
 import LoginPage from './pages/LoginPage';
 import NotFoundPage from './pages/NotFoundPage';
 import Home from './pages/Home';
@@ -18,19 +19,14 @@ import Options from './pages/Options';
 
 function App() { 
   const dispatch = useDispatch();
+  const userData = useSelector(state => state.data);
 
   const silentRefresh = () => {
 
     trySilentRefresh().then(data => {
       if(data){
         dispatch(setUserData({
-          _id: data.ref._id,
-          username: data.ref.username,
-          email: data.ref.email,
-          roles: data.ref.role,
-          permissions: data.permissions,
-          accessToken: data.accessToken,
-          reg_no: data.ref.reg_no
+          ...userData, accessToken: data.accessToken
         }));
       }
     })

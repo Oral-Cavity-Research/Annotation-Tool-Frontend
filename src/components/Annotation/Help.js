@@ -13,9 +13,9 @@ const Help = () => {
             <tr>
                 <td><div className='key'>Esc</div></td><td> Cancle Drawing</td>
             </tr>
-            <tr>
+            {/* <tr>
                 <td><div className='key'>Space</div></td><td> Toggle Preview</td>
-            </tr>
+            </tr> */}
             <tr>
                 <td><div className='key'>Delete</div></td><td> Delete the Selected Region</td>
             </tr>

@@ -13,9 +13,8 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import logo from '../Assets/note.png';
 import { useSelector} from 'react-redux';
-import config from '../config.json';
 import axios from 'axios';
-import { Badge, Divider, ListItem, ListItemAvatar, ListItemIcon, ListItemText, Stack } from '@mui/material';
+import { Badge, Divider, ListItemAvatar, ListItemIcon, ListItemText, Stack } from '@mui/material';
 import { Logout, Notifications, QuestionMark, RateReview } from '@mui/icons-material';
 
 function MenuBar() {
@@ -51,7 +50,7 @@ function MenuBar() {
   };
 
   const handleLogout = ()=>{
-    axios.post(`${config['path']}/auth/revokeToken`, {},
+    axios.post(`${process.env.REACT_APP_BE_URL}/auth/revokeToken`, {},
     { headers: {
       'Authorization': `Bearer ${userData.accessToken.token}`,
       'email': userData.email,
@@ -65,14 +64,17 @@ function MenuBar() {
   };
 
   const handleGoToHome = ()=>{
+    handleCloseNavMenu()
     navigate('/home');
   };
 
   const handleGoToMyWork = ()=>{
+    handleCloseNavMenu()
     navigate('/mywork');
   };
 
   const handleGoToOptions = ()=>{
+    handleCloseNavMenu()
     navigate('/options');
   };
 
@@ -87,7 +89,7 @@ function MenuBar() {
   }
 
   React.useEffect(()=>{
-    axios.get(`${config['path']}/image/notification`,{
+    axios.get(`${process.env.REACT_APP_BE_URL}/image/notification`,{
       headers: {
           'Authorization': `Bearer ${userData.accessToken.token}`,
           'email': userData.email,
@@ -192,7 +194,7 @@ function MenuBar() {
                 
               </Menu>
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar>{userData.username?userData.username[0]:""}</Avatar>
+                <Avatar src={userData.picture} alt={userData.username?userData.username:""}></Avatar>
               </IconButton>
            
               <Menu

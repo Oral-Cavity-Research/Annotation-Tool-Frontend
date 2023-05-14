@@ -1,10 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import { useSelector} from 'react-redux';
-import {Avatar, Box, Skeleton, Stack, Typography} from '@mui/material';
+import {Avatar, Box, Pagination, Skeleton, Stack, Typography} from '@mui/material';
 import axios from 'axios';
-import config from '../config.json';
 import NotificationBar from '../components/NotificationBar';
-import { LoadingButton } from '@mui/lab';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,7 +12,7 @@ export default function Approved() {
     const [status, setStatus] = useState({msg:"",severity:"success", open:false});
     const [data, setData] = useState([]);
     const [page, setPage] = useState(1);
-    const [noMore, setNoMore] = useState(false);
+    const [count, setCount] = useState(0);
     const userData = useSelector(state => state.data);
     const navigate = useNavigate();
 
@@ -26,63 +24,18 @@ export default function Approved() {
         navigate("/image/"+index)
     }
 
-    const loadMore = () => {
-        setLoading(true);
-        setNoMore(false);
-        const path = window.location.pathname;
-        if(path === "/mywork/approved" || path === "/mywork"){
-            axios.get(`${config['path']}/image/mywork/approved`,{
-                params: { page: page + 1},
-                headers: {
-                    'Authorization': `Bearer ${userData.accessToken.token}`,
-                    'email': userData.email,
-                },
-                withCredentials: true
-            }).then(res=>{
-                if(res.data?.length < 18) setNoMore(true);
-                setData([...data, ...res.data]);
-                setPage(page+1);
-            }).catch(err=>{
-                if(err.response) showMsg(err.response.data.message, "error")
-                else alert(err)
-            }).finally(()=>{
-                setLoading(false);
-            })
-        }else{
-            axios.get(`${config['path']}/image/approved`,{
-                params: { page: page + 1},
-                headers: {
-                    'Authorization': `Bearer ${userData.accessToken.token}`,
-                    'email': userData.email,
-                },
-                withCredentials: true
-            }).then(res=>{
-                if(res.data?.length < 18) setNoMore(true);
-                setData([...data, ...res.data]);
-                setPage(page+1);
-            }).catch(err=>{
-                if(err.response) showMsg(err.response.data.message, "error")
-                else alert(err)
-            }).finally(()=>{
-                setLoading(false);
-            })
-        }
-    };
-
     const getData = ()=>{
         setLoading(true);
-        setNoMore(false);
         const path = window.location.pathname;
-        if(path === "/mywork/approved" || path === "/mywork"){
-            axios.get(`${config['path']}/image/mywork/approved`,{
-                params: { page: 1},
+        if(path === "/mywork/approved"){
+            axios.get(`${process.env.REACT_APP_BE_URL}/image/mywork/approved`,{
+                params: { page: page},
                 headers: {
                     'Authorization': `Bearer ${userData.accessToken.token}`,
                     'email': userData.email,
                 },
                 withCredentials: true
             }).then(res=>{
-                if(res.data?.length < 18) setNoMore(true);
                 setData(res.data);
             }).catch(err=>{
                 if(err.response) showMsg(err.response.data?.message, "error")
@@ -91,15 +44,14 @@ export default function Approved() {
                 setLoading(false);
             })
         }else{
-            axios.get(`${config['path']}/image/approved`,{
-                params: { page: 1},
+            axios.get(`${process.env.REACT_APP_BE_URL}/image/approved`,{
+                params: { page: page},
                 headers: {
                     'Authorization': `Bearer ${userData.accessToken.token}`,
                     'email': userData.email,
                 },
                 withCredentials: true
             }).then(res=>{
-                if(res.data?.length < 18) setNoMore(true);
                 setData(res.data);
             }).catch(err=>{
                 if(err.response) showMsg(err.response.data?.message, "error")
@@ -111,9 +63,50 @@ export default function Approved() {
         
     }  
 
+    const getCount = ()=>{
+        const path = window.location.pathname;
+        if(path === "/mywork/approved"){
+            axios.get(`${process.env.REACT_APP_BE_URL}/image/mywork/count`,{
+                params: {filter: "Approved"},
+                headers: {
+                    'Authorization': `Bearer ${userData.accessToken.token}`,
+                    'email': userData.email,
+                },
+                withCredentials: true
+            }).then(res=>{
+                setCount(res.data.count);
+            }).catch(err=>{
+                if(err.response) showMsg(err.response.data.message, "error")
+                else alert(err)
+            })
+        }else{
+            axios.get(`${process.env.REACT_APP_BE_URL}/image/all/count`,{
+                params: {filter: "Approved"},
+                headers: {
+                    'Authorization': `Bearer ${userData.accessToken.token}`,
+                    'email': userData.email,
+                },
+                withCredentials: true
+            }).then(res=>{
+                setCount(res.data.count);
+            }).catch(err=>{
+                if(err.response) showMsg(err.response.data.message, "error")
+                else alert(err)
+            })
+        }
+    }  
+
+    const changePage = (event, value) => {
+        setPage(value);
+    };
+
+    useEffect(() => {
+        getCount();
+    }, []);
+
     useEffect(() => {
         getData();
-    }, []);
+    }, [page]);
 
   return (
     <>
@@ -142,10 +135,10 @@ export default function Approved() {
     </Box>
     }
     <Stack direction='row' justifyContent='center' sx={{my:5}}>
-        { data.length > 0 ?
-            <LoadingButton disabled={noMore} loading={loading} sx={{mt:2}} onClick={loadMore}>Load More</LoadingButton>
+        { count === 0 ?
+            <Typography sx={{m:3}} variant='body2' color='GrayText'>{loading?"":`No Approved Images`}</Typography>
                 :
-            <Typography sx={{m:3}} variant='body2' color='GrayText'>{loading?"":"No Approved Images"}</Typography>
+            <Pagination size='small' count={(Math.floor((count-1)/18)+1)} page={page} onChange={changePage}></Pagination>
         }
     </Stack>
     <NotificationBar status={status} setStatus={setStatus}/>

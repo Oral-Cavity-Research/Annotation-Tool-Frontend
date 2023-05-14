@@ -4,7 +4,6 @@ import { LoadingButton } from '@mui/lab';
 import { useSelector} from 'react-redux';
 import NotificationBar from '../components/NotificationBar';
 import axios from 'axios';
-import config from '../config.json';
 
 const Options = () => {
     const [status, setStatus] = useState({msg:"",severity:"success", open:false});
@@ -18,7 +17,7 @@ const Options = () => {
 
     const getData = ()=>{
         setLoading(true);
-        axios.get(`${config['path']}/option/${value}`,
+        axios.get(`${process.env.REACT_APP_BE_URL}/option/${value}`,
         {
             headers: {
                 'Authorization': `Bearer ${userData.accessToken.token}`,
@@ -55,7 +54,7 @@ const Options = () => {
 
         setState(1);
 
-        axios.post(`${config['path']}/option/add/${value}`,
+        axios.post(`${process.env.REACT_APP_BE_URL}/option/add/${value}`,
         {
             label, description
         },
@@ -104,7 +103,7 @@ const Options = () => {
         }
 
         setState(2);
-        axios.post(`${config['path']}/option/update/${value}`,
+        axios.post(`${process.env.REACT_APP_BE_URL}/option/update/${value}`,
         {
             options: updatedOptions 
         },

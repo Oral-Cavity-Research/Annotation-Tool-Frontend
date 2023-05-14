@@ -5,7 +5,6 @@ import {LoadingButton} from '@mui/lab';
 import { useSelector} from 'react-redux';
 import NotificationBar from '../NotificationBar';
 import axios from 'axios';
-import config from '../../config.json';
 
 function Actions({coordinates, data, unsaved, location, clinicalDiagnosis, lesion, setTogglePanel}) {
 
@@ -23,7 +22,7 @@ function Actions({coordinates, data, unsaved, location, clinicalDiagnosis, lesio
     const handleAction = ()=>{
         setLoading(true);
     
-        axios.post(`${config['path']}/image/annotate/${data._id}`,
+        axios.post(`${process.env.REACT_APP_BE_URL}/image/annotate/${data._id}`,
         {
             location:location,
             clinical_diagnosis:clinicalDiagnosis,

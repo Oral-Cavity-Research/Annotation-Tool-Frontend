@@ -5,7 +5,6 @@ import { useSelector} from 'react-redux';
 import { Box, CircularProgress} from '@mui/material';
 import NotificationBar from '../components/NotificationBar';
 import axios from 'axios';
-import config from '../config.json';
 import ImageIcon from '@mui/icons-material/Image';
 
 function ImageDisplay() {
@@ -28,14 +27,14 @@ function ImageDisplay() {
 
     const getData = ()=>{
         setLoading(true);
-        axios.get(`${config['path']}/image/data/${id}`,{
+        axios.get(`${process.env.REACT_APP_BE_URL}/image/data/${id}`,{
             headers: {
                 'Authorization': `Bearer ${userData.accessToken.token}`,
                 'email': userData.email,
             },
             withCredentials: true
         }).then(res=>{
-            res.data.img = `${config['image_path']}/${res.data.image_path}/${res.data.image_name}`
+            res.data.img = `${process.env.REACT_APP_IMAGE_PATH}/${res.data.REACT_APP_IMAGE_PATH}/${res.data.image_name}`
             setData(res.data);
             setLoading(false);
             if(res.data.status === "Review Requested"||
@@ -49,7 +48,7 @@ function ImageDisplay() {
     }
 
     const getOptions = ()=>{
-        axios.post(`${config['path']}/option/get`,
+        axios.post(`${process.env.REACT_APP_BE_URL}/option/get`,
         {
             option_names:["regions","diagnosis","locations"]
         },
