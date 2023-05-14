@@ -1,0 +1,13 @@
+{
+    "//path":"http://localhost:5000/api",
+    "//image_path":"http://localhost:5000/Storage/images",
+    "//report_path":"http://localhost:5000/Storage/reports",
+    "//consentform_path":"http://localhost:5000/Storage/consentform",
+    
+    
+    "path":"https://api.annotation.oasis.pdn.ac.lk/api",
+    "image_path":"https://api.annotation.oasis.pdn.ac.lk/Storage/images",
+    "report_path":"https://api.annotation.oasis.pdn.ac.lk/Storage/reports",
+    "consentform_path":"https://api.annotation.oasis.pdn.ac.lk/Storage/consentform"
+}
+
