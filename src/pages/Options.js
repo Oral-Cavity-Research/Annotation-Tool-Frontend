@@ -97,7 +97,7 @@ const Options = () => {
             if(checked) activeCount = activeCount+1;
         }
 
-        if(activeCount==0){
+        if(activeCount === 0){
             showMsg("Atleast add one option", "error");
             return;
         }

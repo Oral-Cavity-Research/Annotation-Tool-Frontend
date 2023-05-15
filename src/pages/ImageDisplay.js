@@ -14,8 +14,8 @@ function ImageDisplay() {
     const [loading, setLoading] = useState(true);
     const [status, setStatus] = useState({msg:"",severity:"success", open:false});
     const [regions, setRegions] = useState([]);
-    const [locations, setLocations] = useState([]);
-    const [diagnosis, setDiagnosis] = useState([]);
+    // const [locations, setLocations] = useState([]);
+    // const [diagnosis, setDiagnosis] = useState([]);
     const [readOnly, setReadOnly] = useState(false);
     const userData = useSelector(state => state.data);
 
@@ -59,7 +59,7 @@ function ImageDisplay() {
             },
             withCredentials: true
         }).then(res=>{
-            var option1 = res.data.find(item=>item.name=="regions");
+            var option1 = res.data.find(item => item.name === "regions");
             // var option2 = res.data.find(item=>item.name=="locations");
             // var option3 = res.data.find(item=>item.name=="diagnosis");
             if(option1) {
@@ -94,7 +94,7 @@ function ImageDisplay() {
                     <CircularProgress size={100}/>
                 </Box>
                 </Box>
-                :<Canvas data={data} readOnly={readOnly} regionNames={regions} diagnosis={diagnosis} locations={locations}/>}
+                :<Canvas data={data} readOnly={readOnly} regionNames={regions} diagnosis={[]} locations={[]}/>}
             </Box>
             {/* <Box className='body' sx={{display: { xs: 'block', sm: 'none' } }} >
                 <Box sx={{ display: 'flex', justifyContent:'center', alignItems:'center', height:'100%' }}>

@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {Box, Button, ButtonBase, Chip, Divider, IconButton, Menu, Select, Stack, TextField, Typography} from '@mui/material';
+import {Box, Button, ButtonBase, Chip, IconButton, Menu, Select, Stack, Typography} from '@mui/material';
 import RegionTable from './RegionTable';
 import Help from './Help';
 import ButtonPanel from './ButtonPanel';
@@ -161,8 +161,8 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
   const [coordinates, setCoordinates] = useState([]);
   const [content, setContent] = useState("Action");
   const [labelVisibility, setLabelVisibility] = useState(false);
-  const [location, setLocation] = useState(data.location)
-  const [clinicalDiagnosis, setClinicalDiagnosis] = useState(data.clinical_diagnosis);
+  // const [location, setLocation] = useState(data.location)
+  // const [clinicalDiagnosis, setClinicalDiagnosis] = useState(data.clinical_diagnosis);
   const [lesion, setLesion] = useState(data.lesions_appear);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -875,10 +875,10 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
           <Typography variant='body2'><b>Image Data</b></Typography>
           <br/>
           <Typography variant='body2' noWrap>Location:</Typography>
-          <Typography variant='body2' noWrap>{location}</Typography>
+          <Typography variant='body2' noWrap>{data.location}</Typography>
           <br/>
           <Typography variant='body2' noWrap>Clinical Diagnosis:</Typography>
-          <Typography variant='body2' noWrap>{clinicalDiagnosis}</Typography>
+          <Typography variant='body2' noWrap>{data.clinical_diagnosis}</Typography>
           <br/>
           <Typography variant='body2' noWrap>Category:</Typography>
           <Typography variant='body2' noWrap>{data.category}</Typography>
@@ -911,7 +911,7 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
               data={data} 
               coordinates={coordinates} 
               unsaved={changed.added?.length !== 0 || changed.deleted?.length !== 0}
-              location={location} clinicalDiagnosis={clinicalDiagnosis}  lesion={lesion}
+              location={data.location} clinicalDiagnosis={data.clinical_diagnosis}  lesion={lesion}
             />}
             {content === "History" && <EditHistory image={data}/>}
             {content === "" && <SaveChanges setContent={setContent}/>}
@@ -942,10 +942,10 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
               <Typography variant='body2'><b>Image Data</b></Typography>
               <br/>
               <Typography variant='body2' noWrap>Location:</Typography>
-              <Typography variant='body2' noWrap>{location}</Typography>
+              <Typography variant='body2' noWrap>{data.location}</Typography>
               <br/>
               <Typography variant='body2' noWrap>Clinical Diagnosis:</Typography>
-              <Typography variant='body2' noWrap>{clinicalDiagnosis}</Typography>
+              <Typography variant='body2' noWrap>{data.clinical_diagnosis}</Typography>
               <br/>
               <Typography variant='body2' noWrap>Category:</Typography>
               <Typography variant='body2' noWrap>{data.category}</Typography>

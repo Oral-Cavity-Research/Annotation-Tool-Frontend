@@ -8,7 +8,7 @@ const trySilentRefresh = async () => {
         }
         return null;
     } catch (err) {
-        const mute = err;
+        //ignore
     }
 };
 

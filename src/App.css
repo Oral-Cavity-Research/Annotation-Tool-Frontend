@@ -20,6 +20,13 @@
   justify-content: center;
 }
 
+.App-title {
+  color: #032b50;
+  -webkit-text-fill-color: #052a4d; /* Will override color (regardless of order) */
+  -webkit-text-stroke-width: 2px;
+  -webkit-text-stroke-color: black;
+}
+
 .body{
   margin-top: 50px;
   height: calc(100vh - 50px);

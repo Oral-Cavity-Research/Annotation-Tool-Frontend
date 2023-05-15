@@ -54,7 +54,7 @@ function MenuBar() {
     { headers: {
       'Authorization': `Bearer ${userData.accessToken.token}`,
       'email': userData.email,
-  },
+    },
       withCredentials: true}
     )
     .then(()=>{

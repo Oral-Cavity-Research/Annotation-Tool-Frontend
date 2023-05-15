@@ -48,7 +48,7 @@ export default function EditHistory({image}) {
         if(err.response) showMsg(err.response.data.message, "error")
         else alert(err)
     })
-  },[])
+  },[userData])
 
   return (
     <>

@@ -11,8 +11,8 @@ export function stringToColor(string) {
     const colorNum = asciiCode.toString() + asciiCode.toString() + asciiCode.toString();
     
     var num = Math.round(0xffffff * parseInt(colorNum));
-    var r = num >> 16 & 255;
-    var g = num >> 8 & 255;
+    var r = (num >> 16) & 255;
+    var g = (num >> 8) & 255;
     var b = num & 255;
 
     return 'rgb('+r+','+g+','+b+')';
