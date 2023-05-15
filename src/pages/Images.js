@@ -182,7 +182,7 @@ function Images() {
                     <Typography noWrap variant='body2'>{item.clinical_diagnosis}</Typography>
                 </Box> 
                 <div className='grid_item' onClick={()=>handleClick(item._id)} style={{
-                    backgroundImage:`url(${process.env.REACT_APP_IMAGE_PATH}/${item.REACT_APP_IMAGE_PATH}/${item.image_name})`,
+                    backgroundImage:`url(${process.env.REACT_APP_IMAGE_PATH}/${item.image_path}/${item.image_name})`,
                     backgroundRepeat: "no-repeat",
                     backgroundSize: "cover",
                     backgroundPosition: "center"

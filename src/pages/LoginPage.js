@@ -77,7 +77,7 @@ function LoginPage() {
             <Box sx={{p:3}}>
             <Stack direction='column' alignItems='center' spacing={2}>
                 <img src={logo} className="App-logo" alt="logo" />
-                <Typography variant='h4' className='App-title'>OASIS Annotation Tool</Typography>
+                <Typography variant='h5' className='App-title'>OASIS Annotation Tool</Typography>
                 <Divider sx={{width:'100%', "&::before, &::after": {borderColor: "black",},}}>Login As</Divider>
                 <div id='signinDiv'></div>
             </Stack>
