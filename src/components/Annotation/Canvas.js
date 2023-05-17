@@ -496,7 +496,7 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
   // redraw the region ids
   const redraw_ids = () =>{
 
-    if(!labelVisibility | ctx === null) return;
+    if(!labelVisibility || ctx === null) return;
     
 
     var text, text_info, height, width;
