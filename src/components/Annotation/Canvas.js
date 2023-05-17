@@ -478,7 +478,9 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
 
   // redraw the canvas
   const redraw_canvas = () =>{
-
+    
+    if(ctx === null) return;
+    
     ctx.clearRect(0,0, canvas.width, canvas.height);
     mouse.cursor = "crosshair";
     if(readOnly) {mouse.cursor = "default"};
@@ -494,7 +496,7 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
   // redraw the region ids
   const redraw_ids = () =>{
 
-    if(!labelVisibility) return;
+    if(!labelVisibility | ctx === null) return;
     
 
     var text, text_info, height, width;
@@ -552,7 +554,7 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
 
   // redraw if canvas size changed
   useEffect(()=>{
-    if(ctx != null && size.height > 1  && size.width> 1){
+    if(size.height > 1  && size.width> 1){
       redraw_canvas()
       redraw_ids()
     }
