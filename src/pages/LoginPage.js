@@ -8,6 +8,8 @@ import { setUserData } from '../Reducers/userDataSlice';
 import axios from 'axios';
 import jwt_decode from 'jwt-decode';
 
+const google = window.google;
+
 function LoginPage() {
     const [status, setStatus] = useState({msg:"",severity:"success", open:false});
 
@@ -49,8 +51,7 @@ function LoginPage() {
     }
 
     useEffect(()=>{
-        const google = window.google;
-
+        
         google.accounts.id.initialize({
             client_id: process.env.REACT_APP_CLIENT_ID,
             callback: handleCallBackResponse
