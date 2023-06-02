@@ -51,20 +51,17 @@ function Actions({coordinates, data, unsaved, location, clinicalDiagnosis, lesio
     }
 
     const changed = ()=>{
-        return unsaved || 
-        (data.location !== location ||
-        data.clinical_diagnosis !== clinicalDiagnosis ||
-        data.lesions_appear !== lesion)
+        return unsaved
     }
 
     return (
         <div>
             <Box border={'1px dashed var(--dark-color)'} borderRadius={1} padding={2} marginTop={2}>
             <Stack direction='row'>
-                <Avatar/>
+                <Avatar src={userData.picture} alt={userData.username?userData.username:""}></Avatar>
                 <ArrowRight fontSize='large' color='disabled'/>
                 <Stack direction='column' spacing={2} sx={{width:'100%'}}>
-                    <TextField fullWidth size='small' placeholder='Comment' onChange={(e)=>setTitle(e.target.value)} inputProps={{ maxLength: 100 }}></TextField>
+                    <TextField fullWidth error={title===""} required size='small' label='Message' onChange={(e)=>setTitle(e.target.value)} inputProps={{ maxLength: 100 }}></TextField>
                     <TextField fullWidth size='small' multiline rows={4} placeholder='Add an optional description' onChange={(e)=>setComment(e.target.value)} inputProps={{ maxLength: 1000 }}></TextField>
                     {
                         (data.status === "New" || data.status === "Marked As Resolved" || data.status === "Reviewed" || data.status === "Reopened") &&

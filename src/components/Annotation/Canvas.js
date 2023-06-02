@@ -17,7 +17,7 @@ import SaveChanges from './SaveChanges';
 // todo: check whether we could use useStates instead
 
 
-const mouse = {x : 0, y : 0, button : 0, cursor: 'crosshair'};
+const mouse = {x : 0, y : 0, button : 0, cursor: 'default'};
 var regions = []
 var isDragging = false;
 var isSelected = false;
@@ -68,7 +68,7 @@ class Polygon{
   }
   draw(opacity) {
       this.ctx.beginPath();
-      this.ctx.lineWidth = 1;
+      this.ctx.lineWidth = 2;
       this.ctx.strokeStyle = this.color;
       this.ctx.fillStyle = this.transcolor
       for (const p of this.points) { this.ctx.lineTo((p.x)*this.scale,(p.y)*this.scale) }
@@ -91,7 +91,7 @@ class Polygon{
     }
     if (index > -1) { return this.points[index] }
   }
-  update(opacity){
+  update(opacity, drawingMode){
       // line following the cursor
       if(!this.completed && this.points.length !== 0){
         isDrawing = true
@@ -108,7 +108,7 @@ class Polygon{
       if (!this.dragging) {  this.activePoint = this.closest(mouse) }
 
       // if not dragging and mouse button clicked and when other regions are not selected add a point
-      if (this.activePoint === undefined && !isDragging && !isSelected && mouse.button && !this.completed) {
+      if (this.activePoint === undefined && !isDragging && !isSelected && mouse.button && !this.completed && drawingMode) {
           this.addPoint(mouse);
           mouse.button = false;
       // if completed and dragging update the points
@@ -138,7 +138,7 @@ class Polygon{
   }
   show(opacity){
     this.ctx.beginPath();
-    this.ctx.lineWidth = 1;
+    this.ctx.lineWidth = 2;
     this.ctx.strokeStyle = this.color;
     this.ctx.fillStyle = this.color.replace(')', ', 0.6)').replace('rgb', 'rgba');
     for (const p of this.points) { this.ctx.lineTo((p.x)*this.scale,(p.y)*this.scale) }
@@ -157,10 +157,11 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
   const [labelType, setLabelType] = useState("name");
   const [defaultSettings, setDefaultSettings] = useState({type:regionNames[0].label, color: stringToColor(regionNames[0].label) });
   const [togglePanel, setTogglePanel] = useState(false);
-  const [opacity, setOpacity] = useState(true);
+  const [opacity, setOpacity] = useState(false);
   const [coordinates, setCoordinates] = useState([]);
   const [content, setContent] = useState("Action");
-  const [labelVisibility, setLabelVisibility] = useState(false);
+  const [labelVisibility, setLabelVisibility] = useState(true);
+  const [drawingMode, setDrawingMode] = useState(false);
   // const [location, setLocation] = useState(data.location)
   // const [clinicalDiagnosis, setClinicalDiagnosis] = useState(data.clinical_diagnosis);
   const [lesion, setLesion] = useState(data.lesions_appear);
@@ -380,7 +381,7 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
 
   
     //if drawing don't select
-    if(isDrawing) return
+    if(isDrawing || drawingMode) return
 
     var selectedIndex = -1;
     var i;
@@ -446,6 +447,12 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
     };
   }, [handle_keyup]);
 
+  // change drawing mode
+  useEffect(() => {
+    mouse.cursor = "default"
+    finish_drawing();
+  }, [drawingMode]);
+
   const check_changes = ()=>{
     const newCoor = getCoordinates();
     const originalCoor = data.annotation;
@@ -482,12 +489,13 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
     if(ctx === null) return;
     
     ctx.clearRect(0,0, canvas.width, canvas.height);
-    mouse.cursor = "crosshair";
-    if(readOnly) {mouse.cursor = "default"};
+    
+    if(readOnly || !drawingMode) {mouse.cursor = "default"}
+    else {mouse.cursor = "crosshair"}
 
     regions = regions.filter(region => !region.markedForDeletion);
 
-    [...regions].forEach(region => {region.update(opacity)})
+    [...regions].forEach(region => {region.update(opacity, drawingMode)})
 
     canvas.style.cursor = mouse.cursor;
 
@@ -707,14 +715,14 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
   }
 
   // clear all regions
-  const clear_all = ()=>{
-    [...regions].forEach(region => region.markedForDeletion = true);
-    polygon = new Polygon(ctx, defaultSettings.color, defaultSettings.type)
-    polygon.scale = zoomLevel;
-    regions.push(polygon)
-    redraw_canvas()
-    check_changes();
-  }
+  // const clear_all = ()=>{
+  //   [...regions].forEach(region => region.markedForDeletion = true);
+  //   polygon = new Polygon(ctx, defaultSettings.color, defaultSettings.type)
+  //   polygon.scale = zoomLevel;
+  //   regions.push(polygon)
+  //   redraw_canvas()
+  //   check_changes();
+  // }
 
   const show_diff = ()=>{
 
@@ -786,7 +794,7 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
         {/********************* side bar **********************/}
         <div className='top_bar'>
           <Stack direction='row' sx={{width:'100%'}} alignItems='center' style={{paddingInline:'10px'}} spacing={1}>
-          <ButtonBase aria-controls="lock-menu" sx={{cursor:'pointer', textAlign:'left', bgcolor:'white',p:1,borderRadius:1}}
+          <ButtonBase aria-controls="lock-menu" sx={{cursor:'pointer', textAlign:'left', bgcolor:'white', p:1, borderRadius:1}}
             aria-expanded={open ? 'true' : undefined} onClick={handleClickListItem}>
             
             <div className='color_square' style={{backgroundColor:stringToColor(regionNames[selectedIndex].label)}}></div>
@@ -808,8 +816,8 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
           </Menu>
 
           {/******************* button pannel *************************/}
-          <ButtonPanel func={{finish_drawing,show_regions,show_history, zoom_in, zoom_out, zoom_reset, move_selected, 
-          delete_selected, show_help, clear_all, show_label, label_type, opacity_change, show_actions}} labelVisibility={labelVisibility} readOnly={readOnly}/>
+          <ButtonPanel func={{finish_drawing,setDrawingMode,show_regions,show_history, zoom_in, zoom_out, zoom_reset, move_selected, 
+          delete_selected, show_help, show_label, label_type, opacity_change, show_actions}} labelVisibility={labelVisibility} readOnly={readOnly} drawingMode={drawingMode}/>
           
           <Box sx={{display: { xs: 'none', sm: 'block' } }} >
             {!readOnly && <Chip size='small' label={
@@ -830,9 +838,9 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
           </Box>
           <Box sx={{display: { xs: 'block', sm: 'none' } }} >
             <Stack direction='row' spacing={1}>
-              <IconButton size='small' onClick={show_image_annotations}><TextFields color='primary' /></IconButton>
+              <IconButton size='small' onClick={show_image_annotations}><TextFields color='inherit'/></IconButton>
               <IconButton size='small' onClick={show_actions}><SaveAs color='warning'/></IconButton>
-              <IconButton size='small' onClick={goBack}><Cancel color='error'/></IconButton>
+              <IconButton size='small' onClick={goBack}><Cancel color='inherit' /></IconButton>
             </Stack>
           </Box>
 
@@ -867,17 +875,14 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
             })}
           </Select> */}
           
-          <Typography fontSize='small'>Lesion Present</Typography>
+          {/* <Typography fontSize='small'>Lesion Present</Typography>
           <Select disabled={readOnly} fullWidth size='small'  value={lesion} onChange={(e)=>setLesion(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
               <MenuItem value={false}>False</MenuItem>
               <MenuItem value={true}>True</MenuItem>
-          </Select>
+          </Select> */}
 
           <Box sx={{bgcolor:'white', borderRadius:1, p:1}}>
           <Typography variant='body2'><b>Image Data</b></Typography>
-          <br/>
-          <Typography variant='body2' noWrap>Location:</Typography>
-          <Typography variant='body2' noWrap>{data.location}</Typography>
           <br/>
           <Typography variant='body2' noWrap>Clinical Diagnosis:</Typography>
           <Typography variant='body2' noWrap>{data.clinical_diagnosis}</Typography>
@@ -935,16 +940,13 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
               })}
             </Select> */}
   
-            <Typography fontSize='small'>Lesion Present</Typography>
+            {/* <Typography fontSize='small'>Lesion Present</Typography>
             <Select disabled={readOnly} fullWidth size='small'  value={lesion} onChange={(e)=>setLesion(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
                 <MenuItem value={false}>False</MenuItem>
                 <MenuItem value={true}>True</MenuItem>
-            </Select>
+            </Select> */}
             <Box sx={{bgcolor:'#fbfbfb', borderRadius:1, p:1}}>
               <Typography variant='body2'><b>Image Data</b></Typography>
-              <br/>
-              <Typography variant='body2' noWrap>Location:</Typography>
-              <Typography variant='body2' noWrap>{data.location}</Typography>
               <br/>
               <Typography variant='body2' noWrap>Clinical Diagnosis:</Typography>
               <Typography variant='body2' noWrap>{data.clinical_diagnosis}</Typography>
