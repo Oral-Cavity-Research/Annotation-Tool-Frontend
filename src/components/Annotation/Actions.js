@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Avatar, Box, FormControlLabel, Radio, RadioGroup, Stack, TextField, Typography} from '@mui/material';
 import { AddComment, ArrowRight, CheckCircle, Comment, LockOpen, RateReview, Save, TaskAlt, Warning } from '@mui/icons-material';
 import {LoadingButton} from '@mui/lab';
 import { useSelector} from 'react-redux';
 import NotificationBar from '../NotificationBar';
 import axios from 'axios';
+
+const messageNeeded = ["Comment", "Request Changes", "Review"]
 
 function Actions({coordinates, data, unsaved, location, clinicalDiagnosis, lesion, setTogglePanel}) {
 
@@ -14,6 +16,12 @@ function Actions({coordinates, data, unsaved, location, clinicalDiagnosis, lesio
     const [title, setTitle] = useState("");
     const [comment, setComment] = useState("");
     const [loading, setLoading] = useState(false);
+    const [errorText, setErrorText] = useState(false);
+
+    useEffect(()=>{
+        if((title==="" && messageNeeded.includes(action))) setErrorText(true);
+        else setErrorText(false);
+    },[title, action])
 
     const showMsg = (msg, severity)=>{
         setStatus({msg, severity, open:true})
@@ -61,7 +69,7 @@ function Actions({coordinates, data, unsaved, location, clinicalDiagnosis, lesio
                 <Avatar src={userData.picture} alt={userData.username?userData.username:""}></Avatar>
                 <ArrowRight fontSize='large' color='disabled'/>
                 <Stack direction='column' spacing={2} sx={{width:'100%'}}>
-                    <TextField fullWidth error={title===""} required size='small' label='Message' onChange={(e)=>setTitle(e.target.value)} inputProps={{ maxLength: 100 }}></TextField>
+                    <TextField fullWidth error={errorText} helperText={errorText? "Please enter a meaningful message":null} required size='small' label='Message' onChange={(e)=>setTitle(e.target.value)} inputProps={{ maxLength: 100 }}></TextField>
                     <TextField fullWidth size='small' multiline rows={4} placeholder='Add an optional description' onChange={(e)=>setComment(e.target.value)} inputProps={{ maxLength: 1000 }}></TextField>
                     {
                         (data.status === "New" || data.status === "Marked As Resolved" || data.status === "Reviewed" || data.status === "Reopened") &&
@@ -108,7 +116,7 @@ function Actions({coordinates, data, unsaved, location, clinicalDiagnosis, lesio
                     }
                     <LoadingButton variant='contained'  loading={loading}
                         sx={{minWidth:'150px', width:'fit-content'}} color='success'  
-                        disabled={title==="" || action==="Action"}
+                        disabled={errorText}
                         onClick={handleAction}
                         startIcon={
                             action==="Save"? <Save/> :
