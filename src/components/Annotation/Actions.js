@@ -5,6 +5,7 @@ import {LoadingButton} from '@mui/lab';
 import { useSelector} from 'react-redux';
 import NotificationBar from '../NotificationBar';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const messageNeeded = ["Comment", "Request Changes", "Review"]
 
@@ -17,6 +18,8 @@ function Actions({coordinates, data, unsaved, location, clinicalDiagnosis, lesio
     const [comment, setComment] = useState("");
     const [loading, setLoading] = useState(false);
     const [errorText, setErrorText] = useState(false);
+
+    const navigate = useNavigate();
 
     useEffect(()=>{
         if((title==="" && messageNeeded.includes(action))) setErrorText(true);
@@ -47,7 +50,11 @@ function Actions({coordinates, data, unsaved, location, clinicalDiagnosis, lesio
             showMsg("Image Data Updated", "success");
             if(action === "Comment"){
                 setTogglePanel(false);
-            }else{
+            }else if(action === "Request Review"){
+                navigate('/home/requests');
+            }else if(action === "Approve"){
+                navigate('/home/approved');
+            }else {
                 window.location.reload(true);
             }
         }).catch(err=>{
@@ -72,14 +79,14 @@ function Actions({coordinates, data, unsaved, location, clinicalDiagnosis, lesio
                     <TextField fullWidth error={errorText} helperText={errorText? "Please enter a meaningful message":null} required size='small' label='Message' onChange={(e)=>setTitle(e.target.value)} inputProps={{ maxLength: 100 }}></TextField>
                     <TextField fullWidth size='small' multiline rows={4} placeholder='Add an optional description' onChange={(e)=>setComment(e.target.value)} inputProps={{ maxLength: 1000 }}></TextField>
                     {
-                        (data.status === "New" || data.status === "Marked As Resolved" || data.status === "Reviewed" || data.status === "Reopened") &&
+                        data.status === "New" &&
                         <RadioGroup name="action" onChange={(e)=>setAction(e.target.value)}>
                             { changed() && <FormControlLabel value="Save" control={<Radio size='small' />} label="Save"/>}
                             <FormControlLabel value="Comment" control={<Radio size='small' />} label="Comment" />
                         </RadioGroup>
                     }
                     {
-                        data.status === "Edited" &&
+                        (data.status === "Edited" || data.status === "Reviewed" || data.status === "Marked As Resolved" || data.status === "Reopened") &&
                         <RadioGroup name="action" onChange={(e)=>setAction(e.target.value)}>
                             { changed() && <FormControlLabel value="Save" control={<Radio size='small' />} label="Save"/>}
                             <FormControlLabel value="Comment" control={<Radio size='small' />} label="Comment" />
@@ -98,7 +105,7 @@ function Actions({coordinates, data, unsaved, location, clinicalDiagnosis, lesio
                     {
                         data.status === "Review Requested" &&
                         <RadioGroup name="action" onChange={(e)=>setAction(e.target.value)}>
-                            <FormControlLabel value="Review" control={<Radio size='small' />} label="Review" />
+                            <FormControlLabel value="Review" control={<Radio size='small' />} label="Review & Save" />
                             <FormControlLabel value="Request Changes" control={<Radio size='small' />} label="Request Changes"/>
                             <FormControlLabel value="Approve" control={<Radio size='small' />} label="Approve" />
                         </RadioGroup>
@@ -109,7 +116,7 @@ function Actions({coordinates, data, unsaved, location, clinicalDiagnosis, lesio
                             <FormControlLabel value="Reopen" control={<Radio size='small' />} label="Reopen" />
                         </RadioGroup>
                     }
-                    {changed() && !(action === "Save" || action === "Action" || action==="Comment") &&
+                    {changed() && !(action === "Save" || action === "Action" || action==="Comment" || action==="Review") &&
                     <Stack direction='row' spacing={1} alignItems='center' sx={{mt:2}}>
                         <Warning fontSize='small' color='warning' /><Typography color='GrayText' >You have unsaved changes</Typography>
                     </Stack>

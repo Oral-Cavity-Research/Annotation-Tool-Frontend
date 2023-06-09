@@ -5,7 +5,9 @@ import {ArrowUpward, ArrowDownward, ArrowBack, ArrowForward, Opacity, Check} fro
 import {Label, LabelOff, History} from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
 
-const ButtonPanel = ({func, labelVisibility, readOnly, drawingMode}) => {
+const messageNeeded = ["Commented", "Changes Requested", "Reviewed"]
+
+const ButtonPanel = ({func, labelVisibility, readOnly, drawingMode, status}) => {
 
     const [anchorElNav, setAnchorElNav] = React.useState(null);
 
@@ -65,7 +67,7 @@ const ButtonPanel = ({func, labelVisibility, readOnly, drawingMode}) => {
         
                 {/* <div style={{flex: 1}}></div> */}
                 <Tooltip enterNextDelay={1000} title="Help" placement="bottom-end" arrow><Button size='small' onClick={func.show_help}><HelpOutline  fontSize='small' sx={{color:"var(--dark-color)"}}/></Button></Tooltip>
-                <Tooltip enterNextDelay={1000} title="History" placement="bottom-end" arrow><Button size='small' onClick={func.show_history}><History fontSize='small' sx={{color:"var(--dark-color)"}}/></Button></Tooltip>
+                <Tooltip enterNextDelay={1000} title="History" placement="bottom-end" arrow><Button size='small' onClick={func.show_history}><History fontSize='small' sx={{color: messageNeeded.includes(status)?"red":"var(--dark-color)"}}/></Button></Tooltip>
             </ButtonGroup>
         </Box>
         <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>

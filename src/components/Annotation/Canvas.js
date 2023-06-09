@@ -828,7 +828,7 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
 
           {/******************* button pannel *************************/}
           <ButtonPanel func={{finish_drawing,setDrawingMode,show_regions,show_history, zoom_in, zoom_out, zoom_reset, move_selected, 
-          delete_selected, show_help, show_label, label_type, opacity_change, show_actions}} labelVisibility={labelVisibility} readOnly={readOnly} drawingMode={drawingMode}/>
+          delete_selected, show_help, show_label, label_type, opacity_change, show_actions}} labelVisibility={labelVisibility} readOnly={readOnly} drawingMode={drawingMode} status={data.status}/>
           
           <Box sx={{display: { xs: 'none', sm: 'block' } }} >
             {!readOnly && <Chip size='small' label={

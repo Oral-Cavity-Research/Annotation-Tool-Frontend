@@ -37,8 +37,7 @@ function ImageDisplay() {
             res.data.img = `${process.env.REACT_APP_IMAGE_PATH}/${res.data.image_path}/${res.data.image_name}`
             setData(res.data);
             setLoading(false);
-            if(res.data.status === "Review Requested"||
-            res.data.status === "Approved"){
+            if(res.data.status === "Approved"){
                 setReadOnly(true);
             }
         }).catch(err=>{
