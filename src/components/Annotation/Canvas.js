@@ -72,7 +72,7 @@ class Polygon{
       this.ctx.strokeStyle = this.color;
       this.ctx.fillStyle = this.transcolor
       for (const p of this.points) { this.ctx.lineTo((p.x)*this.scale,(p.y)*this.scale) }
-      this.ctx.closePath();
+      if(this.completed) this.ctx.closePath();
       if(opacity) this.ctx.fill();
       this.ctx.stroke();
   }
@@ -91,7 +91,7 @@ class Polygon{
     }
     if (index > -1) { return this.points[index] }
   }
-  update(opacity, drawingMode){
+  update(opacity, drawingMode, defaultColor, defaultType){
       // line following the cursor
       if(!this.completed && this.points.length !== 0){
         isDrawing = true
@@ -107,8 +107,19 @@ class Polygon{
       // if not dragging get the closest point to mouse
       if (!this.dragging) {  this.activePoint = this.closest(mouse) }
 
+      // check if connecting to the first point
+      if (!this.completed && this.points?.length> 2 && this.activePoint === this.points[0]) { drawCircle(this.ctx, this.points[0], this.scale, 4) }
+
+      // if not ccompleted and mouse button clicked on first point complete the region
+      if(!this.completed && this.points?.length> 2 && this.activePoint === this.points[0] && mouse.button){
+        this.completed = true
+
+        polygon = new Polygon(ctx, defaultColor, defaultType)
+        polygon.scale = this.scale;
+        regions.push(polygon)
+
       // if not dragging and mouse button clicked and when other regions are not selected add a point
-      if (this.activePoint === undefined && !isDragging && !isSelected && mouse.button && !this.completed && drawingMode) {
+      }else if (!isDragging && !isSelected && mouse.button && !this.completed && drawingMode) {
           this.addPoint(mouse);
           mouse.button = false;
       // if completed and dragging update the points
@@ -142,7 +153,7 @@ class Polygon{
     this.ctx.strokeStyle = this.color;
     this.ctx.fillStyle = this.color.replace(')', ', 0.6)').replace('rgb', 'rgba');
     for (const p of this.points) { this.ctx.lineTo((p.x)*this.scale,(p.y)*this.scale) }
-    this.ctx.closePath();
+    if(this.completed) this.ctx.closePath();
     if(opacity) this.ctx.fill();
     this.ctx.stroke();
   }
@@ -495,7 +506,7 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
 
     regions = regions.filter(region => !region.markedForDeletion);
 
-    [...regions].forEach(region => {region.update(opacity, drawingMode)})
+    [...regions].forEach(region => {region.update(opacity, drawingMode, defaultSettings.color, defaultSettings.type)})
 
     canvas.style.cursor = mouse.cursor;
 
