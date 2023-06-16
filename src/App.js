@@ -16,6 +16,7 @@ import Approved from './pages/Approved';
 import './App.css';
 import MyWork from './pages/MyWork';
 import Options from './pages/Options';
+import Imagedb from './pages/PublicDB/Imagedb';
 
 function App() { 
   const dispatch = useDispatch();
@@ -61,6 +62,7 @@ function App() {
           <Route path='/image/:id' element={<ImageDisplay/>}/>
           <Route path='/options' element={<Options/>}/>
         </Route>
+        <Route path='/imagedb' element={<Imagedb/>}/>
         <Route path='/*' element={<NotFoundPage/>}/>
       </Route>
     )
