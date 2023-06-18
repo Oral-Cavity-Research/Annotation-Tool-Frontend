@@ -178,7 +178,6 @@ function Images() {
             <Grid item xs={6} sm={3} md={2} key={index}>
                 <Paper className='card'>
                 <Box sx={{p:1}}>
-                    <Typography noWrap variant='body2'>{item.location}</Typography>
                     <Typography noWrap variant='body2'>{item.clinical_diagnosis}</Typography>
                 </Box> 
                 <div className='grid_item' onClick={()=>handleClick(item._id)} style={{

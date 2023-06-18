@@ -1,6 +1,6 @@
 import React from 'react';
 import {IconButton, Tooltip, Box, Menu, MenuItem, ListItemIcon, ListItemText, Divider, Button, ButtonGroup} from '@mui/material';
-import {Preview,ZoomIn,CropFree,ZoomOut,Close, HelpOutline, Style, Draw} from '@mui/icons-material';
+import {Preview,ZoomIn,CropFree,ZoomOut,Close, HelpOutline, Style, Draw, Settings} from '@mui/icons-material';
 import {ArrowUpward, ArrowDownward, ArrowBack, ArrowForward, Opacity, Check} from '@mui/icons-material';
 import {Label, LabelOff, History} from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -10,19 +10,28 @@ const messageNeeded = ["Commented", "Changes Requested", "Reviewed"]
 const ButtonPanel = ({func, labelVisibility, readOnly, drawingMode, status}) => {
 
     const [anchorElNav, setAnchorElNav] = React.useState(null);
+    const [anchorSetNav, setAnchorSetNav] = React.useState(null);
 
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
+    };
+
+    const handleOpenSetMenu = (event) => {
+        setAnchorSetNav(event.currentTarget);
     };
 
     const handleCloseNavMenu = () => {
         setAnchorElNav(null);
     };
 
+    const handleCloseSetMenu = () => {
+        setAnchorSetNav(null);
+    };
+
     return (
         <div>
         <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>     
-            {!readOnly && <Tooltip enterNextDelay={1000} title="Draw Region" placement="bottom-end" arrow><Button size='small' 
+            {!readOnly && <Tooltip enterNextDelay={1000} title="Drawing mode on / off" placement="bottom-end" arrow><Button size='small' 
             onClick={()=>func.setDrawingMode(!drawingMode)}
             sx={{
                 height: 40,
@@ -61,14 +70,56 @@ const ButtonPanel = ({func, labelVisibility, readOnly, drawingMode, status}) => 
                 {!readOnly && <Tooltip enterNextDelay={1000} title="Move Right" placement="bottom-end" arrow><Button size='small' onClick={()=>func.move_selected("ArrowRight", 10)}><ArrowForward  fontSize='small' sx={{color:"var(--dark-color)"}}/></Button></Tooltip>}
             
                 
-                <Tooltip enterNextDelay={1000} title="Toggle Label Visibility" placement="bottom-end" arrow><Button size='small' onClick={func.show_label}>{labelVisibility?<LabelOff  fontSize='small' sx={{color:"var(--dark-color)"}}/>:<Label   fontSize='small' sx={{color:"var(--dark-color)"}}/>}</Button></Tooltip>
+                {/* <Tooltip enterNextDelay={1000} title="Toggle Label Visibility" placement="bottom-end" arrow><Button size='small' onClick={func.show_label}>{labelVisibility?<LabelOff  fontSize='small' sx={{color:"var(--dark-color)"}}/>:<Label   fontSize='small' sx={{color:"var(--dark-color)"}}/>}</Button></Tooltip>
                 <Tooltip enterNextDelay={1000} title="Toggle label type" placement="bottom-end" arrow><Button size='small' onClick={func.label_type}><Style  fontSize='small' sx={{color:"var(--dark-color)"}}/></Button></Tooltip>
-                <Tooltip enterNextDelay={1000} title="Opacity" placement="bottom-end" arrow><Button size='small' onClick={func.opacity_change}><Opacity  fontSize='small' sx={{color:"var(--dark-color)"}}/></Button></Tooltip>
+                <Tooltip enterNextDelay={1000} title="Opacity" placement="bottom-end" arrow><Button size='small' onClick={func.opacity_change}><Opacity  fontSize='small' sx={{color:"var(--dark-color)"}}/></Button></Tooltip> */}
         
                 {/* <div style={{flex: 1}}></div> */}
                 <Tooltip enterNextDelay={1000} title="Help" placement="bottom-end" arrow><Button size='small' onClick={func.show_help}><HelpOutline  fontSize='small' sx={{color:"var(--dark-color)"}}/></Button></Tooltip>
                 <Tooltip enterNextDelay={1000} title="History" placement="bottom-end" arrow><Button size='small' onClick={func.show_history}><History fontSize='small' sx={{color: messageNeeded.includes(status)?"red":"var(--dark-color)"}}/></Button></Tooltip>
-            </ButtonGroup>
+                
+                <Tooltip enterNextDelay={1000} title="Settings" placement="bottom-end" arrow>
+                <Button
+                    size="small"
+                    aria-controls="menu-set"
+                    aria-haspopup="true"
+                    onClick={handleOpenSetMenu}
+                    color="inherit"
+                    >
+                    <Settings fontSize='small'/>
+                </Button>
+                </Tooltip>
+                <Menu
+                    id="menu-set"
+                    anchorEl={anchorSetNav}
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'left',
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'left',
+                    }}
+                    open={Boolean(anchorSetNav)}
+                    onClose={handleCloseSetMenu}
+                    onClick={handleCloseSetMenu}
+                >           
+                
+                    <MenuItem onClick={func.show_label}>
+                        <ListItemIcon>{labelVisibility?<LabelOff  fontSize='small' sx={{color:"var(--dark-color)"}}/>:<Label   fontSize='small' sx={{color:"var(--dark-color)"}}/>}</ListItemIcon>
+                        <ListItemText>Label visibility</ListItemText>
+                    </MenuItem>
+                    <MenuItem onClick={func.label_type}>
+                        <ListItemIcon> <Style fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
+                        <ListItemText>Label Type</ListItemText>
+                    </MenuItem>
+                    <MenuItem onClick={func.opacity_change}>
+                        <ListItemIcon> <Opacity fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
+                        <ListItemText>Change Opacity</ListItemText>
+                    </MenuItem>
+                </Menu>
+        </ButtonGroup>
         </Box>
         <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
@@ -188,7 +239,7 @@ const ButtonPanel = ({func, labelVisibility, readOnly, drawingMode, status}) => 
             
             {!readOnly && <Tooltip enterNextDelay={1000} title="Finish Drawing" placement="bottom-end" arrow><IconButton size='small' onClick={func.finish_drawing}><Check  fontSize='small' sx={{color:"var(--dark-color)"}}/></IconButton></Tooltip>}
             
-            {!readOnly && <Tooltip enterNextDelay={1000} title="Draw Region" placement="bottom-end" arrow><IconButton size='small' 
+            {!readOnly && <Tooltip enterNextDelay={1000} title="Drawing mode on / off" placement="bottom-end" arrow><IconButton size='small' 
             onClick={()=>func.setDrawingMode(!drawingMode)}
             ><Draw fontSize='small' sx={{color:drawingMode?'primary.main':'var(--dark-color)'}} /></IconButton></Tooltip>}
             

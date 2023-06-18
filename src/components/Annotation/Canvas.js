@@ -5,13 +5,13 @@ import RegionTable from './RegionTable';
 import Help from './Help';
 import ButtonPanel from './ButtonPanel';
 import MenuItem from '@mui/material/MenuItem';
-// import axios from 'axios';
-// import config from '../../config.json';
+import axios from 'axios';
 import { stringToColor } from '../Utils';
 import Actions from './Actions';
 import EditHistory from './EditHistory';
 import { Cancel, Close, SaveAs, TextFields} from '@mui/icons-material';
 import SaveChanges from './SaveChanges';
+import { useSelector} from 'react-redux';
 
 // global variables 
 // todo: check whether we could use useStates instead
@@ -178,10 +178,34 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
   const [lesion, setLesion] = useState(data.lesions_appear);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [changed, setChanged] = useState({added:[], same:[], deleted:[]});
+  const [changed, setChanged] = useState({added:[] , same:[], deleted:[]});
+  const userData = useSelector(state => state.data);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
   
+  const handleSave = ()=>{
+
+    const coor = getCoordinates();
+    setCoordinates(coor);
+
+    axios.post(`${process.env.REACT_APP_BE_URL}/image/annotate/${data._id}`,
+    {
+        location: data.location,
+        clinical_diagnosis: data.clinical_diagnosis,
+        lesions_appear:lesion,
+        annotation: coor,
+        status: "Save",
+    },
+    { headers: {
+        'Authorization': `Bearer ${userData.accessToken.token}`,
+        'email': userData.email,
+    }}).then(res=>{
+        data.annotation = coor;
+        check_changes();
+    }).catch(err=>{
+        alert(err)
+    })
+  }
   const handleClickListItem = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -811,7 +835,7 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
             <div className='color_square' style={{backgroundColor:stringToColor(regionNames[selectedIndex].label)}}></div>
             <Typography noWrap sx={{width:'100px'}}>{regionNames[selectedIndex].label}</Typography>
           
-        </ButtonBase>
+          </ButtonBase>
 
           <Menu id="lock-menu" anchorEl={anchorEl} open={open} onClose={handleMenuClose}>
             {regionNames.map((option, index) => (
@@ -843,6 +867,7 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
           <div style={{flex: 1}}></div>
           <Box sx={{display: { xs: 'none', sm: 'block' } }} >
             <Stack direction='row' spacing={1}>
+              {!(data.status === "Review Requested" || data.status === "Approved") && <Button size='small' variant='contained' color='success' onClick={handleSave}>Save</Button>}
               <Button size='small' variant='contained' onClick={show_actions}>Action</Button>
               <Button size='small' variant='outlined' color='inherit' onClick={goBack}>Close</Button>
             </Stack>
