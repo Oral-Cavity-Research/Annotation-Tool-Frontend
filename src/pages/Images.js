@@ -223,7 +223,7 @@ function Images() {
         { count === 0 ?
             <Typography sx={{m:3}} variant='body2' color='GrayText'>{loading?"":`No ${filt} Images`}</Typography>
                 :
-            <Pagination size='small' count={(Math.floor((count-1)/18)+1)} page={page} onChange={changePage}></Pagination>
+            <Pagination size='small' count={(Math.floor((count-1)/18)+1)} page={Number(page)} onChange={changePage}></Pagination>
         }
         </Stack>
         

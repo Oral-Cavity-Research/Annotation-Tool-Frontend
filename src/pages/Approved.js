@@ -125,7 +125,7 @@ export default function Approved() {
             <Typography noWrap color='Highlight' fontWeight={700} variant='body2'>{item.last_comment?.title}</Typography>
             <Typography noWrap variant='body2'>{item.last_comment?.comment}</Typography>
             <Stack direction='row' alignItems='center' spacing={1} sx={{my:1}}>
-            <Avatar sx={{width:'25px', height:'25px'}} />
+            <Avatar sx={{width:'25px', height:'25px'}} src={item.last_comment?.annotator?.picture}></Avatar>
             <Typography noWrap variant='body2'>{item.last_comment?.annotator?.username}</Typography>
             <Typography noWrap variant='body2' color='GrayText' >{dayjs(item.updatedAt).format("DD/MM/YYYY")}</Typography>
             </Stack>
@@ -138,7 +138,7 @@ export default function Approved() {
         { count === 0 ?
             <Typography sx={{m:3}} variant='body2' color='GrayText'>{loading?"":`No Approved Images`}</Typography>
                 :
-            <Pagination size='small' count={(Math.floor((count-1)/18)+1)} page={page} onChange={changePage}></Pagination>
+            <Pagination size='small' count={(Math.floor((count-1)/18)+1)} page={Number(page)} onChange={changePage}></Pagination>
         }
     </Stack>
     <NotificationBar status={status} setStatus={setStatus}/>

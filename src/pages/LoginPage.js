@@ -21,7 +21,8 @@ function LoginPage() {
         var email = userObject.email;
 
         axios.post(`${process.env.REACT_APP_BE_URL}/auth/verify`, {
-            email: email
+            email: email,
+            picture: userObject.picture
         }, { withCredentials: true })
         .then(function (response) {
             var data = response.data

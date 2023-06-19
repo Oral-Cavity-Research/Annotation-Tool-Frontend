@@ -76,7 +76,7 @@ function Actions({coordinates, data, unsaved, location, clinicalDiagnosis, lesio
                 <Avatar src={userData.picture} alt={userData.username?userData.username:""}></Avatar>
                 <ArrowRight fontSize='large' color='disabled'/>
                 <Stack direction='column' spacing={2} sx={{width:'100%'}}>
-                    <TextField fullWidth error={errorText} helperText={errorText? "Please enter a meaningful message":null} required size='small' label='Message' onChange={(e)=>setTitle(e.target.value)} inputProps={{ maxLength: 100 }}></TextField>
+                    <TextField fullWidth error={errorText} helperText={errorText? "Please enter a meaningful message":null} size='small' label='Message' onChange={(e)=>setTitle(e.target.value)} inputProps={{ maxLength: 100 }}></TextField>
                     <TextField fullWidth size='small' multiline rows={4} placeholder='Add an optional description' onChange={(e)=>setComment(e.target.value)} inputProps={{ maxLength: 1000 }}></TextField>
                     {
                         data.status === "New" &&
