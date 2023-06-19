@@ -14,17 +14,19 @@ function Images() {
     const [loading, setLoading] = useState(true);
     const [status, setStatus] = useState({msg:"",severity:"success", open:false});
     const userData = useSelector(state => state.data);
-    const [filt, setFilt] = useState("All");
+    const [filt, setFilt] = useState(null);
     const [page, setPage] = useState(1);
     const [count, setCount] = useState(0);
-    const [filtOptions, setFlitOptions] = useState(["All"]);
+    const [filtOptions, setFlitOptions] = useState([]);
 
     useEffect(()=>{
         const path = window.location.pathname;
         if(path === "/mywork/images" || path === "/mywork"){
             setFlitOptions(["All","Edited","Changes Requested","Reviewed"])
+            setFilt("All")
         }else{
             setFlitOptions(["All","New","Edited","Changes Requested","Reviewed"])
+            setFilt("New")
         }
     },[])
 
@@ -128,10 +130,12 @@ function Images() {
     };
 
     useEffect(() => {
+        if(filt === null) return
         getCount();
     }, [filt]);
 
     useEffect(() => {
+        if(filt === null) return
         getData();
     }, [page, filt]);
 
