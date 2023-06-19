@@ -15,7 +15,7 @@ function Images() {
     const [status, setStatus] = useState({msg:"",severity:"success", open:false});
     const userData = useSelector(state => state.data);
     const [filt, setFilt] = useState(null);
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(-1);
     const [count, setCount] = useState(0);
     const [filtOptions, setFlitOptions] = useState([]);
 
@@ -23,10 +23,16 @@ function Images() {
         const path = window.location.pathname;
         if(path === "/mywork/images" || path === "/mywork"){
             setFlitOptions(["All","Edited","Changes Requested","Reviewed"])
-            setFilt("All")
+            const filter = sessionStorage.getItem("myworkfilter")?sessionStorage.getItem("myworkfilter"): "All";
+            const pageNo = sessionStorage.getItem("myworkpage")?sessionStorage.getItem("myworkpage"): 1;
+            setFilt(filter)
+            setPage(pageNo)
         }else{
             setFlitOptions(["All","New","Edited","Changes Requested","Reviewed"])
-            setFilt("New")
+            const filter = sessionStorage.getItem("allfilter")?sessionStorage.getItem("allfilter"): "New";
+            const pageNo = sessionStorage.getItem("allpage")?sessionStorage.getItem("allpage"): 1;
+            setFilt(filter)
+            setPage(pageNo)
         }
     },[])
 
@@ -67,6 +73,8 @@ function Images() {
                 withCredentials: true
             }).then(res=>{
                 setData(res.data);
+                sessionStorage.setItem("myworkfilter", filt);
+                sessionStorage.setItem("myworkpage", page);
             }).catch(err=>{
                 if(err.response) showMsg(err.response.data.message, "error")
                 else alert(err)
@@ -83,6 +91,8 @@ function Images() {
                 withCredentials: true
             }).then(res=>{
                 setData(res.data);
+                sessionStorage.setItem("allfilter", filt);
+                sessionStorage.setItem("allpage", page);
             }).catch(err=>{
                 if(err.response) showMsg(err.response.data.message, "error")
                 else alert(err)
@@ -130,12 +140,12 @@ function Images() {
     };
 
     useEffect(() => {
-        if(filt === null) return
+        if(filt === null || page === -1) return
         getCount();
     }, [filt]);
 
     useEffect(() => {
-        if(filt === null) return
+        if(filt === null || page === -1) return
         getData();
     }, [page, filt]);
 

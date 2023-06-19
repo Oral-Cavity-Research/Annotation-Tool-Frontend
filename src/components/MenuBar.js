@@ -59,6 +59,7 @@ function MenuBar() {
     )
     .then(()=>{
       sessionStorage.removeItem("info")
+    }).finally(()=>{
       navigate("/");
     });
   };

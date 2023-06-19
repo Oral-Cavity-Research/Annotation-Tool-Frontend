@@ -17,6 +17,7 @@ import './App.css';
 import MyWork from './pages/MyWork';
 import Options from './pages/Options';
 import Imagedb from './pages/PublicDB/Imagedb';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() { 
   const dispatch = useDispatch();
@@ -46,7 +47,7 @@ function App() {
       <Route path='/' element={<Outlet/>}>
         <Route index element={<LoginPage/>}/>
         <Route path='/login' element={<LoginPage/>}/>
-        <Route path='/' element={<Layout/>}>
+        <Route path='/' element={<ProtectedRoute><Layout/></ProtectedRoute>}>
           <Route path='/home' element={<Home/>}>
             <Route index element={<Images/>}/>
             <Route path='/home/images' element={<Images/>}/>
