@@ -1,8 +1,8 @@
 import React from 'react';
-import {IconButton, Tooltip, Box, Menu, MenuItem, ListItemIcon, ListItemText, Divider, Button, ButtonGroup} from '@mui/material';
-import {Preview,ZoomIn,CropFree,ZoomOut,Close, HelpOutline, Style, Draw, Settings, OpenWith} from '@mui/icons-material';
+import {IconButton, Tooltip, Box, Menu, MenuItem, ListItemIcon, ListItemText, Divider, Button, ButtonGroup, Badge} from '@mui/material';
+import {Preview,ZoomIn,CropFree,ZoomOut,Close, HelpOutline, Style, Draw, Settings, OpenWith, Message} from '@mui/icons-material';
 import {ArrowUpward, ArrowDownward, ArrowBack, ArrowForward, Opacity, Check} from '@mui/icons-material';
-import {Label, LabelOff, History} from '@mui/icons-material';
+import {Label, LabelOff} from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
 
 const messageNeeded = ["Commented", "Changes Requested", "Reviewed"]
@@ -79,6 +79,7 @@ const ButtonPanel = ({func, labelVisibility, readOnly, drawingMode, status}) => 
                 {!readOnly && <Tooltip enterNextDelay={1000} title="Move Right" placement="bottom-end" arrow><Button size='small' onClick={()=>func.move_selected("ArrowRight", 10)}><ArrowForward  fontSize='small' sx={{color:"var(--dark-color)"}}/></Button></Tooltip>}
              */}
                 
+                {!readOnly &&
                 <Tooltip enterNextDelay={1000} title="Move selected" placement="bottom-end" arrow>
                 <Button
                     size="small"
@@ -90,6 +91,7 @@ const ButtonPanel = ({func, labelVisibility, readOnly, drawingMode, status}) => 
                     <OpenWith fontSize='small'/>
                 </Button>
                 </Tooltip>
+                }
                 <Menu
                     id="menu-move"
                     anchorEl={anchorMoveNav}
@@ -128,7 +130,15 @@ const ButtonPanel = ({func, labelVisibility, readOnly, drawingMode, status}) => 
         
                 {/* <div style={{flex: 1}}></div> */}
                 <Tooltip enterNextDelay={1000} title="Help" placement="bottom-end" arrow><Button size='small' onClick={func.show_help}><HelpOutline  fontSize='small' sx={{color:"var(--dark-color)"}}/></Button></Tooltip>
-                <Tooltip enterNextDelay={1000} title="History" placement="bottom-end" arrow><Button size='small' onClick={func.show_history}><History fontSize='small' sx={{color: messageNeeded.includes(status)?"red":"var(--dark-color)"}}/></Button></Tooltip>
+                
+                {messageNeeded.includes(status)?
+                <Tooltip enterNextDelay={1000} title="Message" placement="bottom-end" arrow><Button size='small' onClick={func.show_history}>
+                    <Badge badgeContent={1} color="error"><Message fontSize='small' sx={{color: "var(--dark-color)"}}/></Badge>
+                </Button></Tooltip>
+                :
+                <Tooltip enterNextDelay={1000} title="Message" placement="bottom-end" arrow><Button size='small' onClick={func.show_history}>
+                    <Message fontSize='small' sx={{color: "var(--dark-color)"}}/>
+                </Button></Tooltip>}
                 
                 <Tooltip enterNextDelay={1000} title="Settings" placement="bottom-end" arrow>
                 <Button
@@ -278,15 +288,14 @@ const ButtonPanel = ({func, labelVisibility, readOnly, drawingMode, status}) => 
             </MenuItem>} */}
 
             <Divider/>
+            <MenuItem onClick={func.show_history}>
+                <ListItemIcon> <Message fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
+                <ListItemText>Message History</ListItemText>
+            </MenuItem>
             <MenuItem onClick={func.show_help}>
                 <ListItemIcon> <HelpOutline fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
                 <ListItemText>Help</ListItemText>
             </MenuItem>
-            <MenuItem onClick={func.show_history}>
-                <ListItemIcon> <History fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
-                <ListItemText>History</ListItemText>
-            </MenuItem>
-            
             </Menu>
             
             {!readOnly && <Tooltip enterNextDelay={1000} title="Finish Drawing" placement="bottom-end" arrow><IconButton size='small' onClick={func.finish_drawing}><Check  fontSize='small' sx={{color:"var(--dark-color)"}}/></IconButton></Tooltip>}

@@ -12,6 +12,7 @@ import EditHistory from './EditHistory';
 import { Cancel, Close, SaveAs, TextFields} from '@mui/icons-material';
 import SaveChanges from './SaveChanges';
 import { useSelector} from 'react-redux';
+import { LoadingButton } from '@mui/lab';
 
 // global variables 
 // todo: check whether we could use useStates instead
@@ -173,12 +174,11 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
   const [content, setContent] = useState("Action");
   const [labelVisibility, setLabelVisibility] = useState(true);
   const [drawingMode, setDrawingMode] = useState(false);
-  // const [location, setLocation] = useState(data.location)
-  // const [clinicalDiagnosis, setClinicalDiagnosis] = useState(data.clinical_diagnosis);
   const [lesion, setLesion] = useState(data.lesions_appear);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [changed, setChanged] = useState({added:[] , same:[], deleted:[]});
+  const [saving, setSaving] = useState(false);
   const userData = useSelector(state => state.data);
   const open = Boolean(anchorEl);
   const readOnly = data.status === "Approved";
@@ -186,8 +186,12 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
   
   const handleSave = ()=>{
 
+    if(changed.added?.length === 0 && changed.deleted?.length === 0) return;
+
     const coor = getCoordinates();
     setCoordinates(coor);
+
+    setSaving(true);
 
     axios.post(`${process.env.REACT_APP_BE_URL}/image/annotate/${data._id}`,
     {
@@ -205,6 +209,8 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
         check_changes();
     }).catch(err=>{
         alert(err)
+    }).finally(()=>{
+      setSaving(false)
     })
   }
   const handleClickListItem = (event) => {
@@ -488,6 +494,10 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
     mouse.cursor = "default"
     finish_drawing();
   }, [drawingMode]);
+
+  useEffect(() => {
+    check_changes();
+  }, [data]);
 
   const check_changes = ()=>{
     const newCoor = getCoordinates();
@@ -870,7 +880,7 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
           <div style={{flex: 1}}></div>
           <Box sx={{display: { xs: 'none', sm: 'block' } }} >
             <Stack direction='row' spacing={1}>
-              {!(data.status === "Review Requested" || data.status === "Approved") && <Button size='small' variant='contained' color='success' onClick={handleSave}>Save</Button>}
+              {!(data.status === "Review Requested" || data.status === "Approved") && <LoadingButton loading={saving} size='small' variant='contained' color='success' onClick={handleSave}>Save</LoadingButton>}
               <Button size='small' variant='contained' onClick={show_actions}>Action</Button>
               <Button size='small' variant='outlined' color='inherit' onClick={goBack}>Close</Button>
             </Stack>

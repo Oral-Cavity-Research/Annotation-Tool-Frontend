@@ -21,6 +21,7 @@ function MenuBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [anchorElNotification, setAnchorElNotification] = React.useState(null);
+  const [notificationTrigger, setNotificationTrigger] = React.useState(false);
   const [data, setData] = React.useState({});
   const userData = useSelector(state => state.data);
   const navigate = useNavigate();
@@ -35,6 +36,7 @@ function MenuBar() {
 
   const handleOpenNotification = (event) => {
     setAnchorElNotification(event.currentTarget);
+    setNotificationTrigger(!notificationTrigger)
   };
 
   const handleCloseNotification = () => {
@@ -103,7 +105,7 @@ function MenuBar() {
     }).catch(err=>{
         console.log(err)
     })
-  },[])
+  },[notificationTrigger])
 
   return (
     <AppBar position="fixed" sx={{background:'var(--dark-color)'}}>
