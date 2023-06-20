@@ -159,7 +159,7 @@ class Polygon{
   }
 }
 
-const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {  
+const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {  
   
   const [size, setSize] = useState({width: 1, height:1})
   const [orginalSize, setOriginalSize] = useState({width: 1, height:1})
@@ -181,6 +181,7 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
   const [changed, setChanged] = useState({added:[] , same:[], deleted:[]});
   const userData = useSelector(state => state.data);
   const open = Boolean(anchorEl);
+  const readOnly = data.status === "Approved";
   const navigate = useNavigate();
   
   const handleSave = ()=>{
@@ -200,7 +201,7 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
         'Authorization': `Bearer ${userData.accessToken.token}`,
         'email': userData.email,
     }}).then(res=>{
-        data.annotation = coor;
+        setData({...data, annotation: coor, status : "Edited"})
         check_changes();
     }).catch(err=>{
         alert(err)
@@ -814,7 +815,7 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
   }
 
   const goBack = ()=>{
-    if(changed.added?.length === 0 && changed.deleted?.length === 0){
+    if((changed.added?.length === 0 && changed.deleted?.length === 0) || readOnly){
       navigate(-1);
     }else{
       setContent("");
@@ -829,6 +830,7 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
         {/********************* side bar **********************/}
         <div className='top_bar'>
           <Stack direction='row' sx={{width:'100%'}} alignItems='center' style={{paddingInline:'10px'}} spacing={1}>
+          {!readOnly && 
           <ButtonBase aria-controls="lock-menu" sx={{cursor:'pointer', textAlign:'left', bgcolor:'white', p:1, borderRadius:1}}
             aria-expanded={open ? 'true' : undefined} onClick={handleClickListItem}>
             
@@ -836,6 +838,7 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
             <Typography noWrap sx={{width:'100px'}}>{regionNames[selectedIndex].label}</Typography>
           
           </ButtonBase>
+          }
 
           <Menu id="lock-menu" anchorEl={anchorEl} open={open} onClose={handleMenuClose}>
             {regionNames.map((option, index) => (
@@ -952,6 +955,7 @@ const Canvas = ({data, readOnly, regionNames, locations, diagnosis}) => {
             {content === "Action" && <Actions 
               setTogglePanel={setTogglePanel}
               data={data} 
+              setData={setData}
               coordinates={coordinates} 
               unsaved={changed.added?.length !== 0 || changed.deleted?.length !== 0}
               location={data.location} clinicalDiagnosis={data.clinical_diagnosis}  lesion={lesion}

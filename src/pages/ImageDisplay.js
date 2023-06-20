@@ -16,7 +16,6 @@ function ImageDisplay() {
     const [regions, setRegions] = useState([]);
     // const [locations, setLocations] = useState([]);
     // const [diagnosis, setDiagnosis] = useState([]);
-    const [readOnly, setReadOnly] = useState(false);
     const userData = useSelector(state => state.data);
 
 
@@ -37,9 +36,6 @@ function ImageDisplay() {
             res.data.img = `${process.env.REACT_APP_IMAGE_PATH}/${res.data.image_path}/${res.data.image_name}`
             setData(res.data);
             setLoading(false);
-            if(res.data.status === "Approved"){
-                setReadOnly(true);
-            }
         }).catch(err=>{
             if(err.response) showMsg(err.response.data.message, "error")
             else alert(err)
@@ -93,7 +89,7 @@ function ImageDisplay() {
                     <CircularProgress size={100}/>
                 </Box>
                 </Box>
-                :<Canvas data={data} readOnly={readOnly} regionNames={regions} diagnosis={[]} locations={[]}/>}
+                :<Canvas data={data} setData={setData} regionNames={regions} diagnosis={[]} locations={[]}/>}
             </Box>
             {/* <Box className='body' sx={{display: { xs: 'block', sm: 'none' } }} >
                 <Box sx={{ display: 'flex', justifyContent:'center', alignItems:'center', height:'100%' }}>

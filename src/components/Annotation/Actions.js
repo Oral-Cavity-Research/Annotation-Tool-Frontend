@@ -5,11 +5,10 @@ import {LoadingButton} from '@mui/lab';
 import { useSelector} from 'react-redux';
 import NotificationBar from '../NotificationBar';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 
 const messageNeeded = ["Comment", "Request Changes", "Review"]
 
-function Actions({coordinates, data, unsaved, location, clinicalDiagnosis, lesion, setTogglePanel}) {
+function Actions({coordinates, data, unsaved, location, clinicalDiagnosis, lesion, setTogglePanel, setData}) {
 
     const [status, setStatus] = useState({msg:"",severity:"success", open:false}) 
     const userData = useSelector(state => state.data);
@@ -18,8 +17,6 @@ function Actions({coordinates, data, unsaved, location, clinicalDiagnosis, lesio
     const [comment, setComment] = useState("");
     const [loading, setLoading] = useState(false);
     const [errorText, setErrorText] = useState(false);
-
-    const navigate = useNavigate();
 
     useEffect(()=>{
         if((title==="" && messageNeeded.includes(action))) setErrorText(true);
@@ -48,15 +45,9 @@ function Actions({coordinates, data, unsaved, location, clinicalDiagnosis, lesio
             'email': userData.email,
         }}).then(res=>{
             showMsg("Image Data Updated", "success");
-            if(action === "Comment"){
-                setTogglePanel(false);
-            }else if(action === "Request Review"){
-                navigate('/home/requests');
-            }else if(action === "Approve"){
-                navigate('/home/approved');
-            }else {
-                window.location.reload(true);
-            }
+            res.data.img = `${process.env.REACT_APP_IMAGE_PATH}/${res.data.image_path}/${res.data.image_name}`
+            setData(res.data);
+            setTogglePanel(false);
         }).catch(err=>{
             if(err.response) showMsg(err.response.data?.message, "error")
             else alert(err)

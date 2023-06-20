@@ -80,6 +80,8 @@ function MenuBar() {
   };
 
   const goToImages = ()=>{
+    sessionStorage.setItem("myworkfilter", "Changes Requested");
+    sessionStorage.setItem("myworkpage", 1);
     navigate('/mywork/images');
     handleCloseNotification();
   }
