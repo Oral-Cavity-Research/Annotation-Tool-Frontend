@@ -129,7 +129,6 @@ const ButtonPanel = ({func, labelVisibility, readOnly, drawingMode, status}) => 
                 <Tooltip enterNextDelay={1000} title="Opacity" placement="bottom-end" arrow><Button size='small' onClick={func.opacity_change}><Opacity  fontSize='small' sx={{color:"var(--dark-color)"}}/></Button></Tooltip> */}
         
                 {/* <div style={{flex: 1}}></div> */}
-                <Tooltip enterNextDelay={1000} title="Help" placement="bottom-end" arrow><Button size='small' onClick={func.show_help}><HelpOutline  fontSize='small' sx={{color:"var(--dark-color)"}}/></Button></Tooltip>
                 
                 {messageNeeded.includes(status)?
                 <Tooltip enterNextDelay={1000} title="Message" placement="bottom-end" arrow><Button size='small' onClick={func.show_history}>
@@ -181,6 +180,9 @@ const ButtonPanel = ({func, labelVisibility, readOnly, drawingMode, status}) => 
                         <ListItemText>Change Opacity</ListItemText>
                     </MenuItem>
                 </Menu>
+
+                <Tooltip enterNextDelay={1000} title="Help" placement="bottom-end" arrow><Button size='small' onClick={func.show_help}><HelpOutline  fontSize='small' sx={{color:"var(--dark-color)"}}/></Button></Tooltip>
+
         </ButtonGroup>
         </Box>
         <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
