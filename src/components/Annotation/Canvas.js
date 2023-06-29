@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {Box, Button, ButtonBase, Chip, IconButton, Menu, Select, Stack, Typography} from '@mui/material';
+import {Box, Button, ButtonBase, Chip, IconButton, Menu, Stack, Typography} from '@mui/material';
 import RegionTable from './RegionTable';
 import Help from './Help';
 import ButtonPanel from './ButtonPanel';
@@ -13,6 +13,8 @@ import { Cancel, Close, SaveAs, TextFields} from '@mui/icons-material';
 import SaveChanges from './SaveChanges';
 import { useSelector} from 'react-redux';
 import { LoadingButton } from '@mui/lab';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 // global variables 
 // todo: check whether we could use useStates instead
@@ -163,7 +165,6 @@ class Polygon{
 const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {  
   
   const [size, setSize] = useState({width: 1, height:1})
-  const [orginalSize, setOriginalSize] = useState({width: 1, height:1})
   const [showPoints, setShowPoints] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [labelType, setLabelType] = useState("name");
@@ -183,6 +184,8 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
   const open = Boolean(anchorEl);
   const readOnly = data.status === "Approved";
   const navigate = useNavigate();
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up('sm'));
   
   const handleSave = ()=>{
 
@@ -616,50 +619,34 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
  
   // zoom in
   const zoom_in = ()=>{
-    if(zoomLevel > Math.pow(1.5, 3)) return
+    if(size.width > 2 * window.innerWidth) return
 
     setSize({
-      width: orginalSize.width * zoomLevel *1.5,
-      height: orginalSize.height * zoomLevel *1.5
+      width: size.width * 1.25 ,
+      height: size.height * 1.25 
     });
     
     [...regions].forEach(region =>{
-      region.scale = region.scale * 1.5;
+      region.scale = region.scale * 1.25;
     })
 
-    setZoomLevel(zoomLevel*1.5)
+    setZoomLevel(zoomLevel * 1.25)
   }
 
   // zoom out
   const zoom_out = ()=>{
-    if(zoomLevel < 1/Math.pow(1.5, 7)) return
+    if(size.width < window.innerWidth/4) return
 
     setSize({
-      width: orginalSize.width * zoomLevel /1.5 ,
-      height: orginalSize.height * zoomLevel /1.5
+      width: size.width / 1.25 ,
+      height: size.height / 1.25 
     });
     
     [...regions].forEach(region =>{
-      region.scale = region.scale / 1.5;
+      region.scale = region.scale / 1.25;
     })
 
-    setZoomLevel(zoomLevel/1.5)
-  }
-
-  // zoom reset
-  const zoom_reset = ()=>{
-    if(zoomLevel === 1) return
-
-    setSize({
-      width: orginalSize.width ,
-      height: orginalSize.height
-    });
-    
-    [...regions].forEach(region =>{
-      region.scale = 1
-    })
-
-    setZoomLevel(1)
+    setZoomLevel(zoomLevel/1.25)
   }
 
   // move the selected region
@@ -732,28 +719,16 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
 
   // get the size of the image
   const get_dimensions = (img)=>{
-    setOriginalSize({
-      width: img.nativeEvent.srcElement.naturalWidth,
-      height: img.nativeEvent.srcElement.naturalHeight,
-    })
-  
-    var initZoomLevel = 1;
+   
+    const drawingboard_width = matches? window.innerWidth - (300+20) : window.innerWidth - 20 ;
+    const image_width = img.nativeEvent.srcElement.naturalWidth;
 
-    var image_w = img.nativeEvent.srcElement.naturalWidth
-    var window_w = window.screen.width
 
-    while(window_w < image_w){
-      image_w = image_w / 1.5
-      initZoomLevel = initZoomLevel / 1.5
-    } 
-
-    if(initZoomLevel < 1/Math.pow(1.5, 7)){
-      initZoomLevel = 1/Math.pow(1.5, 7)
-    }
+    var initZoomLevel = image_width > drawingboard_width ? (drawingboard_width / image_width): 1;
 
     setSize({
       width: img.nativeEvent.srcElement.naturalWidth * initZoomLevel,
-      height: img.nativeEvent.srcElement.naturalHeight * initZoomLevel
+      height: img.nativeEvent.srcElement.naturalHeight * initZoomLevel,
     });
 
     setZoomLevel(initZoomLevel);
@@ -864,7 +839,7 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
           </Menu>
 
           {/******************* button pannel *************************/}
-          <ButtonPanel func={{finish_drawing,setDrawingMode,show_regions,show_history, zoom_in, zoom_out, zoom_reset, move_selected, 
+          <ButtonPanel func={{finish_drawing,setDrawingMode,show_regions,show_history, zoom_in, zoom_out, move_selected, 
           delete_selected, show_help, show_label, label_type, opacity_change, show_actions}} labelVisibility={labelVisibility} readOnly={readOnly} drawingMode={drawingMode} status={data.status}/>
           
           <Box sx={{display: { xs: 'none', sm: 'block' } }} >
