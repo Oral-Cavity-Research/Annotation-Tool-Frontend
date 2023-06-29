@@ -22,7 +22,7 @@ function ImageDisplay() {
     useEffect(()=>{
         getData();
         getOptions();
-    },[])
+    },[id])
 
     const getData = ()=>{
         setLoading(true);
@@ -36,6 +36,7 @@ function ImageDisplay() {
             res.data.img = `${process.env.REACT_APP_IMAGE_PATH}/${res.data.image_path}/${res.data.image_name}`
             setData(res.data);
             setLoading(false);
+            console.log(res.data)
         }).catch(err=>{
             if(err.response) showMsg(err.response.data.message, "error")
             else alert(err)

@@ -1,25 +1,31 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {Button, Stack, Typography } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 
-function SaveChanges({setContent}) {
+function SaveChanges({saving, handleSave, direction}) {
 
     const navigate = useNavigate();
 
-    const saveChanges = ()=>{
-        setContent("Action");
+    const handleLeave = ()=>{
+        if(direction === -1){
+            navigate("/home/images");
+        }else{
+            navigate("/image/"+ direction)
+        }
     }
 
-    const goBack = ()=>{
-        navigate(-1);
+    const handleSaveandLeave = ()=>{
+        handleSave();
+        handleLeave();
     }
 
     return (
         <Stack direction='column' spacing={2} justifyContent='center' alignItems='center' sx={{my:5}}>
             <Typography>You have unsaved changes, are you sure you want to leave?</Typography>
             <Stack direction='row' spacing={2}>
-                <Button variant='contained' color='primary' onClick={saveChanges}>Save</Button>
-                <Button variant='contained' color='error' onClick={goBack}>Leave</Button>
+                <LoadingButton loading={saving} size='small' variant='contained' color='primary' onClick={handleSaveandLeave}>Save</LoadingButton>
+                <Button variant='contained' color='error' onClick={handleLeave}>Leave</Button>
             </Stack>
         </Stack>
     );

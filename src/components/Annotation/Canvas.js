@@ -9,7 +9,7 @@ import axios from 'axios';
 import { stringToColor } from '../Utils';
 import Actions from './Actions';
 import EditHistory from './EditHistory';
-import { Cancel, Close, SaveAs, TextFields} from '@mui/icons-material';
+import { Cancel, Close, NavigateBefore, NavigateNext, SaveAs, TextFields} from '@mui/icons-material';
 import SaveChanges from './SaveChanges';
 import { useSelector} from 'react-redux';
 import { LoadingButton } from '@mui/lab';
@@ -180,12 +180,35 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [changed, setChanged] = useState({added:[] , same:[], deleted:[]});
   const [saving, setSaving] = useState(false);
+  const [direction, setDirection] = useState(-1);
   const userData = useSelector(state => state.data);
   const open = Boolean(anchorEl);
   const readOnly = data.status === "Approved";
   const navigate = useNavigate();
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up('sm'));
+
+  const handlePrev = ()=>{
+    
+    if((changed.added?.length === 0 && changed.deleted?.length === 0) || readOnly){
+      navigate("/image/"+ data.prevImage)
+    }else{
+      setContent("");
+      setDirection(data.prevImage);
+      setTogglePanel(true);
+    }
+  }
+
+  const handleNext = ()=>{
+
+    if((changed.added?.length === 0 && changed.deleted?.length === 0) || readOnly){
+      navigate("/image/"+ data.nextImage)
+    }else{
+      setContent("");
+      setDirection(data.nextImage);
+      setTogglePanel(true);
+    }
+  }
   
   const handleSave = ()=>{
 
@@ -210,6 +233,7 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
     }}).then(res=>{
         setData({...data, annotation: coor, status : "Edited"})
         check_changes();
+        setTogglePanel(false);
     }).catch(err=>{
         alert(err)
     }).finally(()=>{
@@ -800,10 +824,13 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
   }
 
   const goBack = ()=>{
+    const coor = getCoordinates();
+    setCoordinates(coor);
     if((changed.added?.length === 0 && changed.deleted?.length === 0) || readOnly){
-      navigate(-1);
+      navigate("/home/images");
     }else{
       setContent("");
+      setDirection(-1);
       setTogglePanel(true);
     }
   }
@@ -917,6 +944,10 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
           <Typography variant='body2' noWrap>Image Name:</Typography>
           <Typography variant='body2' noWrap>{data.image_name}</Typography>
           </Box>
+          <Stack direction='row'  spacing={1} sx={{bgcolor:'#fbfbfb', borderRadius:1, p:1, my:2}}>
+            <Button size='small' onClick={handlePrev} color='inherit' disabled={data.prevImage === null} startIcon={<NavigateBefore/>} fullWidth variant='contained'>Prev</Button>
+            <Button size='small' onClick={handleNext} color='inherit' disabled={data.nextImage === null} endIcon={<NavigateNext/>} fullWidth variant='contained'>Next</Button>
+          </Stack>
           </div>
         </Box>
         </div>
@@ -946,7 +977,7 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
               location={data.location} clinicalDiagnosis={data.clinical_diagnosis}  lesion={lesion}
             />}
             {content === "History" && <EditHistory image={data}/>}
-            {content === "" && <SaveChanges setContent={setContent}/>}
+            {content === "" && <SaveChanges direction={direction} handleSave={handleSave} saving={saving}/>}
             {content === "Image Label" &&
             <div style={{padding:'10px'}}>
                 
