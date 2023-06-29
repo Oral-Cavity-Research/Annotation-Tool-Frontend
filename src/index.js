@@ -4,6 +4,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Provider } from 'react-redux';
 import { persistor, store } from './store';
 import { PersistGate } from 'redux-persist/integration/react';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import App from './App';
 import './index.css';
 
@@ -32,13 +33,15 @@ const theme = createTheme({
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <Provider store={store}>
-  <PersistGate loading={null} persistor={persistor}>
-  <React.StrictMode>
-    <ThemeProvider theme={theme}>
-      <App />
-    </ThemeProvider>
-  </React.StrictMode>
-  </PersistGate>
-  </Provider>
+  <GoogleOAuthProvider clientId={process.env.REACT_APP_CLIENT_ID}>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <React.StrictMode>
+          <ThemeProvider theme={theme}>
+            <App />
+          </ThemeProvider>
+        </React.StrictMode>
+      </PersistGate>
+      </Provider>
+  </GoogleOAuthProvider>
 );

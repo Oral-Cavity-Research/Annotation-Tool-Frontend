@@ -5,10 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import NotificationBar from '../components/NotificationBar';
 import { useDispatch } from 'react-redux';
 import { setUserData } from '../Reducers/userDataSlice';
+import { GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 import jwt_decode from 'jwt-decode';
 
-const google = window.google;
 
 function LoginPage() {
     const [status, setStatus] = useState({msg:"",severity:"success", open:false});
@@ -51,25 +51,12 @@ function LoginPage() {
 
     }
 
-    useEffect(()=>{
-        
-        google.accounts.id.initialize({
-            client_id: process.env.REACT_APP_CLIENT_ID,
-            callback: handleCallBackResponse
-            
-        });
-
-        google.accounts.id.renderButton(
-            document.getElementById("signinDiv"),
-            {theme:"filled_black", size:"large", type: "standard"}
-        );
-
-        google.accounts.id.prompt();
-
-    },[])
-
     const showMsg = (msg, severity)=>{
         setStatus({msg, severity, open:true})
+    }
+
+    const errorMessage = ()=>{
+        showMsg("Failed to login",'error')
     }
 
     return (
@@ -81,7 +68,12 @@ function LoginPage() {
                 <img src={logo} className="App-logo" alt="logo" />
                 <Typography variant='h5' className='App-title'>OASIS Annotation Tool</Typography>
                 <Divider sx={{width:'100%', "&::before, &::after": {borderColor: "black",},}}>Login As</Divider>
-                <div id='signinDiv'></div>
+                <GoogleLogin onSuccess={handleCallBackResponse} onError={errorMessage}
+                    theme="filled_black"
+                    size="large"
+                    type= "standard"
+                    useOneTap
+                />
             </Stack>
             </Box>
             </Paper>
