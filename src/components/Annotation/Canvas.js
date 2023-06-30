@@ -15,6 +15,7 @@ import { useSelector} from 'react-redux';
 import { LoadingButton } from '@mui/lab';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import NotificationBar from '../NotificationBar';
 
 // global variables 
 // todo: check whether we could use useStates instead
@@ -181,6 +182,7 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
   const [changed, setChanged] = useState({added:[] , same:[], deleted:[]});
   const [saving, setSaving] = useState(false);
   const [direction, setDirection] = useState(-1);
+  const [status, setStatus] = useState({msg:"",severity:"success", open:false}) 
   const userData = useSelector(state => state.data);
   const open = Boolean(anchorEl);
   const readOnly = data.status === "Approved";
@@ -234,6 +236,7 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
         setData({...data, annotation: coor, status : "Edited"})
         check_changes();
         setTogglePanel(false);
+        showMsg("Successful!",'success')
     }).catch(err=>{
         alert(err)
     }).finally(()=>{
@@ -835,6 +838,10 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
     }
   }
 
+  const showMsg = (msg, severity)=>{
+    setStatus({msg, severity, open:true})
+  }
+
   return (
     <>
     <div className='page_body' onMouseDown={(e)=>{deselect_all(e)}}>
@@ -904,6 +911,13 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
           <canvas className='main_canvas' onDoubleClick={(e)=>handle_mouse(e)} onMouseMove={(e)=>{handle_mouse(e)}} onMouseDown={(e)=>{handle_mouse(e)}} onMouseUp={(e)=>{handle_mouse(e)}} ref={canvaRef} width={size.width} height={size.height}>Sorry, Canvas functionality is not supported.</canvas>
   
           <img className="main_img" onLoad={(e)=>{get_dimensions(e)}}  width={size.width} height={size.height} src={data.img} alt="failed to load"/> 
+          
+          <Box sx={{display: { xs: 'block', sm: 'none' } }}>
+            <Stack direction='row' p={1} my={2}  spacing={1} justifyContent='center'>
+              <Button size='small' onClick={handlePrev} color='inherit' disabled={data.prevImage === null} startIcon={<NavigateBefore/>} variant='contained'>Prev</Button>
+              <Button size='small' onClick={handleNext} color='inherit' disabled={data.nextImage === null} endIcon={<NavigateNext/>} variant='contained'>Next</Button>
+            </Stack>
+          </Box>
           </div>
         </div>
         {/******************** image annotation ************************/} 
@@ -931,7 +945,6 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
               <MenuItem value={false}>False</MenuItem>
               <MenuItem value={true}>True</MenuItem>
           </Select> */}
-
           <Box sx={{bgcolor:'white', borderRadius:1, p:1}}>
           <Typography variant='body2'><b>Image Data</b></Typography>
           <br/>
@@ -943,6 +956,10 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
           <br/>
           <Typography variant='body2' noWrap>Image Name:</Typography>
           <Typography variant='body2' noWrap>{data.image_name}</Typography>
+          </Box>
+          <Box sx={{bgcolor:'white', borderRadius:1, p:1, my:2}}>
+            <Typography variant='body2'><b>Current Status</b></Typography>
+            <Chip size='small' label={data.status} sx={{bgcolor:'var(--dark-color)', color:'white'}} onClick={show_history}/>
           </Box>
           <Stack direction='row'  spacing={1} sx={{bgcolor:'#fbfbfb', borderRadius:1, p:1, my:2}}>
             <Button size='small' onClick={handlePrev} color='inherit' disabled={data.prevImage === null} startIcon={<NavigateBefore/>} fullWidth variant='contained'>Prev</Button>
@@ -969,6 +986,7 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
             {content === "Help" && <Help/>}
             {content === "Regions" && <RegionTable showPoints={showPoints}/>}
             {content === "Action" && <Actions 
+              showMsg={showMsg}
               setTogglePanel={setTogglePanel}
               data={data} 
               setData={setData}
@@ -1002,6 +1020,10 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
                 <MenuItem value={true}>True</MenuItem>
             </Select> */}
             <Box sx={{bgcolor:'#fbfbfb', borderRadius:1, p:1}}>
+              <Typography variant='body2'><b>Current Status</b></Typography>
+              <br/>
+              <Typography variant='body2' color='green' noWrap>{data.status}</Typography>
+              <br/>
               <Typography variant='body2'><b>Image Data</b></Typography>
               <br/>
               <Typography variant='body2' noWrap>Clinical Diagnosis:</Typography>
@@ -1020,6 +1042,7 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
           </Box>
         }
     </div>
+    <NotificationBar status={status} setStatus={setStatus}/>
     </>
   )
 }
