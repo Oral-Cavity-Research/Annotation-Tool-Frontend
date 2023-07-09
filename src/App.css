@@ -177,6 +177,15 @@
 }
 
 .content_panel{
+  height: calc(100vh - 50px);
+}
+
+.content_panel .content_area{
+  height: calc(100% - 50px);
+  width: 100%;
+  overflow: auto;
+} 
+/* .content_panel{
   height: 100%;
   width: 100%;
   position: absolute;
@@ -188,7 +197,9 @@
   height: calc(100% - 50px);
   width: 100%;
   overflow: auto;
-}
+} */
+
+
 
 .type_select{
   width: fit-content;

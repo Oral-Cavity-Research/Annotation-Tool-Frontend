@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {Box, Button, ButtonBase, Chip, IconButton, Menu, Select, Stack, Typography} from '@mui/material';
+import {Box, Button, ButtonBase, ButtonGroup, Chip, Drawer, IconButton, Menu, Select, Stack, Typography} from '@mui/material';
 import RegionTable from './RegionTable';
 import Help from './Help';
 import ButtonPanel from './ButtonPanel';
@@ -9,17 +9,18 @@ import axios from 'axios';
 import { stringToColor } from '../Utils';
 import Actions from './Actions';
 import EditHistory from './EditHistory';
-import { Cancel, Close, NavigateBefore, NavigateNext, SaveAs, TextFields} from '@mui/icons-material';
+import {ArrowDropDown, Cancel, Close, NavigateBefore, NavigateNext, OnlinePrediction, SaveAs, TextFields} from '@mui/icons-material';
 import SaveChanges from './SaveChanges';
 import { useSelector} from 'react-redux';
 import { LoadingButton } from '@mui/lab';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import NotificationBar from '../NotificationBar';
+import Prediction from './Prediction';
 
 // global variables 
 // todo: check whether we could use useStates instead
-const statuses = ["New", "Changes Requested","Review Requested","Edited", "Approved", "Reviewed"]
+const statuses = ["New", "Changes Requested","Review Requested","Edited", "Approved", "Reviewed","Reopened"]
 
 const mouse = {x : 0, y : 0, button : 0, cursor: 'default'};
 var regions = []
@@ -347,6 +348,11 @@ const Canvas = ({imagedata, regionNames}) => {
     setTogglePanel(true)
   }
 
+  const show_prediction = () =>{
+    setContent("Prediction")
+    setTogglePanel(true)
+  }
+
   const show_label = ()=>{
     setLabelVisibility(!labelVisibility)
   }
@@ -539,7 +545,6 @@ const Canvas = ({imagedata, regionNames}) => {
         'email': userData.email,
     }}).then(res=>{
         setNavigateTo({prev: res.data.prev, next: res.data.next})
-        console.log(res.data)
     }).catch(err=>{
         showMsg("Error!","error")
     }).finally(()=>{
@@ -916,8 +921,14 @@ const Canvas = ({imagedata, regionNames}) => {
           <div style={{flex: 1}}></div>
           <Box sx={{display: { xs: 'none', sm: 'block' } }} >
             <Stack direction='row' spacing={1}>
-              {!(data.status === "Review Requested" || data.status === "Approved") && <LoadingButton loading={saving} size='small' variant='contained' color='success' onClick={handleSave}>Save</LoadingButton>}
-              <Button size='small' variant='contained' onClick={show_actions}>Action</Button>
+            {!(data.status === "Review Requested" || data.status === "Approved")?
+              <ButtonGroup color='success' variant="contained">
+                <LoadingButton loading={saving} variant='contained' onClick={handleSave}>Save</LoadingButton>
+                <Button size='small'  onClick={show_actions}><ArrowDropDown/></Button>
+              </ButtonGroup>
+              :
+              <Button size='small' color='success' endIcon={<ArrowDropDown/>} variant='contained' onClick={show_actions}>Action</Button>
+            }
               <Button size='small' variant='outlined' color='inherit' onClick={goBack}>Close</Button>
             </Stack>
           </Box>
@@ -940,8 +951,18 @@ const Canvas = ({imagedata, regionNames}) => {
           <img className="main_img" onLoad={(e)=>{get_dimensions(e)}}  width={size.width} height={size.height} src={data.img} alt="failed to load"/> 
           
           <Box sx={{display: { xs: 'block', sm: 'none' } }}>
-          <Stack direction='column' spacing={1}   p={1} my={2}>
-    
+          <Stack direction='column' spacing={1}  p={1} my={2}>
+            <Select
+              value={navigateThrough? navigateThrough: imagedata.status}
+              size='small'
+              onChange={handleNavigationChange}
+            >
+              {
+                statuses.map((val, index)=>(
+                  <MenuItem key={index} value={val}>{val}</MenuItem>
+                ))
+              }
+            </Select>
             <Stack direction='row' spacing={1} justifyContent='center'>
               <LoadingButton loadingPosition="start" loading={loadingNav} size='small' onClick={handlePrev} color='inherit' disabled={navigateTo.prev === null} startIcon={<NavigateBefore/>} variant='contained'>Prev</LoadingButton>
               <LoadingButton loadingPosition="end" loading={loadingNav} size='small' onClick={handleNext} color='inherit' disabled={navigateTo.next === null} endIcon={<NavigateNext/>} variant='contained'>Next</LoadingButton>
@@ -968,7 +989,7 @@ const Canvas = ({imagedata, regionNames}) => {
           </Box>
           <Box sx={{bgcolor:'white', borderRadius:1, p:1, my:2}}>
             <Typography variant='body2'><b>Current Status</b></Typography>
-            <Chip size='small' label={data.status} sx={{bgcolor:'var(--dark-color)', color:'white'}} onClick={show_history}/>
+            <Chip size='small' label={data.status} sx={{bgcolor:'gray', color:'white'}} onClick={show_history}/>
           </Box>
           <Stack direction='column'  spacing={1} sx={{bgcolor:'#fbfbfb', borderRadius:1, p:1, my:2}}>
             <Select
@@ -987,12 +1008,16 @@ const Canvas = ({imagedata, regionNames}) => {
               <LoadingButton loading={loadingNav} loadingPosition="end" size='small' onClick={handleNext} color='inherit' disabled={navigateTo.next === null} endIcon={<NavigateNext/>} fullWidth variant='contained'>Next</LoadingButton>
             </Stack>
           </Stack>
+          {/* <Box sx={{bgcolor:'white', borderRadius:1, p:1, my:2}}>
+            <Button fullWidth variant='contained' onClick={show_prediction} sx={{bgcolor:'var(--dark-color)'}} startIcon={<OnlinePrediction/>}>Prediction</Button>
+          </Box> */}
           </div>
         </Box>
         </div>
         {/********************** info panel **********************/}
         {
-          togglePanel &&
+          
+        <Drawer anchor='bottom' open={togglePanel} onClose={()=>setTogglePanel(false)}>
           <Box className='content_panel'>
            
             <div className='top_bar'>
@@ -1006,6 +1031,7 @@ const Canvas = ({imagedata, regionNames}) => {
             <div className='content_area'>
             <Box sx={{p:2}}>
             {content === "Help" && <Help/>}
+            {content === "Prediction" && <Prediction  showMsg={showMsg} img={data.img} name={data.image_name}/>}
             {content === "Regions" && <RegionTable showPoints={showPoints}/>}
             {content === "Action" && <Actions 
               showMsg={showMsg}
@@ -1042,6 +1068,7 @@ const Canvas = ({imagedata, regionNames}) => {
             </Box>
             </div>
           </Box>
+        </Drawer>
         }
     </div>
     <NotificationBar status={status} setStatus={setStatus}/>
