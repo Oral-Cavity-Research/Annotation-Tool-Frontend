@@ -7,7 +7,7 @@ import axios from 'axios';
 
 const messageNeeded = ["Comment", "Request Changes", "Review"]
 
-function Actions({showMsg, coordinates, data, unsaved, location, clinicalDiagnosis, lesion, setTogglePanel, setData}) {
+function Actions({showMsg, coordinates, data, unsaved, location, clinicalDiagnosis, setTogglePanel, setData}) {
 
     const userData = useSelector(state => state.data);
     const [action ,setAction] = useState("Action");
@@ -28,7 +28,6 @@ function Actions({showMsg, coordinates, data, unsaved, location, clinicalDiagnos
         {
             location:location,
             clinical_diagnosis:clinicalDiagnosis,
-            lesions_appear:lesion,
             annotation: coordinates,
             status: action,
             title,

@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {Box, Button, ButtonBase, Chip, IconButton, Menu, Stack, Typography} from '@mui/material';
+import {Box, Button, ButtonBase, Chip, IconButton, Menu, Select, Stack, Typography} from '@mui/material';
 import RegionTable from './RegionTable';
 import Help from './Help';
 import ButtonPanel from './ButtonPanel';
@@ -19,7 +19,7 @@ import NotificationBar from '../NotificationBar';
 
 // global variables 
 // todo: check whether we could use useStates instead
-
+const statuses = ["New", "Changes Requested","Review Requested","Edited", "Approved", "Reviewed"]
 
 const mouse = {x : 0, y : 0, button : 0, cursor: 'default'};
 var regions = []
@@ -163,9 +163,10 @@ class Polygon{
   }
 }
 
-const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {  
+const Canvas = ({imagedata, regionNames}) => {  
   
   const [size, setSize] = useState({width: 1, height:1})
+  const [data, setData] = useState(imagedata);
   const [showPoints, setShowPoints] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [labelType, setLabelType] = useState("name");
@@ -176,27 +177,30 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
   const [content, setContent] = useState("Action");
   const [labelVisibility, setLabelVisibility] = useState(true);
   const [drawingMode, setDrawingMode] = useState(false);
-  const [lesion, setLesion] = useState(data.lesions_appear);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [changed, setChanged] = useState({added:[] , same:[], deleted:[]});
   const [saving, setSaving] = useState(false);
   const [direction, setDirection] = useState(-1);
-  const [status, setStatus] = useState({msg:"",severity:"success", open:false}) 
+  const [status, setStatus] = useState({msg:"",severity:"success", open:false});
+  const [loadingNav, setLoadingNav] = useState(false);
   const userData = useSelector(state => state.data);
+  const [navigateThrough, setNavigateThrough] = useState(null);
+  const [navigateTo, setNavigateTo] = useState({prev: null, next: null});
+
   const open = Boolean(anchorEl);
-  const readOnly = data.status === "Approved";
   const navigate = useNavigate();
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up('sm'));
+  const readOnly = data.status === "Approved";
 
   const handlePrev = ()=>{
     
     if((changed.added?.length === 0 && changed.deleted?.length === 0) || readOnly){
-      navigate("/image/"+ data.prevImage)
+      navigate("/image/"+ navigateTo.prev)
     }else{
       setContent("");
-      setDirection(data.prevImage);
+      setDirection(navigateTo.prev);
       setTogglePanel(true);
     }
   }
@@ -204,10 +208,10 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
   const handleNext = ()=>{
 
     if((changed.added?.length === 0 && changed.deleted?.length === 0) || readOnly){
-      navigate("/image/"+ data.nextImage)
+      navigate("/image/"+ navigateTo.next)
     }else{
       setContent("");
-      setDirection(data.nextImage);
+      setDirection(navigateTo.next);
       setTogglePanel(true);
     }
   }
@@ -225,7 +229,6 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
     {
         location: data.location,
         clinical_diagnosis: data.clinical_diagnosis,
-        lesions_appear:lesion,
         annotation: coor,
         status: "Save",
     },
@@ -422,14 +425,6 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
       move_selected(e.key, del);
     }
 
-    // if(e.key === ' '){
-    //   if(togglePanel) {
-    //     setTogglePanel(false)
-    //     return
-    //   }
-    //   show_actions();
-    // } 
-
     check_changes(); 
   }
 
@@ -528,6 +523,29 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
   useEffect(() => {
     check_changes();
   }, [data]);
+
+  useEffect(() => {
+    setData(imagedata);
+    setNavigateTo({prev:imagedata.prevImage, next:imagedata.nextImage})
+    setNavigateThrough(imagedata.status)
+  }, [imagedata]);
+
+  useEffect(() => {
+    if (navigateThrough === null) return;
+    setLoadingNav(true);
+    axios.get(`${process.env.REACT_APP_BE_URL}/image/navigation/${data._id}/${navigateThrough}`,
+    { headers: {
+        'Authorization': `Bearer ${userData.accessToken.token}`,
+        'email': userData.email,
+    }}).then(res=>{
+        setNavigateTo({prev: res.data.prev, next: res.data.next})
+        console.log(res.data)
+    }).catch(err=>{
+        showMsg("Error!","error")
+    }).finally(()=>{
+      setLoadingNav(false);
+    })
+  }, [navigateThrough]);
 
   const check_changes = ()=>{
     const newCoor = getCoordinates();
@@ -830,7 +848,13 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
     const coor = getCoordinates();
     setCoordinates(coor);
     if((changed.added?.length === 0 && changed.deleted?.length === 0) || readOnly){
-      navigate("/home/images");
+      if(imagedata.status === "Review Requested"){
+        navigate("/home/requests");
+      }else if(imagedata.status === "Approved"){
+        navigate("/home/approved");
+      }else{
+        navigate("/home/images");
+      }
     }else{
       setContent("");
       setDirection(-1);
@@ -840,6 +864,10 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
 
   const showMsg = (msg, severity)=>{
     setStatus({msg, severity, open:true})
+  }
+
+  const handleNavigationChange =(event)=>{
+    setNavigateThrough(event.target.value);
   }
 
   return (
@@ -876,15 +904,14 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
           <ButtonPanel func={{finish_drawing,setDrawingMode,show_regions,show_history, zoom_in, zoom_out, move_selected, 
           delete_selected, show_help, show_label, label_type, opacity_change, show_actions}} labelVisibility={labelVisibility} readOnly={readOnly} drawingMode={drawingMode} status={data.status}/>
           
+          {!readOnly &&
           <Box sx={{display: { xs: 'none', sm: 'block' } }} >
-            {!readOnly && <Chip size='small' label={
-              (changed.added?.length === 0 && changed.deleted?.length === 0)?
-              "Saved": "Unsaved changes"}
-              color={(changed.added?.length === 0 && changed.deleted?.length === 0)?
-                "success": "warning"}
-              onClick={show_diff}
-            />}
+          {(changed.added?.length === 0 && changed.deleted?.length === 0)?
+           <Chip size='small' label="Saved" color="success" onClick={show_diff}/>
+            :
+            <Chip size='small' label="Unsaved Changes" color="warning" onClick={show_diff}/>}
           </Box>
+          }
 
           <div style={{flex: 1}}></div>
           <Box sx={{display: { xs: 'none', sm: 'block' } }} >
@@ -913,10 +940,13 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
           <img className="main_img" onLoad={(e)=>{get_dimensions(e)}}  width={size.width} height={size.height} src={data.img} alt="failed to load"/> 
           
           <Box sx={{display: { xs: 'block', sm: 'none' } }}>
-            <Stack direction='row' p={1} my={2}  spacing={1} justifyContent='center'>
-              <Button size='small' onClick={handlePrev} color='inherit' disabled={data.prevImage === null} startIcon={<NavigateBefore/>} variant='contained'>Prev</Button>
-              <Button size='small' onClick={handleNext} color='inherit' disabled={data.nextImage === null} endIcon={<NavigateNext/>} variant='contained'>Next</Button>
+          <Stack direction='column' spacing={1}   p={1} my={2}>
+    
+            <Stack direction='row' spacing={1} justifyContent='center'>
+              <LoadingButton loadingPosition="start" loading={loadingNav} size='small' onClick={handlePrev} color='inherit' disabled={navigateTo.prev === null} startIcon={<NavigateBefore/>} variant='contained'>Prev</LoadingButton>
+              <LoadingButton loadingPosition="end" loading={loadingNav} size='small' onClick={handleNext} color='inherit' disabled={navigateTo.next === null} endIcon={<NavigateNext/>} variant='contained'>Next</LoadingButton>
             </Stack>
+          </Stack>
           </Box>
           </div>
         </div>
@@ -924,27 +954,6 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
         <Box className='right_bar' sx={{display: { xs: 'none', sm: 'block' } }}>
         <div style={{padding:'10px'}}>
                 
-          {/* <Typography fontSize='small'>Location</Typography> */}
-        
-          {/* <Select disabled={readOnly} fullWidth size='small' value={location} onChange={(e)=>setLocation(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
-            {locations.map((item, index) =>{
-              return (<MenuItem key={index} value={item.value}>{item.label}</MenuItem>)
-            })}
-          </Select> */}
-          
-        
-          {/* <Typography fontSize='small'>Clinical Diagnosis</Typography> */}
-          {/* <Select disabled={readOnly} fullWidth size='small' value={clinicalDiagnosis} onChange={(e)=>setClinicalDiagnosis(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
-            {diagnosis.map((item, index) =>{
-              return (<MenuItem key={index} value={item.value}>{item.label}</MenuItem>)
-            })}
-          </Select> */}
-          
-          {/* <Typography fontSize='small'>Lesion Present</Typography>
-          <Select disabled={readOnly} fullWidth size='small'  value={lesion} onChange={(e)=>setLesion(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
-              <MenuItem value={false}>False</MenuItem>
-              <MenuItem value={true}>True</MenuItem>
-          </Select> */}
           <Box sx={{bgcolor:'white', borderRadius:1, p:1}}>
           <Typography variant='body2'><b>Image Data</b></Typography>
           <br/>
@@ -961,9 +970,22 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
             <Typography variant='body2'><b>Current Status</b></Typography>
             <Chip size='small' label={data.status} sx={{bgcolor:'var(--dark-color)', color:'white'}} onClick={show_history}/>
           </Box>
-          <Stack direction='row'  spacing={1} sx={{bgcolor:'#fbfbfb', borderRadius:1, p:1, my:2}}>
-            <Button size='small' onClick={handlePrev} color='inherit' disabled={data.prevImage === null} startIcon={<NavigateBefore/>} fullWidth variant='contained'>Prev</Button>
-            <Button size='small' onClick={handleNext} color='inherit' disabled={data.nextImage === null} endIcon={<NavigateNext/>} fullWidth variant='contained'>Next</Button>
+          <Stack direction='column'  spacing={1} sx={{bgcolor:'#fbfbfb', borderRadius:1, p:1, my:2}}>
+            <Select
+              value={navigateThrough? navigateThrough: imagedata.status}
+              size='small'
+              onChange={handleNavigationChange}
+            >
+              {
+                statuses.map((val, index)=>(
+                  <MenuItem key={index} value={val}>{val}</MenuItem>
+                ))
+              }
+            </Select>
+            <Stack direction='row' spacing={1}>
+              <LoadingButton loading={loadingNav} loadingPosition="start" size='small' onClick={handlePrev} color='inherit' disabled={navigateTo.prev === null} startIcon={<NavigateBefore/>} fullWidth variant='contained'>Prev</LoadingButton>
+              <LoadingButton loading={loadingNav} loadingPosition="end" size='small' onClick={handleNext} color='inherit' disabled={navigateTo.next === null} endIcon={<NavigateNext/>} fullWidth variant='contained'>Next</LoadingButton>
+            </Stack>
           </Stack>
           </div>
         </Box>
@@ -992,33 +1014,13 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
               setData={setData}
               coordinates={coordinates} 
               unsaved={changed.added?.length !== 0 || changed.deleted?.length !== 0}
-              location={data.location} clinicalDiagnosis={data.clinical_diagnosis}  lesion={lesion}
+              location={data.location} clinicalDiagnosis={data.clinical_diagnosis}
             />}
             {content === "History" && <EditHistory image={data}/>}
             {content === "" && <SaveChanges direction={direction} handleSave={handleSave} saving={saving}/>}
             {content === "Image Label" &&
             <div style={{padding:'10px'}}>
                 
-            {/* <Typography fontSize='small'>Location</Typography> */}
-          
-            {/* <Select disabled={readOnly} fullWidth size='small' value={location} onChange={(e)=>setLocation(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
-              {locations.map((item, index) =>{
-                return (<MenuItem key={index} value={item.value}>{item.label}</MenuItem>)
-              })}
-            </Select> */}
-          
-            {/* <Typography fontSize='small'>Clinical Diagnosis</Typography> */}
-            {/* <Select disabled={readOnly} fullWidth size='small' value={clinicalDiagnosis} onChange={(e)=>setClinicalDiagnosis(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
-              {diagnosis.map((item, index) =>{
-                return (<MenuItem key={index} value={item.value}>{item.label}</MenuItem>)
-              })}
-            </Select> */}
-  
-            {/* <Typography fontSize='small'>Lesion Present</Typography>
-            <Select disabled={readOnly} fullWidth size='small'  value={lesion} onChange={(e)=>setLesion(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
-                <MenuItem value={false}>False</MenuItem>
-                <MenuItem value={true}>True</MenuItem>
-            </Select> */}
             <Box sx={{bgcolor:'#fbfbfb', borderRadius:1, p:1}}>
               <Typography variant='body2'><b>Current Status</b></Typography>
               <br/>

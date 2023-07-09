@@ -14,8 +14,6 @@ function ImageDisplay() {
     const [loading, setLoading] = useState(true);
     const [status, setStatus] = useState({msg:"",severity:"success", open:false});
     const [regions, setRegions] = useState([]);
-    // const [locations, setLocations] = useState([]);
-    // const [diagnosis, setDiagnosis] = useState([]);
     const userData = useSelector(state => state.data);
 
 
@@ -54,21 +52,11 @@ function ImageDisplay() {
             },
             withCredentials: true
         }).then(res=>{
-            var option1 = res.data.find(item => item.name === "regions");
-            // var option2 = res.data.find(item=>item.name=="locations");
-            // var option3 = res.data.find(item=>item.name=="diagnosis");
+            var option1 = res.data?.find(item => item.name === "regions");
             if(option1) {
                 option1 = option1.options.filter(item => item.active);
                 setRegions(option1);
             }
-            // if(option2){
-            //     option2 = option2.options.filter(item => item.active);
-            //     setLocations(option2);
-            // }
-            // if(option3){
-            //     option3 = option3.options.filter(item => item.active);
-            //     setDiagnosis(option3);
-            // }
         }).catch(err=>{
             if(err.response) showMsg(err.response.data.message, "error")
             else alert(err)
@@ -89,16 +77,8 @@ function ImageDisplay() {
                     <CircularProgress size={100}/>
                 </Box>
                 </Box>
-                :<Canvas data={data} setData={setData} regionNames={regions} diagnosis={[]} locations={[]}/>}
+                :<Canvas imagedata={data} regionNames={regions} diagnosis={[]} locations={[]}/>}
             </Box>
-            {/* <Box className='body' sx={{display: { xs: 'block', sm: 'none' } }} >
-                <Box sx={{ display: 'flex', justifyContent:'center', alignItems:'center', height:'100%' }}>
-                <Box sx={{position: 'relative', textAlign:'center'}}>
-                    <ImageNotSupported fontSize='large' color='primary' />
-                    <Typography>Not available for mobile view</Typography>
-                </Box>
-                </Box>
-            </Box> */}
             <NotificationBar status={status} setStatus={setStatus}/>
         </div>
     );
