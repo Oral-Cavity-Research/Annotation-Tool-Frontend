@@ -26,5 +26,5 @@ Some researchers have built their own databases to train algorithms using white-
 
 
 ### Other
-[Annotation Tool Node Backend](https://github.com/Oral-Cavity-Research/Annotation-Tool-Backend)
-[Flask Backend for ML model](https://github.com/Oral-Cavity-Research/ML-Backend)
+- [Annotation Tool Node Backend](https://github.com/Oral-Cavity-Research/Annotation-Tool-Backend)
+- [Flask Backend for ML model](https://github.com/Oral-Cavity-Research/ML-Backend)
