@@ -5,13 +5,6 @@ import {Paper,Typography,Box, Stack, IconButton, MenuItem, Skeleton, Badge, Pagi
 import axios from 'axios';
 import { useSelector} from 'react-redux';
 
-const radio = {
-    marginTop: 100,
-    marginBottom: 100,
-    display: 'flex',
-    justifyContent: 'center',
-}
-
 const Imagedb = () => {
 
   const [filtOptions, setFiltOptions] = useState('All');
@@ -38,7 +31,7 @@ const Imagedb = () => {
             withCredentials: true
         }).then(res=>{
             setData(res.data);
-            // setCount(res.data.length);
+
         }).catch(err=>{
             if(err.response) showMsg(err.response.data.message, "error")
             else alert(err)
@@ -50,14 +43,15 @@ const Imagedb = () => {
 
 const getCount = ()=>{
       axios.get(`${process.env.REACT_APP_BE_URL}/publicdb/image/count`,{
-          params: {filter: filtOptions},
+          params: {category: filtOptions},
           headers: {
               'Authorization': `Bearer ${userData.accessToken.token}`,
               'email': userData.email,
           },
           withCredentials: true
       }).then(res=>{
-          setCount(res.data.count);
+          console.log(res.data);
+          setCount(res.data);
       }).catch(err=>{
           if(err.response) showMsg(err.response.data.message, "error")
           else alert(err)
@@ -73,11 +67,13 @@ useEffect(() => {
   getCount();
 }, [filtOptions]);
 
+
   const options = [
     'All',
     'Healthy',
     'Benign',
-    'OC',
+    'OCA',
+    'OPMD'
   ];
 
   const handleOptionChange = (event) => {
@@ -87,6 +83,14 @@ useEffect(() => {
   const changePage = (event, value) => {
     setPage(value);
 };
+
+const radio = {
+  marginTop: 100,
+  marginBottom: 100,
+  display: 'flex',
+  justifyContent: 'center',
+
+}
 
   return (
     <div>
@@ -106,11 +110,20 @@ useEffect(() => {
       </FormGroup>
 
       </div>
+      
       <List>
-      {data.map((item, index) => (
-        <ListItem key={index} style={{width: "100%"}}><ImageCard imagepath={item.image_path} imagename={item.image_name}/></ListItem>
+      {data.map((item, index) => (        
         
-      ))}
+        <ListItem key={index} style={{width: "100%"}}>
+          
+        {!item.annotation || item.annotation.length === 0 ? (
+          <ImageCard imagepath={item.image_path} imagename={item.image_name} masks={[]} age={item.age} gender={item.gender} clinical={item.clinical_diagnosis} risks={item.risk_habits}/>
+
+          ) : (
+          <ImageCard imagepath={item.image_path} imagename={item.image_name} masks={item.annotation} age={item.age} gender={item.gender} clinical={item.clinical_diagnosis} risks={item.risk_habits}/>
+          
+      )}
+      </ListItem>))}
     </List>
       
 
