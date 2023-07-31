@@ -279,3 +279,27 @@
 .image_list:hover{
   background-color: #ececec;
 }
+
+.square_div {
+  width: 30%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+
+.cardStyle {
+  display: flex;
+  max-width: 80%;
+  width: 60%; /* Set a fixed width */
+  margin: auto; /* Center the card horizontally */
+}
+
+@media (max-width: 800px) {
+  .square_div {
+    width: 80%;
+  }
+
+  .cardStyle {
+    width: 80%;
+  }
+}
+
