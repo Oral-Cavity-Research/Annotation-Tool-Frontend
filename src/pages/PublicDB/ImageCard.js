@@ -1,158 +1,136 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Card, CardMedia, CardContent, Typography, List, ListItem, ListItemText, ListItemIcon, Button  } from '@mui/material';
+import { Grid, Card, Typography, Button, Stack } from '@mui/material';
 import {saveAs} from "file-saver";
 import { stringToColor } from '../../components/Utils';
 import '../../App.css'
+import { Download } from '@mui/icons-material';
 
 const ImageCard = ({imagepath, imagename, masks, age, gender, clinical, risks}) => {
 
+  const [imageWidth, setImageWidth] = useState(0);
+  const [polygons, setPolygons] = useState(<></>);
   const uniqueMasks = [];
   const masksSet = new Set();
 
-    masks.forEach((mask) => {
-      if (!masksSet.has(mask.name)) {
-        masksSet.add(mask.name);
-        uniqueMasks.push(mask);
-      }
-    });
-
-
-  const imageStyle = {
-    padding: '20px',
-    width: '100%',
-
-
-  };
-
-  const masksStyle = {
-    padding: '20px',
-    // margin: 'auto', // Center the card horizontally
-
-
-  };
-
-  const detailsStyle = {
-    padding: '20px',
-    margin: 'auto', // Center the card horizontally
-
-
-  };
+  masks.forEach((mask) => {
+    if (!masksSet.has(mask.name)) {
+      masksSet.add(mask.name);
+      uniqueMasks.push(mask);
+    }
+  });
 
   const downloadImage = (imagepath, imagename)=>{
     let url = `${process.env.REACT_APP_IMAGE_PATH}/${imagepath}/${imagename}`;
     saveAs(url, imagename);
    }
 
-   // *** this needs to be modified
-   const downloadAnnotation = (imagepath, imagename)=>{
-    let url = `${process.env.REACT_APP_IMAGE_PATH}/${imagepath}/${imagename}`;
-    saveAs(url, imagename);
-   }
+  // *** this needs to be modified
+  const downloadAnnotation = (imagepath, imagename)=>{
+  let url = `${process.env.REACT_APP_IMAGE_PATH}/${imagepath}/${imagename}`;
+  saveAs(url, imagename);
+  }
+
+  // Function to draw polygons in the SVG
+  useEffect(()=>{
+
+    if (imageWidth === 0) return;
+
+    const svg = document.getElementById("polygonSVG");
+    const svgWidth = svg.clientWidth;
+
+    var regions = []
+    masks.forEach((item) => {
+      const { annotations, name } = item;
+      const scaled = annotations.map((element) => Math.round(element * svgWidth / imageWidth));
+      console.log(annotations)
+      console.log(scaled)
+      console.log(svgWidth, imageWidth)
+      var pointstring = scaled.join(',');
+      regions.push(
+        <polygon points={pointstring} strokeWidth={2} fill='transparent' stroke={stringToColor(name)}></polygon>
+      )
+    })
+  
+    setPolygons(regions)
+
+  },[imageWidth])
+
+  // get the size of the image
+  const get_dimensions = (img)=>{
+    const image_width = img.nativeEvent.srcElement.naturalWidth;
+    setImageWidth(image_width);
+  }
 
   return (
-    <Card className='cardStyle' >
-  <Grid container >
+  <Card className='cardStyle' >
+  <Grid container spacing={2}>
     {/* Div for the First Grid */}
+    <Grid item xs={12} md={4}>
     <div className='square_div'>
-    
-      <Grid item xs={12} md={12} style={imageStyle}>
-        <CardMedia
-          component="img"
-          image={`${process.env.REACT_APP_IMAGE_PATH}/${imagepath}/${imagename}`}
-          title="Failed to load the image"
-        />
-      </Grid>
+        <svg id="polygonSVG">
+        {polygons}
+        </svg>
+        <img onLoad={(e)=>{get_dimensions(e)}} src={`${process.env.REACT_APP_IMAGE_PATH}/${imagepath}/${imagename}`} alt='Failed to load the image'/>
     </div>
+    </Grid>
 
 
     {/* Second Grid for the List of Three Items */}
-    <Grid item xs={12} md={4} style={detailsStyle} >
-      <CardContent>
-        <Typography variant="h5">Patient Details: </Typography>
-        <List>
-          <ListItem>
-            <ListItemText primary=
-            {<table>
+    <Grid item xs={12} md={4} >
+        <table style={{tableLayout:'fixed', width: "100%", wordWrap:'break-word'}}>
             <tbody>
               <tr>
-                <td><b>Age: </b></td>
-                <td>{age}</td>
+                <td><Typography><b>Age: </b></Typography></td>
+                <td><Typography>{age}</Typography></td>
               </tr>
-            </tbody>
-          </table>} 
-          />
-          </ListItem>
-          <ListItem>
-            <ListItemText primary={<table>
-            <tbody>
               <tr>
-                <td><b>Gender: </b></td>
-                <td>{gender}</td>
+                <td><Typography><b>Gender: </b></Typography></td>
+                <td><Typography>{gender}</Typography></td>
               </tr>
-            </tbody>
-          </table>}/>
-          </ListItem>
-          <ListItem>
-            <ListItemText primary={<table>
-            <tbody>
               <tr>
-                <td><b>Clinical Diagnosis: </b></td>
-                <td>{clinical}</td>
+                <td><Typography><b>Clinical Diagnosis: </b></Typography></td>
+                <td><Typography>{clinical}</Typography></td>
               </tr>
-            </tbody>
-          </table>} />
-          </ListItem>
-          <ListItem>
-            <ListItemText primary={<table>
-            <tbody>
               <tr>
-                <td><b>Risk Habits: </b></td>
-                <td>{risks}</td>
+                <td><Typography><b>Risk Habits: </b></Typography></td>
+                <td><Typography>{risks}</Typography></td>
               </tr>
             </tbody>
-          </table>} />
-          </ListItem>
-        </List>
-      </CardContent>
+          </table>
     </Grid>
 
 
     {/* Third Grid for the Masks */}
-    <Grid item xs={12} md={4} style={masksStyle}>
-      <CardContent>
-        <Typography variant="h5">Masks: </Typography>
-        <List>
-        {uniqueMasks.length === 0 ? (
-    <ListItem>
-      <ListItemText primary="No annotations" />
-    </ListItem>
+    <Grid item xs={12} md={4}>
+    {uniqueMasks.length === 0 ? (
+      <Typography>No Annotations</Typography>
   ) : (
-    uniqueMasks.map((mask, index) => (
-      <ListItem key={index}>
-        <ListItemIcon>
-          <div
+    <table style={{tableLayout:'fixed', width: "100%", wordWrap:'break-word'}}>
+      <tbody>
+    {uniqueMasks.map((mask, index) => (
+      <tr key={index}>
+          <td style={{width:'25px'}}><div
             style={{
               width: '16px',
               height: '16px',
               backgroundColor: stringToColor(mask.name),
             }}
-          />
-        </ListItemIcon>
-        <ListItemText primary={mask.name} />
-      </ListItem>
-    ))
+          /></td>
+        <td><Typography>{mask.name}</Typography></td>
+        </tr>
+    ))}
+    </tbody>
+    </table>
   )}
-        </List>
-      </CardContent>
-      <Button variant="contained" color="primary" onClick={() => downloadImage(imagepath, imagename)}>
-        Download Image
+    <Stack my={2} spacing={1} alignItems='flex-start' direction='column'>
+      <Button startIcon={<Download/>} size='small' variant="contained" color="inherit" onClick={() => downloadImage(imagepath, imagename)}>
+        Image
       </Button>
 
-      <div style={{ margin: '10px' }} />
-
-      <Button variant="contained" color="primary" onClick={() => downloadAnnotation(imagepath, imagename)}>
-        Download Annotation
+      <Button startIcon={<Download/>} size='small' variant="contained" color="inherit" onClick={() => downloadAnnotation(imagepath, imagename)}>
+        Annotations
       </Button>
+    </Stack>
     </Grid>
   </Grid>
 </Card>

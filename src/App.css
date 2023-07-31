@@ -281,23 +281,33 @@
 }
 
 .square_div {
-  width: 30%;
+  position: relative;
+  width: 100%;
   aspect-ratio: 1 / 1;
   overflow: hidden;
 }
 
+.square_div img{
+  width: 100%;
+}
+
+.square_div svg{
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  z-index: 10;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+
 .cardStyle {
-  display: flex;
   max-width: 80%;
   width: 60%; /* Set a fixed width */
   margin: auto; /* Center the card horizontally */
+  padding: 20px;
 }
 
 @media (max-width: 800px) {
-  .square_div {
-    width: 80%;
-  }
-
   .cardStyle {
     width: 80%;
   }
