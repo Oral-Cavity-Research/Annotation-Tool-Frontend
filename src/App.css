@@ -153,6 +153,21 @@
   overflow: auto;
 }
 
+.drawing_area::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.drawing_area::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+  border-radius: 5px;
+}
+
+.drawing_area::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  -webkit-box-shadow: inset 0 0 6px var(--dark-color);
+}
+
 .drawing_area{
   position: relative;
   width: calc(100% - 20px);
@@ -162,6 +177,15 @@
 }
 
 .content_panel{
+  height: calc(100vh - 50px);
+}
+
+.content_panel .content_area{
+  height: calc(100% - 50px);
+  width: 100%;
+  overflow: auto;
+} 
+/* .content_panel{
   height: 100%;
   width: 100%;
   position: absolute;
@@ -173,7 +197,9 @@
   height: calc(100% - 50px);
   width: 100%;
   overflow: auto;
-}
+} */
+
+
 
 .type_select{
   width: fit-content;
@@ -255,23 +281,33 @@
 }
 
 .square_div {
-  width: 30%;
+  position: relative;
+  width: 100%;
   aspect-ratio: 1 / 1;
   overflow: hidden;
 }
 
+.square_div img{
+  width: 100%;
+}
+
+.square_div svg{
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  z-index: 10;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+
 .cardStyle {
-  display: flex;
   max-width: 80%;
   width: 60%; /* Set a fixed width */
   margin: auto; /* Center the card horizontally */
+  padding: 20px;
 }
 
 @media (max-width: 800px) {
-  .square_div {
-    width: 80%;
-  }
-
   .cardStyle {
     width: 80%;
   }

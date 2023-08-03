@@ -1,5 +1,5 @@
 import React from 'react';
-import {Preview,ZoomIn,CropFree,ZoomOut,Close, CancelOutlined, Style, Label} from '@mui/icons-material';
+import {Preview,ZoomIn,ZoomOut,Close, Style, Label, Message} from '@mui/icons-material';
 import {ArrowUpward, ArrowDownward, ArrowBack, ArrowForward, Opacity} from '@mui/icons-material';
 
 const Help = () => {
@@ -13,9 +13,6 @@ const Help = () => {
             <tr>
                 <td><div className='key'>Esc</div></td><td> Cancle Drawing</td>
             </tr>
-            {/* <tr>
-                <td><div className='key'>Space</div></td><td> Toggle Preview</td>
-            </tr> */}
             <tr>
                 <td><div className='key'>Delete</div></td><td> Delete the Selected Region</td>
             </tr>
@@ -46,9 +43,15 @@ const Help = () => {
             </tr>
             <tr>
                 <td>
-                    <ZoomIn style={{color:"gray"}}/><ZoomOut style={{color:"gray"}}/><CropFree style={{color:"gray"}}/>
+                    <Message style={{color:"gray"}}/>
                 </td>
-                <td> Zoom In, Zoom Out, Original Size</td>
+                <td> Show edit history</td>
+            </tr>
+            <tr>
+                <td>
+                    <ZoomIn style={{color:"gray"}}/><ZoomOut style={{color:"gray"}}/>
+                </td>
+                <td> Zoom In, Zoom Out</td>
             </tr>
             <tr>
                 <td>
@@ -59,9 +62,9 @@ const Help = () => {
             </tr>
             <tr>
                 <td>
-                    <Close style={{color:"gray"}}/><CancelOutlined style={{color:"gray"}}/>
+                    <Close style={{color:"gray"}}/>
                 </td>
-                <td>Delete the selected region, Delete all regions</td>
+                <td>Delete the selected region</td>
             </tr>
             <tr>
                 <td>

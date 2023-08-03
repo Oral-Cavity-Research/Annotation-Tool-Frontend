@@ -70,7 +70,6 @@ const ButtonPanel = ({func, labelVisibility, readOnly, drawingMode, status}) => 
                 
                 <Tooltip enterNextDelay={1000} title="Zoom In" placement="bottom-end" arrow><Button size='small' onClick={func.zoom_in}><ZoomIn  fontSize='small' sx={{color:"var(--dark-color)"}}/></Button></Tooltip>
                 <Tooltip enterNextDelay={1000} title="Zoom Out" placement="bottom-end" arrow><Button size='small' onClick={func.zoom_out}><ZoomOut  fontSize='small' sx={{color:"var(--dark-color)"}}/></Button></Tooltip>
-                <Tooltip enterNextDelay={1000} title="Zoom Reset" placement="bottom-end" arrow><Button size='small' onClick={func.zoom_reset}><CropFree  fontSize='small' sx={{color:"var(--dark-color)"}}/></Button></Tooltip>
             
                 
                 {/* {!readOnly && <Tooltip enterNextDelay={1000} title="Move Up" placement="bottom-end" arrow><Button size='small' onClick={()=>func.move_selected("ArrowUp", 10)}><ArrowUpward  fontSize='small' sx={{color:"var(--dark-color)"}}/></Button></Tooltip>}
@@ -237,11 +236,6 @@ const ButtonPanel = ({func, labelVisibility, readOnly, drawingMode, status}) => 
                 <ListItemIcon> <ZoomOut fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
                 <ListItemText>Zoom Out</ListItemText>
             </MenuItem>
-            <MenuItem onClick={func.zoom_reset}>
-                <ListItemIcon> <CropFree fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
-                <ListItemText>Zoom Reset</ListItemText>
-            </MenuItem>
-
             <Divider/>
             {!readOnly && 
             <MenuItem onClick={()=>func.move_selected("ArrowUp", 10)}>

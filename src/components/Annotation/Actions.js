@@ -3,14 +3,12 @@ import { Avatar, Box, FormControlLabel, Radio, RadioGroup, Stack, TextField, Typ
 import { AddComment, ArrowRight, CheckCircle, Comment, LockOpen, RateReview, Save, TaskAlt, Warning } from '@mui/icons-material';
 import {LoadingButton} from '@mui/lab';
 import { useSelector} from 'react-redux';
-import NotificationBar from '../NotificationBar';
 import axios from 'axios';
 
 const messageNeeded = ["Comment", "Request Changes", "Review"]
 
-function Actions({coordinates, data, unsaved, location, clinicalDiagnosis, lesion, setTogglePanel, setData}) {
+function Actions({showMsg, coordinates, data, unsaved, location, clinicalDiagnosis, setTogglePanel, setData}) {
 
-    const [status, setStatus] = useState({msg:"",severity:"success", open:false}) 
     const userData = useSelector(state => state.data);
     const [action ,setAction] = useState("Action");
     const [title, setTitle] = useState("");
@@ -23,10 +21,6 @@ function Actions({coordinates, data, unsaved, location, clinicalDiagnosis, lesio
         else setErrorText(false);
     },[title, action])
 
-    const showMsg = (msg, severity)=>{
-        setStatus({msg, severity, open:true})
-    }
-
     const handleAction = ()=>{
         setLoading(true);
     
@@ -34,7 +28,6 @@ function Actions({coordinates, data, unsaved, location, clinicalDiagnosis, lesio
         {
             location:location,
             clinical_diagnosis:clinicalDiagnosis,
-            lesions_appear:lesion,
             annotation: coordinates,
             status: action,
             title,
@@ -44,7 +37,7 @@ function Actions({coordinates, data, unsaved, location, clinicalDiagnosis, lesio
             'Authorization': `Bearer ${userData.accessToken.token}`,
             'email': userData.email,
         }}).then(res=>{
-            showMsg("Image Data Updated", "success");
+            showMsg("Successful!", "success");
             res.data.img = `${process.env.REACT_APP_IMAGE_PATH}/${res.data.image_path}/${res.data.image_name}`
             setData(res.data);
             setTogglePanel(false);
@@ -129,7 +122,6 @@ function Actions({coordinates, data, unsaved, location, clinicalDiagnosis, lesio
                     >{action}</LoadingButton>
                 </Stack>
             </Stack>
-            <NotificationBar status={status} setStatus={setStatus}/>
             </Box>
         </div>
     );

@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {Box, Button, ButtonBase, Chip, IconButton, Menu, Select, Stack, Typography} from '@mui/material';
+import {Box, Button, ButtonBase, ButtonGroup, Chip, Drawer, IconButton, Menu, Select, Stack, Typography} from '@mui/material';
 import RegionTable from './RegionTable';
 import Help from './Help';
 import ButtonPanel from './ButtonPanel';
@@ -9,14 +9,18 @@ import axios from 'axios';
 import { stringToColor } from '../Utils';
 import Actions from './Actions';
 import EditHistory from './EditHistory';
-import { Cancel, Close, SaveAs, TextFields} from '@mui/icons-material';
+import {ArrowDropDown, Cancel, Close, NavigateBefore, NavigateNext, OnlinePrediction, SaveAs, TextFields} from '@mui/icons-material';
 import SaveChanges from './SaveChanges';
 import { useSelector} from 'react-redux';
 import { LoadingButton } from '@mui/lab';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import NotificationBar from '../NotificationBar';
+import Prediction from './Prediction';
 
 // global variables 
 // todo: check whether we could use useStates instead
-
+const statuses = ["New", "Changes Requested","Review Requested","Edited", "Approved", "Reviewed","Reopened"]
 
 const mouse = {x : 0, y : 0, button : 0, cursor: 'default'};
 var regions = []
@@ -160,10 +164,10 @@ class Polygon{
   }
 }
 
-const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {  
+const Canvas = ({imagedata, regionNames}) => {  
   
   const [size, setSize] = useState({width: 1, height:1})
-  const [orginalSize, setOriginalSize] = useState({width: 1, height:1})
+  const [data, setData] = useState(imagedata);
   const [showPoints, setShowPoints] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [labelType, setLabelType] = useState("name");
@@ -174,15 +178,44 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
   const [content, setContent] = useState("Action");
   const [labelVisibility, setLabelVisibility] = useState(true);
   const [drawingMode, setDrawingMode] = useState(false);
-  const [lesion, setLesion] = useState(data.lesions_appear);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [changed, setChanged] = useState({added:[] , same:[], deleted:[]});
   const [saving, setSaving] = useState(false);
+  const [direction, setDirection] = useState(-1);
+  const [status, setStatus] = useState({msg:"",severity:"success", open:false});
+  const [loadingNav, setLoadingNav] = useState(false);
   const userData = useSelector(state => state.data);
+  const [navigateThrough, setNavigateThrough] = useState(null);
+  const [navigateTo, setNavigateTo] = useState({prev: null, next: null});
+
   const open = Boolean(anchorEl);
-  const readOnly = data.status === "Approved";
   const navigate = useNavigate();
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up('sm'));
+  const readOnly = data.status === "Approved";
+
+  const handlePrev = ()=>{
+    
+    if((changed.added?.length === 0 && changed.deleted?.length === 0) || readOnly){
+      navigate("/image/"+ navigateTo.prev)
+    }else{
+      setContent("");
+      setDirection(navigateTo.prev);
+      setTogglePanel(true);
+    }
+  }
+
+  const handleNext = ()=>{
+
+    if((changed.added?.length === 0 && changed.deleted?.length === 0) || readOnly){
+      navigate("/image/"+ navigateTo.next)
+    }else{
+      setContent("");
+      setDirection(navigateTo.next);
+      setTogglePanel(true);
+    }
+  }
   
   const handleSave = ()=>{
 
@@ -197,7 +230,6 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
     {
         location: data.location,
         clinical_diagnosis: data.clinical_diagnosis,
-        lesions_appear:lesion,
         annotation: coor,
         status: "Save",
     },
@@ -207,6 +239,8 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
     }}).then(res=>{
         setData({...data, annotation: coor, status : "Edited"})
         check_changes();
+        setTogglePanel(false);
+        showMsg("Successful!",'success')
     }).catch(err=>{
         alert(err)
     }).finally(()=>{
@@ -314,6 +348,11 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
     setTogglePanel(true)
   }
 
+  const show_prediction = () =>{
+    setContent("Prediction")
+    setTogglePanel(true)
+  }
+
   const show_label = ()=>{
     setLabelVisibility(!labelVisibility)
   }
@@ -391,14 +430,6 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
       if(e.shiftKey) del= 10;
       move_selected(e.key, del);
     }
-
-    // if(e.key === ' '){
-    //   if(togglePanel) {
-    //     setTogglePanel(false)
-    //     return
-    //   }
-    //   show_actions();
-    // } 
 
     check_changes(); 
   }
@@ -498,6 +529,28 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
   useEffect(() => {
     check_changes();
   }, [data]);
+
+  useEffect(() => {
+    setData(imagedata);
+    setNavigateTo({prev:imagedata.prevImage, next:imagedata.nextImage})
+    setNavigateThrough(imagedata.status)
+  }, [imagedata]);
+
+  useEffect(() => {
+    if (navigateThrough === null) return;
+    setLoadingNav(true);
+    axios.get(`${process.env.REACT_APP_BE_URL}/image/navigation/${data._id}/${navigateThrough}`,
+    { headers: {
+        'Authorization': `Bearer ${userData.accessToken.token}`,
+        'email': userData.email,
+    }}).then(res=>{
+        setNavigateTo({prev: res.data.prev, next: res.data.next})
+    }).catch(err=>{
+        showMsg("Error!","error")
+    }).finally(()=>{
+      setLoadingNav(false);
+    })
+  }, [navigateThrough]);
 
   const check_changes = ()=>{
     const newCoor = getCoordinates();
@@ -616,50 +669,34 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
  
   // zoom in
   const zoom_in = ()=>{
-    if(zoomLevel > Math.pow(1.5, 3)) return
+    if(size.width > 2 * window.innerWidth) return
 
     setSize({
-      width: orginalSize.width * zoomLevel *1.5,
-      height: orginalSize.height * zoomLevel *1.5
+      width: size.width * 1.25 ,
+      height: size.height * 1.25 
     });
     
     [...regions].forEach(region =>{
-      region.scale = region.scale * 1.5;
+      region.scale = region.scale * 1.25;
     })
 
-    setZoomLevel(zoomLevel*1.5)
+    setZoomLevel(zoomLevel * 1.25)
   }
 
   // zoom out
   const zoom_out = ()=>{
-    if(zoomLevel < 1/Math.pow(1.5, 7)) return
+    if(size.width < window.innerWidth/4) return
 
     setSize({
-      width: orginalSize.width * zoomLevel /1.5 ,
-      height: orginalSize.height * zoomLevel /1.5
+      width: size.width / 1.25 ,
+      height: size.height / 1.25 
     });
     
     [...regions].forEach(region =>{
-      region.scale = region.scale / 1.5;
+      region.scale = region.scale / 1.25;
     })
 
-    setZoomLevel(zoomLevel/1.5)
-  }
-
-  // zoom reset
-  const zoom_reset = ()=>{
-    if(zoomLevel === 1) return
-
-    setSize({
-      width: orginalSize.width ,
-      height: orginalSize.height
-    });
-    
-    [...regions].forEach(region =>{
-      region.scale = 1
-    })
-
-    setZoomLevel(1)
+    setZoomLevel(zoomLevel/1.25)
   }
 
   // move the selected region
@@ -732,28 +769,16 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
 
   // get the size of the image
   const get_dimensions = (img)=>{
-    setOriginalSize({
-      width: img.nativeEvent.srcElement.naturalWidth,
-      height: img.nativeEvent.srcElement.naturalHeight,
-    })
-  
-    var initZoomLevel = 1;
+   
+    const drawingboard_width = matches? window.innerWidth - (300+20) : window.innerWidth - 20 ;
+    const image_width = img.nativeEvent.srcElement.naturalWidth;
 
-    var image_w = img.nativeEvent.srcElement.naturalWidth
-    var window_w = window.screen.width
 
-    while(window_w < image_w){
-      image_w = image_w / 1.5
-      initZoomLevel = initZoomLevel / 1.5
-    } 
-
-    if(initZoomLevel < 1/Math.pow(1.5, 7)){
-      initZoomLevel = 1/Math.pow(1.5, 7)
-    }
+    var initZoomLevel = image_width > drawingboard_width ? (drawingboard_width / image_width): 1;
 
     setSize({
       width: img.nativeEvent.srcElement.naturalWidth * initZoomLevel,
-      height: img.nativeEvent.srcElement.naturalHeight * initZoomLevel
+      height: img.nativeEvent.srcElement.naturalHeight * initZoomLevel,
     });
 
     setZoomLevel(initZoomLevel);
@@ -825,12 +850,29 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
   }
 
   const goBack = ()=>{
+    const coor = getCoordinates();
+    setCoordinates(coor);
     if((changed.added?.length === 0 && changed.deleted?.length === 0) || readOnly){
-      navigate(-1);
+      if(imagedata.status === "Review Requested"){
+        navigate("/home/requests");
+      }else if(imagedata.status === "Approved"){
+        navigate("/home/approved");
+      }else{
+        navigate("/home/images");
+      }
     }else{
       setContent("");
+      setDirection(-1);
       setTogglePanel(true);
     }
+  }
+
+  const showMsg = (msg, severity)=>{
+    setStatus({msg, severity, open:true})
+  }
+
+  const handleNavigationChange =(event)=>{
+    setNavigateThrough(event.target.value);
   }
 
   return (
@@ -864,24 +906,29 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
           </Menu>
 
           {/******************* button pannel *************************/}
-          <ButtonPanel func={{finish_drawing,setDrawingMode,show_regions,show_history, zoom_in, zoom_out, zoom_reset, move_selected, 
+          <ButtonPanel func={{finish_drawing,setDrawingMode,show_regions,show_history, zoom_in, zoom_out, move_selected, 
           delete_selected, show_help, show_label, label_type, opacity_change, show_actions}} labelVisibility={labelVisibility} readOnly={readOnly} drawingMode={drawingMode} status={data.status}/>
           
+          {!readOnly &&
           <Box sx={{display: { xs: 'none', sm: 'block' } }} >
-            {!readOnly && <Chip size='small' label={
-              (changed.added?.length === 0 && changed.deleted?.length === 0)?
-              "Saved": "Unsaved changes"}
-              color={(changed.added?.length === 0 && changed.deleted?.length === 0)?
-                "success": "warning"}
-              onClick={show_diff}
-            />}
+          {(changed.added?.length === 0 && changed.deleted?.length === 0)?
+           <Chip size='small' label="Saved" color="success" onClick={show_diff}/>
+            :
+            <Chip size='small' label="Unsaved Changes" color="warning" onClick={show_diff}/>}
           </Box>
+          }
 
           <div style={{flex: 1}}></div>
           <Box sx={{display: { xs: 'none', sm: 'block' } }} >
             <Stack direction='row' spacing={1}>
-              {!(data.status === "Review Requested" || data.status === "Approved") && <LoadingButton loading={saving} size='small' variant='contained' color='success' onClick={handleSave}>Save</LoadingButton>}
-              <Button size='small' variant='contained' onClick={show_actions}>Action</Button>
+            {!(data.status === "Review Requested" || data.status === "Approved")?
+              <ButtonGroup color='success' variant="contained">
+                <LoadingButton loading={saving} variant='contained' onClick={handleSave}>Save</LoadingButton>
+                <Button size='small'  onClick={show_actions}><ArrowDropDown/></Button>
+              </ButtonGroup>
+              :
+              <Button size='small' color='success' endIcon={<ArrowDropDown/>} variant='contained' onClick={show_actions}>Action</Button>
+            }
               <Button size='small' variant='outlined' color='inherit' onClick={goBack}>Close</Button>
             </Stack>
           </Box>
@@ -902,34 +949,32 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
           <canvas className='main_canvas' onDoubleClick={(e)=>handle_mouse(e)} onMouseMove={(e)=>{handle_mouse(e)}} onMouseDown={(e)=>{handle_mouse(e)}} onMouseUp={(e)=>{handle_mouse(e)}} ref={canvaRef} width={size.width} height={size.height}>Sorry, Canvas functionality is not supported.</canvas>
   
           <img className="main_img" onLoad={(e)=>{get_dimensions(e)}}  width={size.width} height={size.height} src={data.img} alt="failed to load"/> 
+          
+          <Box sx={{display: { xs: 'block', sm: 'none' } }}>
+          <Stack direction='column' spacing={1}  p={1} my={2}>
+            <Select
+              value={navigateThrough? navigateThrough: imagedata.status}
+              size='small'
+              onChange={handleNavigationChange}
+            >
+              {
+                statuses.map((val, index)=>(
+                  <MenuItem key={index} value={val}>{val}</MenuItem>
+                ))
+              }
+            </Select>
+            <Stack direction='row' spacing={1} justifyContent='center'>
+              <LoadingButton loadingPosition="start" loading={loadingNav} size='small' onClick={handlePrev} color='inherit' disabled={navigateTo.prev === null} startIcon={<NavigateBefore/>} variant='contained'>Prev</LoadingButton>
+              <LoadingButton loadingPosition="end" loading={loadingNav} size='small' onClick={handleNext} color='inherit' disabled={navigateTo.next === null} endIcon={<NavigateNext/>} variant='contained'>Next</LoadingButton>
+            </Stack>
+          </Stack>
+          </Box>
           </div>
         </div>
         {/******************** image annotation ************************/} 
         <Box className='right_bar' sx={{display: { xs: 'none', sm: 'block' } }}>
         <div style={{padding:'10px'}}>
                 
-          {/* <Typography fontSize='small'>Location</Typography> */}
-        
-          {/* <Select disabled={readOnly} fullWidth size='small' value={location} onChange={(e)=>setLocation(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
-            {locations.map((item, index) =>{
-              return (<MenuItem key={index} value={item.value}>{item.label}</MenuItem>)
-            })}
-          </Select> */}
-          
-        
-          {/* <Typography fontSize='small'>Clinical Diagnosis</Typography> */}
-          {/* <Select disabled={readOnly} fullWidth size='small' value={clinicalDiagnosis} onChange={(e)=>setClinicalDiagnosis(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
-            {diagnosis.map((item, index) =>{
-              return (<MenuItem key={index} value={item.value}>{item.label}</MenuItem>)
-            })}
-          </Select> */}
-          
-          {/* <Typography fontSize='small'>Lesion Present</Typography>
-          <Select disabled={readOnly} fullWidth size='small'  value={lesion} onChange={(e)=>setLesion(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
-              <MenuItem value={false}>False</MenuItem>
-              <MenuItem value={true}>True</MenuItem>
-          </Select> */}
-
           <Box sx={{bgcolor:'white', borderRadius:1, p:1}}>
           <Typography variant='body2'><b>Image Data</b></Typography>
           <br/>
@@ -942,12 +987,37 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
           <Typography variant='body2' noWrap>Image Name:</Typography>
           <Typography variant='body2' noWrap>{data.image_name}</Typography>
           </Box>
+          <Box sx={{bgcolor:'white', borderRadius:1, p:1, my:2}}>
+            <Typography variant='body2'><b>Current Status</b></Typography>
+            <Chip size='small' label={data.status} sx={{bgcolor:'gray', color:'white'}} onClick={show_history}/>
+          </Box>
+          <Stack direction='column'  spacing={1} sx={{bgcolor:'#fbfbfb', borderRadius:1, p:1, my:2}}>
+            <Select
+              value={navigateThrough? navigateThrough: imagedata.status}
+              size='small'
+              onChange={handleNavigationChange}
+            >
+              {
+                statuses.map((val, index)=>(
+                  <MenuItem key={index} value={val}>{val}</MenuItem>
+                ))
+              }
+            </Select>
+            <Stack direction='row' spacing={1}>
+              <LoadingButton loading={loadingNav} loadingPosition="start" size='small' onClick={handlePrev} color='inherit' disabled={navigateTo.prev === null} startIcon={<NavigateBefore/>} fullWidth variant='contained'>Prev</LoadingButton>
+              <LoadingButton loading={loadingNav} loadingPosition="end" size='small' onClick={handleNext} color='inherit' disabled={navigateTo.next === null} endIcon={<NavigateNext/>} fullWidth variant='contained'>Next</LoadingButton>
+            </Stack>
+          </Stack>
+          {/* <Box sx={{bgcolor:'white', borderRadius:1, p:1, my:2}}>
+            <Button fullWidth variant='contained' onClick={show_prediction} sx={{bgcolor:'var(--dark-color)'}} startIcon={<OnlinePrediction/>}>Prediction</Button>
+          </Box> */}
           </div>
         </Box>
         </div>
         {/********************** info panel **********************/}
         {
-          togglePanel &&
+          
+        <Drawer anchor='bottom' open={togglePanel} onClose={()=>setTogglePanel(false)}>
           <Box className='content_panel'>
            
             <div className='top_bar'>
@@ -961,41 +1031,27 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
             <div className='content_area'>
             <Box sx={{p:2}}>
             {content === "Help" && <Help/>}
+            {content === "Prediction" && <Prediction  showMsg={showMsg} img={data.img} name={data.image_name}/>}
             {content === "Regions" && <RegionTable showPoints={showPoints}/>}
             {content === "Action" && <Actions 
+              showMsg={showMsg}
               setTogglePanel={setTogglePanel}
               data={data} 
               setData={setData}
               coordinates={coordinates} 
               unsaved={changed.added?.length !== 0 || changed.deleted?.length !== 0}
-              location={data.location} clinicalDiagnosis={data.clinical_diagnosis}  lesion={lesion}
+              location={data.location} clinicalDiagnosis={data.clinical_diagnosis}
             />}
             {content === "History" && <EditHistory image={data}/>}
-            {content === "" && <SaveChanges setContent={setContent}/>}
+            {content === "" && <SaveChanges direction={direction} handleSave={handleSave} saving={saving}/>}
             {content === "Image Label" &&
             <div style={{padding:'10px'}}>
                 
-            {/* <Typography fontSize='small'>Location</Typography> */}
-          
-            {/* <Select disabled={readOnly} fullWidth size='small' value={location} onChange={(e)=>setLocation(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
-              {locations.map((item, index) =>{
-                return (<MenuItem key={index} value={item.value}>{item.label}</MenuItem>)
-              })}
-            </Select> */}
-          
-            {/* <Typography fontSize='small'>Clinical Diagnosis</Typography> */}
-            {/* <Select disabled={readOnly} fullWidth size='small' value={clinicalDiagnosis} onChange={(e)=>setClinicalDiagnosis(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
-              {diagnosis.map((item, index) =>{
-                return (<MenuItem key={index} value={item.value}>{item.label}</MenuItem>)
-              })}
-            </Select> */}
-  
-            {/* <Typography fontSize='small'>Lesion Present</Typography>
-            <Select disabled={readOnly} fullWidth size='small'  value={lesion} onChange={(e)=>setLesion(e.target.value)} sx={{backgroundColor: "white", mb:1}} MenuProps={{ PaperProps: { sx: { maxHeight: 400 } } }}>
-                <MenuItem value={false}>False</MenuItem>
-                <MenuItem value={true}>True</MenuItem>
-            </Select> */}
             <Box sx={{bgcolor:'#fbfbfb', borderRadius:1, p:1}}>
+              <Typography variant='body2'><b>Current Status</b></Typography>
+              <br/>
+              <Typography variant='body2' color='green' noWrap>{data.status}</Typography>
+              <br/>
               <Typography variant='body2'><b>Image Data</b></Typography>
               <br/>
               <Typography variant='body2' noWrap>Clinical Diagnosis:</Typography>
@@ -1012,8 +1068,10 @@ const Canvas = ({data, setData, regionNames, locations, diagnosis}) => {
             </Box>
             </div>
           </Box>
+        </Drawer>
         }
     </div>
+    <NotificationBar status={status} setStatus={setStatus}/>
     </>
   )
 }

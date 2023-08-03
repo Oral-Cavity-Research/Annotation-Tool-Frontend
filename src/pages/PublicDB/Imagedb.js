@@ -50,7 +50,6 @@ const getCount = ()=>{
           },
           withCredentials: true
       }).then(res=>{
-          console.log(res.data);
           setCount(res.data);
       }).catch(err=>{
           if(err.response) showMsg(err.response.data.message, "error")
@@ -72,8 +71,8 @@ useEffect(() => {
     'All',
     'Healthy',
     'Benign',
-    'OCA',
-    'OPMD'
+    'OPMD',
+    'OCA'
   ];
 
   const handleOptionChange = (event) => {
@@ -84,23 +83,15 @@ useEffect(() => {
     setPage(value);
 };
 
-const radio = {
-  marginTop: 100,
-  marginBottom: 100,
-  display: 'flex',
-  justifyContent: 'center',
-
-}
-
   return (
     <div>
-      <div style={radio}>
-      <FormGroup row>
+      
+      <FormGroup row sx={{justifyContent:'center', my:5}}>
         {options.map((option, index) => (
           <FormControlLabel
             key={index}
             value={option}
-            control={<Radio color="primary" />}
+            control={<Radio size='small' color="primary" />}
             label={option}
             labelPlacement="bottom"
             checked={filtOptions === option}
@@ -108,8 +99,6 @@ const radio = {
           />
         ))}
       </FormGroup>
-
-      </div>
       
       <List>
       {data.map((item, index) => (        
