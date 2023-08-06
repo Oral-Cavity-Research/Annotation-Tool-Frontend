@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import ImageCard from './ImageCard';
-import { Radio, FormControlLabel, FormGroup } from '@mui/material';
+import { Radio, FormControlLabel, FormGroup, Button } from '@mui/material';
 import {Paper,Typography,Box, Stack, IconButton, MenuItem, Skeleton, Badge, Pagination, List, ListItem} from '@mui/material';
 import axios from 'axios';
 import { useSelector} from 'react-redux';
+import {saveAs} from "file-saver";
+import { Download } from '@mui/icons-material';
 
 const Imagedb = () => {
 
@@ -83,8 +85,20 @@ useEffect(() => {
     setPage(value);
 };
 
+const downloadZip = ()=>{
+  let url = `${process.env.REACT_APP_IMAGE_PATH}/all_images.zip`;
+  saveAs(url, 'all_images');
+}
+
   return (
     <div>
+
+  <div style={{alignItems: "center",display: "flex", flexDirection: "column", marginTop: "30px" }}>
+
+    <Button startIcon={<Download/>} size='small' variant="contained" color="inherit" onClick={() => downloadZip()}>
+      database (400MB)
+    </Button>
+  </div>
       
       <FormGroup row sx={{justifyContent:'center', my:5}}>
         {options.map((option, index) => (
