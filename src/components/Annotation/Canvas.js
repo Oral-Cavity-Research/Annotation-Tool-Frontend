@@ -1008,9 +1008,9 @@ const Canvas = ({imagedata, regionNames}) => {
               <LoadingButton loading={loadingNav} loadingPosition="end" size='small' onClick={handleNext} color='inherit' disabled={navigateTo.next === null} endIcon={<NavigateNext/>} fullWidth variant='contained'>Next</LoadingButton>
             </Stack>
           </Stack>
-          {/* <Box sx={{bgcolor:'white', borderRadius:1, p:1, my:2}}>
+          <Box sx={{bgcolor:'white', borderRadius:1, p:1, my:2}}>
             <Button fullWidth variant='contained' onClick={show_prediction} sx={{bgcolor:'var(--dark-color)'}} startIcon={<OnlinePrediction/>}>Prediction</Button>
-          </Box> */}
+          </Box>
           </div>
         </Box>
         </div>

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import ImageCard from './ImageCard';
-import { Radio, FormControlLabel, FormGroup, Button } from '@mui/material';
-import {Paper,Typography,Box, Stack, IconButton, MenuItem, Skeleton, Badge, Pagination, List, ListItem} from '@mui/material';
+import { Radio, FormControlLabel, FormGroup, Button, Divider, Box } from '@mui/material';
+import {Typography,Stack, Pagination, List, ListItem} from '@mui/material';
 import axios from 'axios';
 import { useSelector} from 'react-redux';
 import {saveAs} from "file-saver";
-import { Download } from '@mui/icons-material';
+import {ArrowLeft, Download } from '@mui/icons-material';
+import NotificationBar from '../../components/NotificationBar';
+import { useNavigate } from 'react-router-dom';
 
 const Imagedb = () => {
 
@@ -15,8 +17,9 @@ const Imagedb = () => {
   const [page, setPage] = useState(1);
   const [data, setData] = useState([]);
   const userData = useSelector(state => state.data);
-  const limit = 10;
   const [status, setStatus] = useState({msg:"",severity:"success", open:false});
+  const limit = 10;
+  const navigate = useNavigate();
 
   const showMsg = (msg, severity)=>{
     setStatus({msg, severity, open:true})
@@ -35,7 +38,7 @@ const Imagedb = () => {
             setData(res.data);
 
         }).catch(err=>{
-            if(err.response) showMsg(err.response.data.message, "error")
+            if(err.response) showMsg(err.response?.data?.message, "error")
             else alert(err)
         }).finally(()=>{
             setLoading(false);
@@ -54,7 +57,7 @@ const getCount = ()=>{
       }).then(res=>{
           setCount(res.data);
       }).catch(err=>{
-          if(err.response) showMsg(err.response.data.message, "error")
+          if(err.response) showMsg(err.response?.data?.message, "error")
           else alert(err)
       })
   
@@ -90,15 +93,19 @@ const downloadZip = ()=>{
   saveAs(url, 'all_images');
 }
 
+const goBack = () => {
+    navigate(-1);
+}
+
   return (
     <div>
 
-  <div style={{alignItems: "center",display: "flex", flexDirection: "column", marginTop: "30px" }}>
-
-    <Button startIcon={<Download/>} size='small' variant="contained" color="inherit" onClick={() => downloadZip()}>
+  <Stack direction='row' justifyContent='space-between' m={3}>
+    <Button size='small' color="inherit" onClick={goBack} startIcon={<ArrowLeft/>}>Go Back</Button>
+    <Button startIcon={<Download/>} size='small' color="inherit" onClick={() => downloadZip()}>
       database (400MB)
     </Button>
-  </div>
+  </Stack>
       
       <FormGroup row sx={{justifyContent:'center', my:5}}>
         {options.map((option, index) => (
@@ -136,7 +143,13 @@ const downloadZip = ()=>{
                 :
             <Pagination size='small' count={Math.ceil(count / 10)} page={page} onChange={changePage}></Pagination>
         }
-        </Stack>
+      </Stack>
+      <Box p={5}>
+        <Divider/>
+        <br/>
+        <Typography>Patients presenting to the Oral Medicine clinic, Teaching hospital Peradeniya, and the bystanders and relatives of patients  were recruited for this study.  Images inside the oral cavity were obtained by the dental surgeons in the clinic supervised by oral medicine specialists. Images were obtained using the camera of the mobile phones under the natural light/light source of the dental chair. Socio-demographic and clinical details of patients were obtained from medical records. Images were labeled, categorized, and annotated by two mid-career dental surgeons, supervised by two oral medicine specialists. </Typography>
+      </Box>
+      <NotificationBar status={status} setStatus={setStatus}/>
     </div>
   );
 };

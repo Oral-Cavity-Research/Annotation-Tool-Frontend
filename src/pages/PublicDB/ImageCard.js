@@ -42,18 +42,15 @@ const ImageCard = ({imagepath, imagename, masks, age, gender, clinical, risks}) 
     masks.forEach((item) => {
       const { annotations, name } = item;
       const scaled = annotations.map((element) => Math.round(element * svgWidth / imageWidth));
-      console.log(annotations)
-      console.log(scaled)
-      console.log(svgWidth, imageWidth)
       var pointstring = scaled.join(',');
       regions.push(
-        <polygon points={pointstring} strokeWidth={2} fill='transparent' stroke={stringToColor(name)}></polygon>
+        <polygon points={pointstring} strokeWidth={4} fill='transparent' stroke={stringToColor(name)}></polygon>
       )
     })
   
     setPolygons(regions)
 
-  },[imageWidth])
+  },[imageWidth, imagename, masks])
 
   // get the size of the image
   const get_dimensions = (img)=>{

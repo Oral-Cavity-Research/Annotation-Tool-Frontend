@@ -18,6 +18,10 @@ import MyWork from './pages/MyWork';
 import Options from './pages/Options';
 import Imagedb from './pages/PublicDB/Imagedb';
 import ProtectedRoute from './components/ProtectedRoute';
+import SignuPage from './pages/SignupPage';
+import Admin from './pages/Admin';
+import Users from './pages/Users';
+import UserRequests from './pages/UserRequests';
 
 function App() { 
   const dispatch = useDispatch();
@@ -47,6 +51,7 @@ function App() {
       <Route path='/' element={<Outlet/>}>
         <Route index element={<LoginPage/>}/>
         <Route path='/login' element={<LoginPage/>}/>
+        <Route path='/signup' element={<SignuPage/>}/>
         <Route path='/' element={<ProtectedRoute><Layout/></ProtectedRoute>}>
           <Route path='/home' element={<Home/>}>
             <Route index element={<Images/>}/>
@@ -61,7 +66,12 @@ function App() {
             <Route path='/mywork/approved' element={<Approved/>}/>
           </Route>
           <Route path='/image/:id' element={<ImageDisplay/>}/>
-          <Route path='/options' element={<Options/>}/>
+          <Route path='/admin' element={<Admin/>}>
+            <Route index element={<UserRequests/>}/>
+            <Route path='/admin/requests' element={<UserRequests/>}/>
+            <Route path='/admin/users' element={<Users/>}/>
+            <Route path='/admin/options' element={<Options/>}/>
+          </Route>
         </Route>
         <Route path='/imagedb' element={<Imagedb/>}/>
         <Route path='/*' element={<NotFoundPage/>}/>

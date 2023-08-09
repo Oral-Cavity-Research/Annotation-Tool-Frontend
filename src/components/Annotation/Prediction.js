@@ -25,7 +25,7 @@ const Prediction = ({img, name, showMsg}) => {
             'Authorization': `Bearer ${userData.accessToken.token}`,
             'email': userData.email,
         }}).then(res=>{
-            setData(res.data)
+            console.log(res.data)
             if(res.data.error){
                 showMsg(res.data.error, "error")
             }

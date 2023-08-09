@@ -76,15 +76,20 @@ function MenuBar() {
     navigate('/mywork');
   };
 
-  const handleGoToOptions = ()=>{
+  const handleGoToDB = ()=>{
     handleCloseNavMenu()
-    navigate('/options');
+    navigate('/imagedb');
+  };
+
+  const handleGoToAdmin = ()=>{
+    handleCloseNavMenu()
+    navigate('/admin');
   };
 
   const goToImages = ()=>{
-    sessionStorage.setItem("myworkfilter", "Changes Requested");
-    sessionStorage.setItem("myworkpage", 1);
-    navigate('/mywork/images');
+    sessionStorage.setItem("allfilter", "Changes Requested");
+    sessionStorage.setItem("allpage", 1);
+    navigate('/home/images');
     handleCloseNotification();
   }
 
@@ -102,6 +107,7 @@ function MenuBar() {
       withCredentials: true
     }).then(res=>{
         setData(res.data);
+        console.log(res.data)
     }).catch(err=>{
         console.log(err)
     })
@@ -150,8 +156,11 @@ function MenuBar() {
               <MenuItem onClick={handleGoToMyWork}>
                 <Typography textAlign="center">My Work</Typography>
               </MenuItem>
-              <MenuItem onClick={handleGoToOptions}>
-                <Typography textAlign="center">Options</Typography>
+              <MenuItem onClick={handleGoToDB}>
+                <Typography textAlign="center">Database</Typography>
+              </MenuItem>
+              <MenuItem onClick={handleGoToAdmin}>
+                <Typography textAlign="center">Admin</Typography>
               </MenuItem>
             </Menu>
           </Box>
@@ -159,8 +168,8 @@ function MenuBar() {
            
             <Button onClick={handleGoToHome} sx={{ my: 2, color: 'white', display: 'block' }}>Home</Button>
             <Button onClick={handleGoToMyWork} sx={{ my: 2, color: 'white', display: 'block' }}>My Work</Button>
-            <Button onClick={handleGoToOptions} sx={{ my: 2, color: 'white', display: 'block' }}>Options</Button>
-         
+            <Button onClick={handleGoToDB} sx={{ my: 2, color: 'white', display: 'block' }}>Database</Button>
+            <Button onClick={handleGoToAdmin} sx={{ my: 2, color: 'white', display: 'block' }}>Admin</Button>
           </Box>
 
           <Stack direction='row' alignItems='flex-end' justifyContent='center' spacing={3}>

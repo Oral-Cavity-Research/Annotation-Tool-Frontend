@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import logo from '../Assets/logo.png';
-import { Paper, Stack, Box, Typography, Divider } from '@mui/material';
+import { Paper, Stack, Box, Typography, Divider, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import NotificationBar from '../components/NotificationBar';
 import { useDispatch } from 'react-redux';
@@ -59,6 +59,10 @@ function LoginPage() {
         showMsg("Failed to login",'error')
     }
 
+    const goTosignup = () =>{
+        navigate('/signup')
+    }
+    
     return (
         <div className="App">
         <header className="App-header">
@@ -74,6 +78,10 @@ function LoginPage() {
                     type= "standard"
                     useOneTap
                 />
+                <Stack direction='row' alignItems='center'>
+                    <Typography>Don't have an account?</Typography>
+                    <Button color='info' size='small' onClick={goTosignup}>Signup</Button>
+                </Stack>
             </Stack>
             </Box>
             </Paper>
