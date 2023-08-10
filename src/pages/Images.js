@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {Paper,Typography,Box, Grid, Stack, IconButton, MenuItem, Skeleton, Badge, Pagination} from '@mui/material';
-import { FilterList } from '@mui/icons-material';
+import {Paper,Typography,Box, Grid, Stack, IconButton, MenuItem, Skeleton, Badge, Pagination, FormControl, OutlinedInput, InputAdornment, Button} from '@mui/material';
+import { FilterList, Search } from '@mui/icons-material';
 import { useSelector} from 'react-redux';
 import NotificationBar from '../components/NotificationBar';
 import axios from 'axios';
@@ -17,6 +17,9 @@ function Images() {
     const [filt, setFilt] = useState(null);
     const [page, setPage] = useState(-1);
     const [count, setCount] = useState(0);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [searchingWord, setSearchingWord] = useState("");
+    const [searchState, setSearchState] = useState(false);
     const [filtOptions, setFlitOptions] = useState([]);
 
     useEffect(()=>{
@@ -29,7 +32,7 @@ function Images() {
             setPage(pageNo)
         }else{
             setFlitOptions(["All","New","Edited","Changes Requested","Reviewed"])
-            const filter = sessionStorage.getItem("allfilter")?sessionStorage.getItem("allfilter"): "New";
+            const filter = sessionStorage.getItem("allfilter")?sessionStorage.getItem("allfilter"): "All";
             const pageNo = sessionStorage.getItem("allpage")?sessionStorage.getItem("allpage"): 1;
             setFilt(filter)
             setPage(pageNo)
@@ -83,7 +86,7 @@ function Images() {
             })
         }else{
             axios.get(`${process.env.REACT_APP_BE_URL}/image/all`,{
-                params: { page: page, filter: filt},
+                params: { page: page, filter: filt, search: searchingWord},
                 headers: {
                     'Authorization': `Bearer ${userData.accessToken.token}`,
                     'email': userData.email,
@@ -91,6 +94,7 @@ function Images() {
                 withCredentials: true
             }).then(res=>{
                 setData(res.data);
+                console.log(searchTerm)
                 sessionStorage.setItem("allfilter", filt);
                 sessionStorage.setItem("allpage", page);
             }).catch(err=>{
@@ -120,7 +124,7 @@ function Images() {
             })
         }else{
             axios.get(`${process.env.REACT_APP_BE_URL}/image/all/count`,{
-                params: {filter: filt},
+                params: {filter: filt, search: searchingWord},
                 headers: {
                     'Authorization': `Bearer ${userData.accessToken.token}`,
                     'email': userData.email,
@@ -140,31 +144,74 @@ function Images() {
     };
 
     useEffect(() => {
+        console.log(filt, page)
         if(filt === null || page === -1) return
         getCount();
-    }, [filt]);
+    }, [filt, searchState]);
+
 
     useEffect(() => {
         if(filt === null || page === -1) return
         getData();
-    }, [page, filt]);
+    }, [page, filt, searchState]);
+
+    const handleSearch = ()=>{
+        setSearchingWord(searchTerm)
+        setSearchState(!searchState)
+    }
+
+    const clearSearch = ()=>{
+        setSearchingWord("")
+        setSearchTerm("")
+        setSearchState(!searchState)
+    }
 
     return (
         <div>
-        <Stack direction='row-reverse' alignItems='center'  spacing={1}>
-        <IconButton
-            id="fade-button"
-            aria-controls={open ? 'fade-menu' : undefined}
-            aria-haspopup="true"
-            aria-expanded={open ? 'true' : undefined}
-            onClick={handleOpen}
-            sx={{my:1}}
-        >
-        <Badge color='primary' badgeContent={count} max={99}>
-        <FilterList/> 
-        </Badge>
-        </IconButton>
-        <Typography variant='body2' color='GrayText'>{filt}</Typography>
+        <Stack direction='row' justifyContent='space-between' my={2}>
+            <Stack direction='row' alignItems='center'  spacing={1}>
+                {
+                searchingWord !== ""? 
+                <>
+                <Typography>Search Term: {searchingWord}</Typography>
+                <Button onClick={clearSearch}>Clear</Button>
+                </>
+                :<>
+                <IconButton
+                    id="fade-button"
+                    aria-controls={open ? 'fade-menu' : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={open ? 'true' : undefined}
+                    onClick={handleOpen}
+                    sx={{my:1}}
+                >
+                <Badge color='primary' badgeContent={count} max={99}>
+                <FilterList/> 
+                </Badge>
+                </IconButton>
+                <Typography variant='body2' color='GrayText'>{filt}</Typography>
+                </>
+                }
+            </Stack>
+            <FormControl sx={{width: '30ch' }} variant="outlined">
+            <OutlinedInput
+                placeholder='Search by name'
+                size='small'
+                inputProps={{ maxLength: 20}}
+                value={searchTerm}
+                onChange={(e)=>setSearchTerm(e.target.value)}
+                endAdornment={
+                <InputAdornment position="end">
+                    <IconButton onClick={handleSearch}
+                    edge="end"
+                    >
+                    <Search/>
+                    </IconButton>
+                </InputAdornment>
+                }
+            />
+            </FormControl>
+            {/* <Button>Clear</Button> */}
         </Stack>
         <StyledMenu id="demo-customized-menu"  MenuListProps={{'aria-labelledby': 'demo-customized-button'}} anchorEl={anchorEl} open={open} onClose={handleClose}>
             {filtOptions.map((item,index)=>{ return(<MenuItem key={index} onClick={()=>handleFilter(item)}>{item}</MenuItem>)})}
@@ -221,7 +268,13 @@ function Images() {
 
         <Stack direction='row' justifyContent='center' sx={{my:5}}>
         { count === 0 ?
-            <Typography sx={{m:3}} variant='body2' color='GrayText'>{loading?"":`No ${filt} Images`}</Typography>
+            <>
+            {searchingWord === ""?
+                <Typography sx={{m:3}} variant='body2' color='GrayText'>{loading?"":`No ${filt} Images`}</Typography>
+                :
+                <Typography sx={{m:3}} variant='body2' color='GrayText'>{loading?"":`No Matching Images`}</Typography>
+            }
+            </>
                 :
             <Pagination size='small' count={(Math.floor((count-1)/18)+1)} page={Number(page)} onChange={changePage}></Pagination>
         }
