@@ -1,6 +1,6 @@
 import React from 'react';
 import {IconButton, Tooltip, Box, Menu, MenuItem, ListItemIcon, ListItemText, Divider, Button, ButtonGroup, Badge} from '@mui/material';
-import {Preview,ZoomIn,CropFree,ZoomOut,Close, HelpOutline, Style, Draw, Settings, OpenWith, Message} from '@mui/icons-material';
+import {Preview,ZoomIn,ZoomOut,Close, HelpOutline, Style, Draw, Settings, OpenWith, Message, Download} from '@mui/icons-material';
 import {ArrowUpward, ArrowDownward, ArrowBack, ArrowForward, Opacity, Check} from '@mui/icons-material';
 import {Label, LabelOff} from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -64,6 +64,7 @@ const ButtonPanel = ({func, labelVisibility, readOnly, drawingMode, status}) => 
                 }}
             >            
                 <Tooltip enterNextDelay={1000} title="Show Regions" placement="bottom-end" arrow><Button size='small' onClick={func.show_regions}><Preview fontSize='small' sx={{color:"var(--dark-color)"}}/></Button></Tooltip>
+                <Tooltip enterNextDelay={1000} title="Download Regions" placement="bottom-end" arrow><Button size='small' onClick={func.downloadJsonFile}><Download fontSize='small' sx={{color:"var(--dark-color)"}}/></Button></Tooltip>
                 {!readOnly && <Tooltip enterNextDelay={1000} title="Finish Drawing" placement="bottom-end" arrow><Button size='small' onClick={func.finish_drawing}><Check  fontSize='small' sx={{color:"var(--dark-color)"}}/></Button></Tooltip>}
                 {!readOnly && <Tooltip enterNextDelay={1000} title="Delete Selected" placement="bottom-end" arrow><Button size='small' onClick={func.delete_selected}><Close  fontSize='small' sx={{color:"var(--dark-color)"}}/></Button></Tooltip>}
             
@@ -276,6 +277,10 @@ const ButtonPanel = ({func, labelVisibility, readOnly, drawingMode, status}) => 
             <MenuItem onClick={func.show_regions}>
                 <ListItemIcon> <Preview fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
                 <ListItemText>Show Regions</ListItemText>
+            </MenuItem>
+            <MenuItem onClick={func.downloadJsonFile}>
+                <ListItemIcon> <Download fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
+                <ListItemText>Download Regions</ListItemText>
             </MenuItem>
             {/* {!readOnly && 
             <MenuItem onClick={func.clear_all}>

@@ -5,7 +5,7 @@ import { stringToColor } from '../../components/Utils';
 import '../../App.css'
 import { Download } from '@mui/icons-material';
 
-const ImageCard = ({imagepath, imagename, masks, age, gender, clinical, risks}) => {
+const ImageCard = ({createdAt, updatedAt, imagepath, imagename, masks, age, gender, clinical, risks}) => {
 
   const [imageWidth, setImageWidth] = useState(0);
   const [polygons, setPolygons] = useState(<></>);
@@ -22,13 +22,13 @@ const ImageCard = ({imagepath, imagename, masks, age, gender, clinical, risks}) 
   const downloadImage = (imagepath, imagename)=>{
     let url = `${process.env.REACT_APP_IMAGE_PATH}/${imagepath}/${imagename}`;
     saveAs(url, imagename);
-   }
+  }
 
   // *** this needs to be modified
-  const downloadAnnotation = (imagepath, imagename)=>{
-  let url = `${process.env.REACT_APP_IMAGE_PATH}/${imagepath}/${imagename}`;
-  saveAs(url, imagename);
-  }
+  // const downloadAnnotation = (imagepath, imagename)=>{
+  // let url = `${process.env.REACT_APP_IMAGE_PATH}/${imagepath}/${imagename}`;
+  // saveAs(url, imagename);
+  // }
 
   // Function to draw polygons in the SVG
   useEffect(()=>{
@@ -39,12 +39,12 @@ const ImageCard = ({imagepath, imagename, masks, age, gender, clinical, risks}) 
     const svgWidth = svg.clientWidth;
 
     var regions = []
-    masks.forEach((item) => {
+    masks.forEach((item, index) => {
       const { annotations, name } = item;
       const scaled = annotations.map((element) => Math.round(element * svgWidth / imageWidth));
       var pointstring = scaled.join(',');
       regions.push(
-        <polygon points={pointstring} strokeWidth={4} fill='transparent' stroke={stringToColor(name)}></polygon>
+        <polygon key={index} points={pointstring} strokeWidth={4} fill='transparent' stroke={stringToColor(name)}></polygon>
       )
     })
   
@@ -57,6 +57,27 @@ const ImageCard = ({imagepath, imagename, masks, age, gender, clinical, risks}) 
     const image_width = img.nativeEvent.srcElement.naturalWidth;
     setImageWidth(image_width);
   }
+
+  const downloadJsonFile = () => {
+    const jsonData = {
+      image_name : imagename,
+      clinical_diagnosis: clinical,
+      age: age,
+      risks: risks,
+      annotation : masks,
+      createdAt, updatedAt
+    }
+
+    const fileName = imagename.split('.').slice(0, -1).join('.') + '.json'
+    const jsonBlob = new Blob([JSON.stringify(jsonData)], { type: 'application/json' });
+    const url = URL.createObjectURL(jsonBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+  
 
   return (
   <Card className='cardStyle' >
@@ -90,7 +111,7 @@ const ImageCard = ({imagepath, imagename, masks, age, gender, clinical, risks}) 
               </tr>
               <tr>
                 <td><Typography><b>Risk Habits: </b></Typography></td>
-                <td><Typography>{risks}</Typography></td>
+                <td><Typography></Typography></td>
               </tr>
             </tbody>
           </table>
@@ -124,7 +145,7 @@ const ImageCard = ({imagepath, imagename, masks, age, gender, clinical, risks}) 
         Image
       </Button>
 
-      <Button startIcon={<Download/>} size='small' variant="contained" color="inherit" onClick={() => downloadAnnotation(imagepath, imagename)}>
+      <Button startIcon={<Download/>} size='small' variant="contained" color="inherit" onClick={downloadJsonFile}>
         Annotations
       </Button>
     </Stack>

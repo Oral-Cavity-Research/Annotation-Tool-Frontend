@@ -17,6 +17,7 @@ import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import NotificationBar from '../NotificationBar';
 import Prediction from './Prediction';
+import {saveAs} from "file-saver";
 
 // global variables 
 // todo: check whether we could use useStates instead
@@ -875,6 +876,39 @@ const Canvas = ({imagedata, regionNames}) => {
     setNavigateThrough(event.target.value);
   }
 
+
+  const downloadImage = ()=>{
+    let url = `${process.env.REACT_APP_IMAGE_PATH}/${data.image_path}/${data.image_name}`;
+    saveAs(url, data.image_name);
+  }
+
+  const downloadJsonFile = () => {
+
+    const coor = getCoordinates();
+
+    const jsonData = {
+      image_name : data.image_name,
+      age: data.age,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+      location: data.location,
+      clinical_diagnosis: data.clinical_diagnosis,
+      annotation: coor,
+    }
+
+    const fileName = data.image_name?.split('.').slice(0, -1).join('.') + '.json'
+    const jsonBlob = new Blob([JSON.stringify(jsonData)], { type: 'application/json' });
+    const url = URL.createObjectURL(jsonBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    link.click();
+    URL.revokeObjectURL(url);
+
+    downloadImage();
+  };
+
+
   return (
     <>
     <div className='page_body' onMouseDown={(e)=>{deselect_all(e)}}>
@@ -906,7 +940,7 @@ const Canvas = ({imagedata, regionNames}) => {
           </Menu>
 
           {/******************* button pannel *************************/}
-          <ButtonPanel func={{finish_drawing,setDrawingMode,show_regions,show_history, zoom_in, zoom_out, move_selected, 
+          <ButtonPanel func={{downloadJsonFile,finish_drawing,setDrawingMode,show_regions,show_history, zoom_in, zoom_out, move_selected, 
           delete_selected, show_help, show_label, label_type, opacity_change, show_actions}} labelVisibility={labelVisibility} readOnly={readOnly} drawingMode={drawingMode} status={data.status}/>
           
           {!readOnly &&

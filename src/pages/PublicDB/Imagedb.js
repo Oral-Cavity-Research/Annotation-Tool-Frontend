@@ -5,7 +5,7 @@ import {Typography,Stack, Pagination, List, ListItem} from '@mui/material';
 import axios from 'axios';
 import { useSelector} from 'react-redux';
 import {saveAs} from "file-saver";
-import {ArrowLeft, Download } from '@mui/icons-material';
+import {Download } from '@mui/icons-material';
 import NotificationBar from '../../components/NotificationBar';
 import { useNavigate } from 'react-router-dom';
 
@@ -23,7 +23,7 @@ const Imagedb = () => {
 
   const showMsg = (msg, severity)=>{
     setStatus({msg, severity, open:true})
-}
+  }
 
   const getData = ()=>{
     setLoading(true);
@@ -101,10 +101,10 @@ const goBack = () => {
     <div>
 
   <Stack direction='row' justifyContent='space-between' m={3}>
-    <Button size='small' color="inherit" onClick={goBack} startIcon={<ArrowLeft/>}>Go Back</Button>
-    <Button startIcon={<Download/>} size='small' color="inherit" onClick={() => downloadZip()}>
+    <Button endIcon={<Download/>} size='small' variant='contained' color="primary" onClick={() => downloadZip()}>
       database (400MB)
     </Button>
+    <Button size='small' color="inherit" onClick={goBack}>Go Back</Button>
   </Stack>
       
       <FormGroup row sx={{justifyContent:'center', my:5}}>
@@ -123,17 +123,17 @@ const goBack = () => {
       
       <List>
       {data.map((item, index) => (        
-        
         <ListItem key={index} style={{width: "100%"}}>
           
         {!item.annotation || item.annotation.length === 0 ? (
-          <ImageCard imagepath={item.image_path} imagename={item.image_name} masks={[]} age={item.age} gender={item.gender} clinical={item.clinical_diagnosis} risks={item.risk_habits}/>
+          <ImageCard createdAt={item.createdAt} updatedAt={item.updatedAt} imagepath={item.image_path} imagename={item.image_name} masks={[]} age={item.age} gender={item.gender} clinical={item.clinical_diagnosis} risks={item.risk_habits}/>
 
           ) : (
-          <ImageCard imagepath={item.image_path} imagename={item.image_name} masks={item.annotation} age={item.age} gender={item.gender} clinical={item.clinical_diagnosis} risks={item.risk_habits}/>
+          <ImageCard createdAt={item.createdAt} updatedAt={item.updatedAt} imagepath={item.image_path} imagename={item.image_name} masks={item.annotation} age={item.age} gender={item.gender} clinical={item.clinical_diagnosis} risks={item.risk_habits}/>
           
       )}
-      </ListItem>))}
+      </ListItem>
+    ))}
     </List>
       
 

@@ -8,6 +8,7 @@ import { setUserData } from '../Reducers/userDataSlice';
 import { GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 import jwt_decode from 'jwt-decode';
+import { Storage } from '@mui/icons-material';
 
 
 function LoginPage() {
@@ -62,10 +63,17 @@ function LoginPage() {
     const goTosignup = () =>{
         navigate('/signup')
     }
+
+    const goToDB = ()=>{
+        navigate('/imagedb');
+    }
     
     return (
         <div className="App">
         <header className="App-header">
+            <Box position='absolute' top={0} right={0} p={3}>
+                <Button onClick={goToDB} startIcon={<Storage/>}>Public DB</Button>
+            </Box>
             <Paper sx={{maxWidth:'400px', width:'100%'}}>
             <Box sx={{p:3}}>
             <Stack direction='column' alignItems='center' spacing={2}>

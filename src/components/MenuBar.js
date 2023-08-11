@@ -107,7 +107,6 @@ function MenuBar() {
       withCredentials: true
     }).then(res=>{
         setData(res.data);
-        console.log(res.data)
     }).catch(err=>{
         console.log(err)
     })
@@ -168,8 +167,8 @@ function MenuBar() {
            
             <Button onClick={handleGoToHome} sx={{ my: 2, color: 'white', display: 'block' }}>Home</Button>
             <Button onClick={handleGoToMyWork} sx={{ my: 2, color: 'white', display: 'block' }}>My Work</Button>
-            <Button onClick={handleGoToDB} sx={{ my: 2, color: 'white', display: 'block' }}>Database</Button>
             <Button onClick={handleGoToAdmin} sx={{ my: 2, color: 'white', display: 'block' }}>Admin</Button>
+            <Button onClick={handleGoToDB} sx={{ my: 2, color: 'white', display: 'block' }}>Database</Button>
           </Box>
 
           <Stack direction='row' alignItems='flex-end' justifyContent='center' spacing={3}>

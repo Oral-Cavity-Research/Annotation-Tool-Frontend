@@ -94,7 +94,6 @@ function Images() {
                 withCredentials: true
             }).then(res=>{
                 setData(res.data);
-                console.log(searchTerm)
                 sessionStorage.setItem("allfilter", filt);
                 sessionStorage.setItem("allpage", page);
             }).catch(err=>{
@@ -144,7 +143,6 @@ function Images() {
     };
 
     useEffect(() => {
-        console.log(filt, page)
         if(filt === null || page === -1) return
         getCount();
     }, [filt, searchState]);
