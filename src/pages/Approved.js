@@ -118,7 +118,9 @@ export default function Approved() {
         <Skeleton variant='rounded' width={'100%'} height={70} />
       </Stack>
       : 
-      <Box sx={{ width: '100%', bgcolor: 'background.paper', my:5}}>
+      <> 
+      <Typography variant='body2' color='GrayText' my={3}>Approved ({count})</Typography>
+      <Box sx={{ width: '100%', bgcolor: 'background.paper'}}>
       {
         data.map((item, index)=>(
           <Box key={index} className="image_list" onClick={()=>handleClick(item._id)}>
@@ -133,6 +135,7 @@ export default function Approved() {
         ))
       }
     </Box>
+    </>
     }
     <Stack direction='row' justifyContent='center' sx={{my:5}}>
         { count === 0 ?
