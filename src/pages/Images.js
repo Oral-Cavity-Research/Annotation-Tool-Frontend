@@ -31,8 +31,8 @@ function Images() {
             setFilt(filter)
             setPage(pageNo)
         }else{
-            setFlitOptions(["All","New","Edited","Changes Requested","Reviewed"])
-            const filter = sessionStorage.getItem("allfilter")?sessionStorage.getItem("allfilter"): "All";
+            setFlitOptions(["All","Unannotated","New","Edited","Changes Requested","Reviewed"])
+            const filter = sessionStorage.getItem("allfilter")?sessionStorage.getItem("allfilter"): "Unannotated";
             const pageNo = sessionStorage.getItem("allpage")?sessionStorage.getItem("allpage"): 1;
             setFilt(filter)
             setPage(pageNo)
@@ -183,11 +183,9 @@ function Images() {
                     onClick={handleOpen}
                     sx={{my:1}}
                 >
-                <Badge color='primary' badgeContent={count} max={99}>
                 <FilterList/> 
-                </Badge>
                 </IconButton>
-                <Typography variant='body2' color='GrayText'>{filt}</Typography>
+                <Typography variant='body2' color='GrayText'>{filt} ({count})</Typography>
                 </>
                 }
             </Stack>

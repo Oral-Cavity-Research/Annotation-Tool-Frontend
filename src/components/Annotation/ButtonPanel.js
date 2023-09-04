@@ -282,12 +282,6 @@ const ButtonPanel = ({func, labelVisibility, readOnly, drawingMode, status}) => 
                 <ListItemIcon> <Download fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
                 <ListItemText>Download Regions</ListItemText>
             </MenuItem>
-            {/* {!readOnly && 
-            <MenuItem onClick={func.clear_all}>
-                <ListItemIcon> <CancelOutlined fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
-                <ListItemText>Clear All</ListItemText>
-            </MenuItem>} */}
-
             <Divider/>
             <MenuItem onClick={func.show_history}>
                 <ListItemIcon> <Message fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
