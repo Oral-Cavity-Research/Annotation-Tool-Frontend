@@ -12,7 +12,6 @@ const ButtonPanel = ({func, labelVisibility, readOnly, drawingMode, status}) => 
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorSetNav, setAnchorSetNav] = React.useState(null);
     const [anchorMoveNav, setAnchorMoveNav] = React.useState(null);
-
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
     };

@@ -80,7 +80,7 @@ export default function EditHistory({image}) {
         data.map((item, index)=>(
           <ListItem key={index}>
             <ListItemAvatar>
-              {Icon(item.action)}
+            <Avatar src={item.annotator?.picture}></Avatar>
             </ListItemAvatar>
               <Stack direction='column'>
                 <Typography variant='body2'><b>{item.title}</b></Typography>
@@ -93,7 +93,7 @@ export default function EditHistory({image}) {
       } 
         <ListItem>
           <ListItemAvatar>
-            {Icon("New")}
+          <Avatar/>
           </ListItemAvatar>
           <Stack direction='column'>
             <Typography variant='body2'><b>Created</b></Typography>

@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {Box, Button, ButtonBase, ButtonGroup, Chip, Drawer, IconButton, Menu, Select, Stack, Typography} from '@mui/material';
+import {Box, Button, ButtonBase, ButtonGroup, Chip, Divider, Drawer, FormControlLabel, IconButton, Menu, Select, Stack, Switch, Typography} from '@mui/material';
 import RegionTable from './RegionTable';
 import Help from './Help';
 import ButtonPanel from './ButtonPanel';
@@ -9,7 +9,7 @@ import axios from 'axios';
 import { stringToColor } from '../Utils';
 import Actions from './Actions';
 import EditHistory from './EditHistory';
-import {ArrowDropDown, Cancel, Close, NavigateBefore, NavigateNext, OnlinePrediction, SaveAs, TextFields} from '@mui/icons-material';
+import {ArrowDropDown, Cancel, Check, Close, NavigateBefore, NavigateNext, OnlinePrediction, SaveAs, TextFields} from '@mui/icons-material';
 import SaveChanges from './SaveChanges';
 import { useSelector} from 'react-redux';
 import { LoadingButton } from '@mui/lab';
@@ -22,6 +22,13 @@ import {saveAs} from "file-saver";
 // global variables 
 // todo: check whether we could use useStates instead
 const statuses = ["New", "Changes Requested","Review Requested","Edited", "Approved", "Reviewed","Reopened"]
+const categories = [
+  {value:"healthy", label:"Healthy"},
+  {value:"benign", label:"Benign"},
+  {value:"opmd", label:"OPMD"},
+  {value:"oca", label:"OCA"},
+  {value:"unknown", label:"Unknown"}
+]
 
 const mouse = {x : 0, y : 0, button : 0, cursor: 'default'};
 var regions = []
@@ -189,6 +196,8 @@ const Canvas = ({imagedata, regionNames}) => {
   const userData = useSelector(state => state.data);
   const [navigateThrough, setNavigateThrough] = useState(null);
   const [navigateTo, setNavigateTo] = useState({prev: null, next: null});
+  const [publicAvailable, setPublicAvailable] = useState(imagedata.is_public)
+  const [category, setCategory] = useState(imagedata.category)
 
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
@@ -216,6 +225,40 @@ const Canvas = ({imagedata, regionNames}) => {
       setDirection(navigateTo.next);
       setTogglePanel(true);
     }
+  }
+
+  const handleAvailability = (e)=>{
+    setPublicAvailable(e.target.checked)
+    axios.post(`${process.env.REACT_APP_BE_URL}/image/availability/${data._id}`,
+    {
+        is_public: e.target.checked
+    },
+    { headers: {
+        'Authorization': `Bearer ${userData.accessToken.token}`,
+        'email': userData.email,
+    }}).then(res=>{
+    }).catch(err=>{
+        showMsg("Error in updating availability", "error")
+    })
+  }
+
+  const handleCategoryUpdate = ()=>{
+    const prevCategory = data.category
+    setData({...data, category})
+    axios.post(`${process.env.REACT_APP_BE_URL}/image/update/${data._id}`,
+    {
+      category,
+      prevCategory 
+    },
+    { headers: {
+        'Authorization': `Bearer ${userData.accessToken.token}`,
+        'email': userData.email,
+    }}).then(res=>{
+        showMsg("Category is Updated", "success")
+    }).catch(err=>{
+        showMsg("Category update failed", "error")
+        setData({...data, category:prevCategory})
+    })
   }
   
   const handleSave = ()=>{
@@ -876,6 +919,10 @@ const Canvas = ({imagedata, regionNames}) => {
     setNavigateThrough(event.target.value);
   }
 
+  const handleCategoryChange =(event)=>{
+    setCategory(event.target.value);
+  }
+
 
   const downloadImage = ()=>{
     let url = `${process.env.REACT_APP_IMAGE_PATH}/${data.image_path}/${data.image_name}`;
@@ -941,7 +988,7 @@ const Canvas = ({imagedata, regionNames}) => {
 
           {/******************* button pannel *************************/}
           <ButtonPanel func={{downloadJsonFile,finish_drawing,setDrawingMode,show_regions,show_history, zoom_in, zoom_out, move_selected, 
-          delete_selected, show_help, show_label, label_type, opacity_change, show_actions}} labelVisibility={labelVisibility} readOnly={readOnly} drawingMode={drawingMode} status={data.status}/>
+          delete_selected, show_help, show_label, label_type, opacity_change, show_actions}} labelVisibility={labelVisibility} readOnly={readOnly} drawingMode={drawingMode} status={data.last_comment?.action}/>
           
           {!readOnly &&
           <Box sx={{display: { xs: 'none', sm: 'block' } }} >
@@ -985,7 +1032,7 @@ const Canvas = ({imagedata, regionNames}) => {
           <img className="main_img" onLoad={(e)=>{get_dimensions(e)}}  width={size.width} height={size.height} src={data.img} alt="failed to load"/> 
           
           <Box sx={{display: { xs: 'block', sm: 'none' } }}>
-          <Stack direction='column' spacing={1}  p={1} my={2}>
+          <Stack sx={{p:1, my:2}} direction='column' spacing={1}>
             <Select
               value={navigateThrough? navigateThrough: imagedata.status}
               size='small'
@@ -1002,31 +1049,55 @@ const Canvas = ({imagedata, regionNames}) => {
               <LoadingButton loadingPosition="end" loading={loadingNav} size='small' onClick={handleNext} color='inherit' disabled={navigateTo.next === null} endIcon={<NavigateNext/>} variant='contained'>Next</LoadingButton>
             </Stack>
           </Stack>
+          <Box sx={{p:1, my:2}}>
+            <Button fullWidth variant='contained' onClick={show_prediction} sx={{bgcolor:'var(--dark-color)'}} startIcon={<OnlinePrediction/>}>Prediction</Button>
+          </Box>
           </Box>
           </div>
         </div>
         {/******************** image annotation ************************/} 
         <Box className='right_bar' sx={{display: { xs: 'none', sm: 'block' } }}>
-        <div style={{padding:'10px'}}>
+        <Box px={1}>
                 
           <Box sx={{bgcolor:'white', borderRadius:1, p:1}}>
-          <Typography variant='body2'><b>Image Data</b></Typography>
+          <Typography variant='body2' noWrap>Image Name:</Typography>
+          <Typography variant='body2' noWrap>{data.image_name}</Typography>
           <br/>
           <Typography variant='body2' noWrap>Clinical Diagnosis:</Typography>
           <Typography variant='body2' noWrap>{data.clinical_diagnosis}</Typography>
           <br/>
           <Typography variant='body2' noWrap>Category:</Typography>
-          <Typography variant='body2' noWrap>{data.category}</Typography>
+          <Stack direction='row' alignItems='center' spacing={1}>
+            <Select
+                fullWidth
+                variant='standard'
+                value={category}
+                size='small'
+                onChange={handleCategoryChange}
+              >
+                {
+                  categories.map((val, index)=>(
+                    <MenuItem key={index} value={val.value}>{val.label}</MenuItem>
+                  ))
+                }
+            </Select>
+            <IconButton 
+              onClick={handleCategoryUpdate}
+              disabled={data.category === category}
+              sx={{bgcolor:'var(--primary-color)', color:'white', "&:hover":{color:'var(--primary-color)'}}} size='small'>
+              <Check fontSize='small' /></IconButton>
+          </Stack>
           <br/>
-          <Typography variant='body2' noWrap>Image Name:</Typography>
-          <Typography variant='body2' noWrap>{data.image_name}</Typography>
-          </Box>
-          <Box sx={{bgcolor:'white', borderRadius:1, p:1, my:2}}>
-            <Typography variant='body2'><b>Current Status</b></Typography>
-            <Chip size='small' label={data.status} sx={{bgcolor:'gray', color:'white'}} onClick={show_history}/>
+          <Typography variant='body2' noWrap>Make available for public:</Typography>
+          <Switch checked={publicAvailable} onChange={handleAvailability} size='small'/>
+          <br/>
+          <br/>
+          <Typography variant='body2'>Current Status:</Typography>
+          <Chip size='small' label={data.status} sx={{bgcolor:'gray', color:'white'}} onClick={show_history}/>
           </Box>
           <Stack direction='column'  spacing={1} sx={{bgcolor:'#fbfbfb', borderRadius:1, p:1, my:2}}>
             <Select
+              fullWidth
               value={navigateThrough? navigateThrough: imagedata.status}
               size='small'
               onChange={handleNavigationChange}
@@ -1045,7 +1116,7 @@ const Canvas = ({imagedata, regionNames}) => {
           <Box sx={{bgcolor:'white', borderRadius:1, p:1, my:2}}>
             <Button fullWidth variant='contained' onClick={show_prediction} sx={{bgcolor:'var(--dark-color)'}} startIcon={<OnlinePrediction/>}>Prediction</Button>
           </Box>
-          </div>
+          </Box>
         </Box>
         </div>
         {/********************** info panel **********************/}
@@ -1092,10 +1163,32 @@ const Canvas = ({imagedata, regionNames}) => {
               <Typography variant='body2' noWrap>{data.clinical_diagnosis}</Typography>
               <br/>
               <Typography variant='body2' noWrap>Category:</Typography>
-              <Typography variant='body2' noWrap>{data.category}</Typography>
+              <Stack direction='row' alignItems='center' spacing={1}>
+                <Select
+                    fullWidth
+                    variant='standard'
+                    value={category}
+                    size='small'
+                    onChange={handleCategoryChange}
+                  >
+                    {
+                      categories.map((val, index)=>(
+                        <MenuItem key={index} value={val.value}>{val.label}</MenuItem>
+                      ))
+                    }
+                </Select>
+                <IconButton 
+                  onClick={handleCategoryUpdate}
+                  disabled={data.category === category}
+                  sx={{bgcolor:'var(--primary-color)', color:'white', "&:hover":{color:'var(--primary-color)'}}} size='small'>
+                  <Check fontSize='small' /></IconButton>
+              </Stack>
               <br/>
               <Typography variant='body2' noWrap>Image Name:</Typography>
               <Typography variant='body2' noWrap>{data.image_name}</Typography>
+              <br/>
+              <Typography variant='body2' noWrap>Make available for public:</Typography>
+              <Switch checked={publicAvailable} onChange={handleAvailability} size='small'/>
             </Box>
             </div>
             }
