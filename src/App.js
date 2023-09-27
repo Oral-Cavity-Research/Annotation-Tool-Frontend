@@ -73,7 +73,7 @@ function App() {
             <Route path='/admin/options' element={<Options/>}/>
           </Route>
         </Route>
-        {/* <Route path='/imagedb' element={<Imagedb/>}/> */}
+        <Route path='/imagedb' element={<Imagedb/>}/>
         <Route path='/*' element={<NotFoundPage/>}/>
       </Route>
     )
