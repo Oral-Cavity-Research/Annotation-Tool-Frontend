@@ -81,7 +81,7 @@ class Polygon{
   }
   draw(opacity) {
       this.ctx.beginPath();
-      this.ctx.lineWidth = 2;
+      this.ctx.lineWidth = 6;
       this.ctx.strokeStyle = this.color;
       this.ctx.fillStyle = this.transcolor
       for (const p of this.points) { this.ctx.lineTo((p.x)*this.scale,(p.y)*this.scale) }

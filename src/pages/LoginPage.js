@@ -65,7 +65,7 @@ function LoginPage() {
     }
 
     const goToDB = ()=>{
-        navigate('/imagedb');
+        navigate('/dataset');
     }
     
     return (

@@ -16,12 +16,14 @@ import Approved from './pages/Approved';
 import './App.css';
 import MyWork from './pages/MyWork';
 import Options from './pages/Options';
-import Imagedb from './pages/PublicDB/Imagedb';
 import ProtectedRoute from './components/ProtectedRoute';
 import SignuPage from './pages/SignupPage';
 import Admin from './pages/Admin';
 import Users from './pages/Users';
 import UserRequests from './pages/UserRequests';
+import PublicDBRoute from './pages/Dataset/PublicDBRoute';
+import Download from './pages/Dataset/Download';
+import Contacts from './pages/Dataset/Contacts';
 
 function App() { 
   const dispatch = useDispatch();
@@ -74,6 +76,12 @@ function App() {
           </Route>
         </Route>
         {/* <Route path='/imagedb' element={<Imagedb/>}/> */}
+        <Route path='/dataset' element={<PublicDBRoute/>}>
+            <Route index element={<div/>}/>
+            <Route  path='/dataset/download' element={<Download/>}/>
+            <Route path='/dataset/description'  element={<div/>}/>
+            <Route path='/dataset/contacts'  element={<Contacts/>}/>
+        </Route>
         <Route path='/*' element={<NotFoundPage/>}/>
       </Route>
     )
