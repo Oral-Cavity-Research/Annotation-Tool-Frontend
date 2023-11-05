@@ -25,6 +25,7 @@ import PublicDBRoute from './pages/Dataset/PublicDBRoute';
 import Download from './pages/Dataset/Download';
 import Contacts from './pages/Dataset/Contacts';
 import Agreement from './pages/Dataset/Agreement';
+import Description from './pages/Dataset/Description';
 
 function App() { 
   const dispatch = useDispatch();
@@ -80,7 +81,7 @@ function App() {
         <Route path='/dataset' element={<PublicDBRoute/>}>
             <Route index element={<div/>}/>
             <Route  path='/dataset/download' element={<Download/>}/>
-            <Route path='/dataset/description'  element={<div/>}/>
+            <Route path='/dataset/description'  element={<Description/>}/>
             <Route path='/dataset/contacts'  element={<Contacts/>}/>
             <Route path='/dataset/agreement'  element={<Agreement/>}/>
         </Route>
