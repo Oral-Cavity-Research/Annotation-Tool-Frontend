@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import {ButtonBase, Stack } from '@mui/material';
 import pdf from '../../Assets/pdf.png';
 import lock from '../../Assets/padlock.png';
@@ -12,11 +12,16 @@ const Download = () => {
 
     const [open, setOpen] = React.useState(false);
     const [type, setType] = React.useState("");
+    const navigate = useNavigate();
 
     const handleClickOpen = (type_) => {
         setOpen(true);
         setType(type_)
     };
+
+    const handleGotoAgreement = ()=>{
+        navigate("/dataset/agreement")
+    }
 
 
     return (
@@ -26,7 +31,7 @@ const Download = () => {
             <h3>Dataset Access</h3>
             <p>To access and download the files available on this page, you should visit the <NavLink to={'/dataset/'}>OASIS dataset request server</NavLink> to acquire a passkey. This passkey is essential for accessing the files. Please be aware that the dataset's usage is restricted to academic research purposes. To obtain access, users are required to apply using their email address and provide a brief description of the intended use of the dataset, outlining the purpose of their study in a few sentences.</p>
             <Stack direction='row' alignItems='center' spacing={2}>
-                <ButtonBase><div className='custom-button light'><img src={lock}/><div>Request Dataset</div></div></ButtonBase>
+                <ButtonBase><div className='custom-button light' onClick={handleGotoAgreement}><img src={lock}/><div>Request Dataset</div></div></ButtonBase>
                 <ButtonBase><div className='custom-button light'><img src={pdf}/><div>License Agreement</div></div></ButtonBase>
             </Stack>
             <hr/>
@@ -54,20 +59,20 @@ const Download = () => {
             </Stack>
             <hr/>
             <h3>Tabular Data</h3>
-            <span>Two CSV (Comma Separated Values) files are included in the dataset, as follows:</span>
+            <p>Two CSV (Comma Separated Values) files are included in the dataset, as follows:</p>
                 <ol style={{margin:'0 0 0 50px'}}>
-                    <li><strong>Imagewise_data.csv:</strong> This file contains information about individual images, including the image ID, category, clinical
-                    diagnosis, and the number of annotated regions for each image.
+                    <li><p><strong>Imagewise_data.csv:</strong> This file contains information about individual images, including the image ID, category, clinical
+                    diagnosis, and the number of annotated regions for each image.</p>
                     </li>
-                    <li><strong>Patientwise_data.csv:</strong> This file contains patient-level metadata, including age, gender and total image count per patient.
-                    Additionally, it includes binary indicators for risk factors such as smoking, chewing betel quid, and alcohol consumption.
+                    <li><p><strong>Patientwise_data.csv:</strong> This file contains patient-level metadata, including age, gender and total image count per patient.
+                    Additionally, it includes binary indicators for risk factors such as smoking, chewing betel quid, and alcohol consumption.</p>
                     </li>
                 </ol>
             <p>See the <NavLink to={'/dataset/description'}>dataset description</NavLink> for more information.</p>
             
             <Stack direction='row' spacing={2}>
-                <ButtonBase><div className='custom-button' onClick={()=>handleClickOpen("patientwise")}><img src={csv}/><div>Imagewise_data.csv</div></div></ButtonBase>
-                <ButtonBase><div className='custom-button' onClick={()=>handleClickOpen("imagewise")}><img src={csv}/><div>Patientwise_data.csv</div></div></ButtonBase>
+                <ButtonBase><div className='custom-button' onClick={()=>handleClickOpen("imagewise")}><img src={csv}/><div>Imagewise_data.csv</div></div></ButtonBase>
+                <ButtonBase><div className='custom-button' onClick={()=>handleClickOpen("patientwise")}><img src={csv}/><div>Patientwise_data.csv</div></div></ButtonBase>
             </Stack>
         </div>
         </div>

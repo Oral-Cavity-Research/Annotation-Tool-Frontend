@@ -24,6 +24,7 @@ import UserRequests from './pages/UserRequests';
 import PublicDBRoute from './pages/Dataset/PublicDBRoute';
 import Download from './pages/Dataset/Download';
 import Contacts from './pages/Dataset/Contacts';
+import Agreement from './pages/Dataset/Agreement';
 
 function App() { 
   const dispatch = useDispatch();
@@ -81,6 +82,7 @@ function App() {
             <Route  path='/dataset/download' element={<Download/>}/>
             <Route path='/dataset/description'  element={<div/>}/>
             <Route path='/dataset/contacts'  element={<Contacts/>}/>
+            <Route path='/dataset/agreement'  element={<Agreement/>}/>
         </Route>
         <Route path='/*' element={<NotFoundPage/>}/>
       </Route>

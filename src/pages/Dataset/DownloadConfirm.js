@@ -15,6 +15,7 @@ import TextField from '@mui/material/TextField';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import {Stack } from '@mui/material';
+import axios from 'axios';
 
 const descriptions = {
     annotation: {
@@ -61,10 +62,39 @@ export default function DownloadConfirm({open, setOpen, type}) {
 
     const handleClose = () => {
         setOpen(false);
+        setErrorMsg("");
+        setEmail("");
+        setPasskey("");
     };
 
     const handleDownload = () => {
-        setOpen(false);
+      if (email ==="" || passkey ===""){
+        setErrorMsg("Please enter your email and passkey");
+        return;
+      }
+
+      axios.post(`${process.env.REACT_APP_BE_URL}/dataset/download`, {
+          email,
+          passkey,
+          type: descriptions[type]?.name
+      },{responseType: 'blob'})
+      .then((response) => {
+        const blob = new Blob([response.data], { type: response.headers['content-type']});
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = type;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        setOpen(false)
+      })
+      .catch(function (error) {
+          if(error.response?.data?.message){
+            setErrorMsg(error.response.data.message)
+          }else{
+              alert(error, "error")
+          }
+      })        
     };
 
   return (
@@ -73,9 +103,7 @@ export default function DownloadConfirm({open, setOpen, type}) {
         <DialogTitle><strong>Download </strong>{descriptions[type]?.name}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            To subscribe to this website, please enter your email address here. We
-            will send updates occasionally.
-            {errorMsg}
+            <span style={{color:"red"}}>{errorMsg}</span>
           </DialogContentText>
           <Stack spacing={2} marginY={3}>
           <TextField
@@ -112,7 +140,7 @@ export default function DownloadConfirm({open, setOpen, type}) {
           </FormControl>
           </Stack>
         <DialogContentText>
-            If you do not possess a passkey, kindly request one by clicking <NavLink to={"/dataset"}>here</NavLink>.
+            If you do not own a passkey, kindly request one by clicking <NavLink to={"/dataset/agreement"}>here</NavLink>.
             </DialogContentText>
         </DialogContent>
         <DialogActions>

@@ -9,8 +9,8 @@ const Contacts = () => {
         <div id="fulltext">
         <h3>Contacts</h3>
             <ul style={{marginLeft:'20px'}}>
-            <li>For any inquiries regarding the dataset that are not addressed in the dataset description, please don't hesitate to reach out via email to <span className="blue">ocr.tech.team@gmail.com</span>.</li>
-            <li>If you require further information about OASIS-Annotator or are interested in collaborating to enhance the dataset through the addition of new annotations, please feel free to get in touch with us at <span className="blue">ocr.tech.team@gmail.com</span>.</li>
+            <li><p>For any inquiries regarding the dataset that are not addressed in the dataset description, please don't hesitate to reach out via email to <span className="blue">ocr.tech.team@gmail.com</span>.</p></li>
+            <li><p>If you require further information about OASIS-Annotator or are interested in collaborating to enhance the dataset through the addition of new annotations, please feel free to get in touch with us at <span className="blue">ocr.tech.team@gmail.com</span>.</p></li>
             </ul>
             <hr/>
             <h3>Credits</h3>

@@ -21,6 +21,7 @@ header, section, footer, aside, nav, article{display:block;}
 /* General Type */
 
 h1, h2, h3, h4, h5, h6{color:#2f2f2f; font-family:"Ubuntu",arial;}
+p {font-size:1.154em; line-height:140%; margin:0 0 15px 0;}
 .bold{font-weight:bold;}
 .blue{color:#4086c6;}
 
@@ -43,7 +44,6 @@ h1, h2, h3, h4, h5, h6{color:#2f2f2f; font-family:"Ubuntu",arial;}
 
 #introduction{margin-top:25px;}
 #introduction h2{font-size:3.231em; font-weight:bold; margin:0 0 5px 0;}
-#introduction p{font-size:1.154em; line-height:140%;}
 #introleft{float:left; width:540px; margin:0 0 25px 0;}
 a.findoutmore, a.findoutmore:visited{padding:10px; font:0.9em "Ubuntu",arial; font-weight:bold; color:#fff; text-shadow:0 0 1px #1e5298; background-image:-webkit-gradient(linear,left bottom,left top,color-stop(0.12,rgb(109,171,229)),color-stop(0.56,rgb(59,126,189))); background-image:-moz-linear-gradient(center bottom,rgb(109,171,229) 12%,rgb(59,126,189) 56%); background-color:#468ac9; -webkit-border-radius:4px; -moz-border-radius:4px; border-radius:4px; margin:13px 0 0 0; float:left;}
 a.findoutmore:hover{background-color:#2f2f2f; background-image:none; text-shadow:0 0 1px #000; text-decoration:none;}
@@ -74,6 +74,7 @@ a.readmore:hover{background-color:#2f2f2f; background-image:none; text-shadow:0 
 .light:hover {background: rgb(6, 63, 117); color: #fff;}
 .light:active {background: rgb(9, 78, 143); }
 
+.licenseBox{max-height: 50vh; overflow-y: auto; border:2px #dbdbdb solid; border-radius: 5px; padding: 20px; margin-bottom: 50px;}
 /* Footer */
 
 #footerwrap{width:100%; margin:20px 0 0 0; padding:30px 0; background:#2d2d2d url("../../Assets/footerbg.jpg");}
