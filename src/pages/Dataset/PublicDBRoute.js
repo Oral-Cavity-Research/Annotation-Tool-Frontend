@@ -32,7 +32,7 @@ const PublicDBRoute = () => {
                 <Stack direction='row'>
                     {/* <NavButton path={"/dataset"} name={"Home"}>Home</NavButton>     */}
                     <NavButton path={"/dataset/description"} name={"Description"}>Description</NavButton>  
-                    <NavButton path={"/dataset/download"} name={"Downlaod"}>Downlaod</NavButton>   
+                    <NavButton path={"/dataset/download"} name={"Download"}>Download</NavButton>   
                     <NavButton path={"/dataset/contacts"} name={"Contacts"}>Contacts</NavButton>   
                 </Stack>
                 </nav>
