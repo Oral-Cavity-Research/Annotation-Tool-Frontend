@@ -14,6 +14,7 @@ import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { LoadingButton } from '@mui/lab';
 import {Stack } from '@mui/material';
 import axios from 'axios';
 
@@ -53,6 +54,7 @@ export default function DownloadConfirm({open, setOpen, type}) {
     const [email, setEmail] = React.useState("");
     const [passkey, setPasskey] = React.useState("");
     const [errorMsg, setErrorMsg] = React.useState("");
+    const [loading, setLoading] = React.useState(false);
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
   
@@ -72,7 +74,7 @@ export default function DownloadConfirm({open, setOpen, type}) {
         setErrorMsg("Please enter your email and passkey");
         return;
       }
-
+      setLoading(true);
       axios.post(`${process.env.REACT_APP_BE_URL}/dataset/download`, {
           email,
           passkey,
@@ -94,6 +96,8 @@ export default function DownloadConfirm({open, setOpen, type}) {
           }else{
               alert(error, "error")
           }
+      }).finally(()=>{
+        setLoading(false)
       })        
     };
 
@@ -144,7 +148,7 @@ export default function DownloadConfirm({open, setOpen, type}) {
             </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button variant='contained' color='primary' onClick={handleDownload}>Download</Button>
+          <LoadingButton loading={loading} variant='contained' color='primary' onClick={handleDownload}>Download</LoadingButton>
           <Button variant='contained' color='inherit' onClick={handleClose}>Cancel</Button>
         </DialogActions>
       </Dialog>
