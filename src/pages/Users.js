@@ -97,7 +97,7 @@ const Users = () => {
             setLoading(false);
         }).catch(err=>{
             if(err.response) showMsg(err.response.data.message, "error")
-            else alert(err)
+            else showMsg("Error!", "error")
             
         })
     },[role])
@@ -117,7 +117,7 @@ const Users = () => {
             setFiltOptions(options);
         }).catch(err=>{
             if(err.response) showMsg(err.response.data.message, "error")
-            else alert(err)
+            else showMsg("Error!", "error")
             
         })
     },[])

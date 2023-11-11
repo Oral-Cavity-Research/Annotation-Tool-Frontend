@@ -4,7 +4,6 @@ import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
 import { FormControl, FormControlLabel, IconButton, TextField, Radio, RadioGroup, Stack } from '@mui/material';
 import {Print } from '@mui/icons-material';
 import AgreementNote from './AgreementNote';
@@ -45,24 +44,25 @@ export default function Agreement() {
             return
         }
 
-        setLoading(true)
-        axios.post(`${process.env.REACT_APP_BE_URL}/dataset/agreement`, {
-                fullName,email,
-                affiliation, purpose
-            })
-            .then(function (response) {
-                setMessage(response.data?.message);
-                setActiveStep((prevActiveStep) => prevActiveStep + 1);
-            })
-            .catch(function (error) {
-                if(error.response?.data?.message){
-                    showMsg(error.response.data.message, "error")
-                }else{
-                    alert(error, "error")
-                }
-            }).finally(()=>{
-                setLoading(false)
-            });
+        // setLoading(true)
+        // axios.post(`${process.env.REACT_APP_BE_URL}/dataset/agreement`, {
+        //         fullName,email,
+        //         affiliation, purpose
+        //     })
+        //     .then(function (response) {
+        //         setMessage(response.data?.message);
+        //         setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        //     })
+        //     .catch(function (error) {
+        //         if(error.response?.data?.message){
+        //             showMsg(error.response.data.message, "error")
+        //         }else{
+        //             alert(error, "error")
+        //         }
+        //     }).finally(()=>{
+        //         setLoading(false)
+        //     });
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
         
     }else{
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -92,7 +92,7 @@ export default function Agreement() {
       </Stepper>
       {activeStep === steps.length ? (
         <Box sx={{ my:5, mx:2 }}>
-        {message === "User exists"?
+        {/* {message === "User exists"?
         <>
         <h1><strong>Email address already in use!</strong></h1>
         <br/>
@@ -104,7 +104,12 @@ export default function Agreement() {
         <br/>
         <h2>Your passkey has been sent to your email. If you haven't received your passkey, please contact us via <span className='blue'>ocr.tech.team@gmail.com</span></h2>
         </>
-        }
+        } */}
+        <>
+        <h1><strong><span style={{color:'red'}}>Apologies!</span> Currently, access to download the dataset is limited to selected individuals.</strong></h1>
+        <br/>
+        <h2>If you would like access, please email <span className='blue'>ocr.tech.team@gmail.com</span>. If you already have access, please go to the download page.</h2>
+        </>
         <Button sx={{my:5}} variant='contained' onClick={()=>navigate("/dataset/download")}>Download Dataset</Button>
         </Box>
       ) : (

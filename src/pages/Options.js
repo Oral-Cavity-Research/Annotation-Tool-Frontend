@@ -28,7 +28,7 @@ const Options = () => {
             setOption(res.data.options);
         }).catch(err=>{
             if(err.response) showMsg(err.response.data.message, "error")
-            else alert(err)
+            else showMsg("Error!", "error")
             setOption([])
         }).finally(()=>{
             setLoading(false);
@@ -72,7 +72,7 @@ const Options = () => {
             setDesc("");
         }).catch(err=>{
             if(err.response) showMsg(err.response.data.message, "error")
-            else alert(err)
+            else showMsg("Error!", "error")
         }).finally(()=>{
             setState(0);
         })
@@ -119,7 +119,7 @@ const Options = () => {
             getData();
         }).catch(err=>{
             if(err.response) showMsg(err.response.data.message, "error")
-            else alert(err)
+            else showMsg("Error!", "error")
         }).finally(()=>{
             setState(0);
         })

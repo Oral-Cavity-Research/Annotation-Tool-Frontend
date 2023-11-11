@@ -39,7 +39,7 @@ const Imagedb = () => {
 
         }).catch(err=>{
             if(err.response) showMsg(err.response?.data?.message, "error")
-            else alert(err)
+            else showMsg("Error!", "error")
         }).finally(()=>{
             setLoading(false);
         })
@@ -58,7 +58,7 @@ const getCount = ()=>{
           setCount(res.data);
       }).catch(err=>{
           if(err.response) showMsg(err.response?.data?.message, "error")
-          else alert(err)
+          else showMsg("Error!", "error")
       })
   
 }  

@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { ListItem, ListItemButton, ListItemText, Stack } from '@mui/material';
 import './styles.css';
 import icon from '../../Assets/favicon.svg'
@@ -20,10 +20,16 @@ const NavButton = ({path,name}) => (
 
 const PublicDBRoute = () => {
 
+    const navigate = useNavigate();
+
+    const handleNavigate = ()=>{
+        navigate('/');
+    }
+
     return (
     <div>
         <div id="headerwrap">
-            <header id="mainheader" className="bodywidth clear"> <img src={icon} alt="" className="logo"/>
+            <header id="mainheader" className="bodywidth clear"> <img src={icon} alt="" onClick={handleNavigate} className="logo"/>
                 <hgroup id="websitetitle">
                 <h1><span className="bold">OASIS</span>dataset</h1>
                 <h2>Annotated White Light Images of Oral Cancer</h2>
@@ -43,7 +49,7 @@ const PublicDBRoute = () => {
         <footer id="mainfooter" className="bodywidth clear">
             <nav className="clear">
             <ul>
-                <li><NavLink to={'/dataset'}>Home</NavLink></li>
+                <li><NavLink to={'/dataset/description'}>Home</NavLink></li>
                 <li><NavLink to={'/dataset/description'}>Dataset Description</NavLink></li>
                 <li><NavLink to={'/dataset/download'}>Downloads</NavLink></li>
                 <li><NavLink to={'/dataset/contacts'}>Contacts</NavLink></li>

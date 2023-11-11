@@ -94,7 +94,7 @@ const UserRequests = () => {
           setDialogOpen(false)
       }).catch(err=>{
           if(err.response) showMsg(err.response.data?.message, "error")
-          else alert(err)
+          else showMsg("Error!", "error")
       }).finally(()=>{
         setState(0);
       })
@@ -118,7 +118,7 @@ const UserRequests = () => {
           setDialogOpen(false)
       }).catch(err=>{
           if(err.response) showMsg(err.response.data.message)
-          else alert(err)
+          else showMsg("Error!", "error")
       }).finally(()=>{
         setState(0);
       })
@@ -137,7 +137,7 @@ const UserRequests = () => {
             setLoading(false);
         }).catch(err=>{
             if(err.response) showMsg(err.response.data?.message, "error")
-            else alert(err)
+            else showMsg("Error!", "error")
             
         })
     },[state])

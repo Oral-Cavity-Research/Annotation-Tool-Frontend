@@ -47,7 +47,7 @@ const Prediction = ({img, name, showMsg}) => {
             }
         }).catch(err=>{
             if(err.response) showMsg(err.response.data?.message, "error")
-            else alert(err)
+            else showMsg("Error!", "error")
             setData({})
         }).finally(()=>{
             setLoading(false);

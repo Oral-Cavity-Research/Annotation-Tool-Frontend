@@ -57,11 +57,8 @@ function SignuPage() {
                 showMsg(response.data?.message, "success")
             })
             .catch(function (error) {
-                if(error.response?.data?.message){
-                    showMsg(error.response.data.message, "error")
-                }else{
-                    alert(error, "error")
-                }
+                if(error.response?.data?.message) showMsg(error.response.data.message, "error")
+                else showMsg("Error!", "error")
             }).finally(()=>{
                 setLoading(false)
             });
@@ -93,7 +90,7 @@ function SignuPage() {
             setHospitalList(res.data);
         }).catch(err=>{
             if(err.response) showMsg(err.response.data.message, "error")
-            else alert(err)
+            else showMsg("Error!", "error")
         })
         
 

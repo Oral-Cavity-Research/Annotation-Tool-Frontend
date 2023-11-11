@@ -1,44 +1,63 @@
 export default function AgreementNote() {
     return(
     <>
-    <h1>User Agreement</h1>
+    
+    <h1>OASIS Dataset End User License Agreement</h1>
+    <br/>
+    <p>By signing this document the user, he or she who will make use of the dataset, agrees to the following terms:</p>
 
-    <p>You must ensure that your user agreement has several components for your website and your business rights, and so that they remain secure and safe. These are what you need to put on the list in choosing a User Agreement template:</p>
+    <ol style={{marginLeft:'20px'}}>
+        <li>
+            <h3>Commercial use</h3>
+            <p>The dataset may only be used for academic research. The dataset may not be used for any commercial purposes. Commercial purposes include, but are not limited to:</p>
+            <ul style={{marginLeft:'20px', marginBottom:'20px'}}>
+                <li>Training or proving the efficiency of commercial systems</li>
+                <li>Using screenshots of subjects from the database in advertisements</li>
+                <li>Selling data from the database</li>
+                <li>Creating military applications</li>
+            </ul>
+        </li>
 
-    <p><strong>Step 1: License to Use</strong></p>
-    <p>This section details that visitors have a restricted right to access the website, provided that they comply with all the conditions specified in their entirety.</p>
+        <li>
+            <h3>Responsibility</h3>
+            <p>Users are required to apply using their affiliated email address and provide a verifiable link to a webpage within their institution confirming their position and email validity.
+            The individual holding the provided email address is granted permission to work with the dataset.
+            The email holder assumes responsibility for the ethical and appropriate use of the dataset on behalf of their affiliated research group.</p>
+        </li>
 
-    <p><strong>Step 2: Privacy</strong></p>
-    <p>In this area, if you have one, you will outline your privacy policy. It must indicate how the Property of users is kept private and in any conditions in which the information cannot be maintained in private. You also have the option to refer to a different privacy policy for your website.</p>
+        <li>
+            <h3>Distribution</h3>
+            <p>Users are strictly prohibited from distributing the dataset or any segments, publicly or privately, except for limited usage to support academic publications or presentations.</p>
+        </li>
 
-    <p><strong>Step 3: Acceptable Use Policy</strong></p>
-    <p>This section gives a list of the website’s forbidden usage. Some of these include unlawful goals, data collection, harassment of others, personal usage of your website and more.</p>
+        <li>
+            <h3>Access</h3>
+            <p>Access to the database is exclusively granted to users who have agreed to the End-User License Agreement (EULA).
+                Users are strictly prohibited from providing access to the database by sharing their username and password with any other individual or entity.</p>
+        </li>
 
-    <p><strong>Step 4: Acceptance of Terms</strong></p>
-    <p>This section tells users that they agree to comply with the terms and conditions put out via the use of the website and any services supplied. It also specifies that the agreements are binding laws and imposes age limits on visitors.</p>
+        <li>
+            <h3>Publications</h3>
+            <p>Publications utilizing the dataset encompass papers as well as presentations for educational or conference purposes.
+                The utilization of the dataset in publications is permissible only upon explicit permission granted through an agreement subsequent to the End-User License Agreement (EULA).
+                All research reports, documents, or papers derived from the OASIS dataset must duly acknowledge and cite the original dataset paper as a reference.</p>
+        </li>
 
-    <p><strong>Step 5: International Use and Compliance</strong></p>
-    <p>In this part, the visitors will be asked to verify that the site is in accordance with their laws.</p>
+        <li>
+            <h3>Changes</h3>
+            <p>The OASIS dataset administrators reserve the right to change this EULA at any time; users will be informed about changes beforehand and given the choice to opt out of the new EULA. Opting out will render the previous EULA void (and thus the user will lose their right to use the dataset).</p>
+        </li>
 
-    <p><strong>Step 6: Cookies</strong></p>
-    <p>You need to include a section on how your website utilizes cookies to save information. In the browser settings, you should additionally explain how users can refuse these cookies by deactivating them.</p>
+        <li>
+            <h3>Misuse</h3>
+            <p>If at any point, the administrators of the dataset have a reasonable doubt that the user does not act in accordance with this EULA, he/she will be notified of this and will immediately be denied access to the database. In this case, they will need to delete any copies of the dataset that they have created.</p>
+        </li>
 
-    <p><strong>Step 7: Modification of Site</strong></p>
-    <p>This section will be included since it will specify that you may update, change, add, terminate and suspend part or the whole of the website at any moment even without warning.</p>
+        <li>
+            <h3>Warranty</h3>
+            <p>The dataset comes without any warranty, the OASIS dataset administrators can not be held accountable for any damage (physical, financial or otherwise) caused by the use of the database.</p>
+        </li>
+    </ol>
 
-    <p><strong>Step 8: User Accounts</strong></p>
-    <p>You should include this part when you permit individuals to establish accounts on your website. It must specify that the user ensures that all data given is correct and truthful when an account is created and that he or she is responsible for your account details and password.</p>
-
-    <p><strong>Step 9: Support or Maintenance</strong></p>
-    <p>Here in this part, you will want to make it clear that you are not obliged to provide any website maintenance or customer assistance unless you plan to give it.</p>
-
-    <p><strong>Step 10: Your Rights and Ownership</strong></p>
-    <p>This section will specify that you have all the rights of intellectual property to content on the website other than the content of users and that visitors to the site are unable to use it without permission in any form.</p>
-
-    <p><strong>Step 11: Disclaimers</strong></p>
-    <p>A number of disclaimers can be used in this area on your website, and you need to make sure they are all explained in depth. For example, the information supplied can contain information simply and acceptance of the site as is and not accountability for any promises that you have not made or are not planning to provide.</p>
-
-    <p><strong>Step 12: Termination and Modification</strong></p>
-    <p>This section details that you can stop any visitor’s access at any moment and at your discretion.</p>
     </>
 )}

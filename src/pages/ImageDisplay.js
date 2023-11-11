@@ -36,7 +36,7 @@ function ImageDisplay() {
             setLoading(false);
         }).catch(err=>{
             if(err.response) showMsg(err.response.data.message, "error")
-            else alert(err)
+            else showMsg("Error!", "error")
         })
     }
 
@@ -59,7 +59,7 @@ function ImageDisplay() {
             }
         }).catch(err=>{
             if(err.response) showMsg(err.response.data.message, "error")
-            else alert(err)
+            else showMsg("Error!", "error")
         })
     }
 

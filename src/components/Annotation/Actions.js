@@ -43,7 +43,7 @@ function Actions({showMsg, coordinates, data, unsaved, location, clinicalDiagnos
             setTogglePanel(false);
         }).catch(err=>{
             if(err.response) showMsg(err.response.data?.message, "error")
-            else alert(err)
+            else showMsg("Error!", "error")
         }).finally(()=>{
             setLoading(false);
         })
@@ -107,7 +107,7 @@ function Actions({showMsg, coordinates, data, unsaved, location, clinicalDiagnos
                     }
                     <LoadingButton variant='contained'  loading={loading}
                         sx={{minWidth:'150px', width:'fit-content'}} color='success'  
-                        disabled={errorText}
+                        disabled={errorText || action === "Action"}
                         onClick={handleAction}
                         startIcon={
                             action==="Save"? <Save/> :

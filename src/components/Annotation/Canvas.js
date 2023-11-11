@@ -238,7 +238,8 @@ const Canvas = ({imagedata, regionNames}) => {
         'email': userData.email,
     }}).then(res=>{
     }).catch(err=>{
-        showMsg("Error in updating availability", "error")
+      if(err.response) showMsg(err.response.data?.message, "error")
+      else  showMsg("Error in updating availability", "error")
     })
   }
 
@@ -256,12 +257,18 @@ const Canvas = ({imagedata, regionNames}) => {
     }}).then(res=>{
         showMsg("Category is Updated", "success")
     }).catch(err=>{
-        showMsg("Category update failed", "error")
-        setData({...data, category:prevCategory})
+      if(err.response) showMsg(err.response.data?.message, "error")
+      else showMsg("Category update failed", "error")
+      setData({...data, category:prevCategory})
     })
   }
   
   const handleSave = ()=>{
+
+    if(userData?.permissions?.includes(90)){
+      showMsg("Unauthorized Access","error")
+      return;
+    };
 
     if(changed.added?.length === 0 && changed.deleted?.length === 0) return;
 
@@ -286,7 +293,8 @@ const Canvas = ({imagedata, regionNames}) => {
         setTogglePanel(false);
         showMsg("Successful!",'success')
     }).catch(err=>{
-        alert(err)
+      if(err.response) showMsg(err.response.data?.message, "error")
+      else showMsg("Category update failed", "error")
     }).finally(()=>{
       setSaving(false)
     })
@@ -925,11 +933,17 @@ const Canvas = ({imagedata, regionNames}) => {
 
 
   const downloadImage = ()=>{
-    let url = `${process.env.REACT_APP_IMAGE_PATH}/${data.image_path}/${data.image_name}`;
-    saveAs(url, data.image_name);
+    if(userData?.permissions?.includes(90)){
+      showMsg("Unauthorized Access","error")
+      return;
+    }
   }
 
   const downloadJsonFile = () => {
+    if(userData?.permissions?.includes(90)){
+      showMsg("Unauthorized Access","error")
+      return;
+    }
 
     const coor = getCoordinates();
 

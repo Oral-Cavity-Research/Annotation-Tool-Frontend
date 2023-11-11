@@ -78,7 +78,7 @@ function MenuBar() {
 
   const handleGoToDB = ()=>{
     handleCloseNavMenu()
-    navigate('/dataset');
+    navigate('/dataset/description');
   };
 
   const handleGoToAdmin = ()=>{

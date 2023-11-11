@@ -32,7 +32,7 @@ const Download = () => {
             <p>To access and download the files available on this page, you should visit the <NavLink to={'/dataset/'}>OASIS dataset request server</NavLink> to acquire a passkey. This passkey is essential for accessing the files. Please be aware that the dataset's usage is restricted to academic research purposes. To obtain access, users are required to apply using their email address and provide a brief description of the intended use of the dataset, outlining the purpose of their study in a few sentences.</p>
             <Stack direction='row' alignItems='center' spacing={2}>
                 <ButtonBase><div className='custom-button light' onClick={handleGotoAgreement}><img src={lock}/><div>Request Dataset</div></div></ButtonBase>
-                <ButtonBase><div className='custom-button light'><img src={pdf}/><div>License Agreement</div></div></ButtonBase>
+                <ButtonBase><a style={{textDecoration:'none'}} href={`${process.env.REACT_APP_IMAGE_PATH}OASISdataset End User Agreement.pdf`} target='_blank'><div className='custom-button light'><img src={pdf}/><div>License Agreement</div></div></a></ButtonBase>
             </Stack>
             <hr/>
             <h3>Image Dataset</h3>

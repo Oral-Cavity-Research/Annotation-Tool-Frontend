@@ -80,7 +80,7 @@ function Images() {
                 sessionStorage.setItem("myworkpage", page);
             }).catch(err=>{
                 if(err.response) showMsg(err.response.data.message, "error")
-                else alert(err)
+                else showMsg("Error!", "error")
             }).finally(()=>{
                 setLoading(false);
             })
@@ -98,7 +98,7 @@ function Images() {
                 sessionStorage.setItem("allpage", page);
             }).catch(err=>{
                 if(err.response) showMsg(err.response.data.message, "error")
-                else alert(err)
+                else showMsg("Error!", "error")
             }).finally(()=>{
                 setLoading(false);
             })
@@ -119,7 +119,7 @@ function Images() {
                 setCount(res.data.count);
             }).catch(err=>{
                 if(err.response) showMsg(err.response.data.message, "error")
-                else alert(err)
+                else showMsg("Error!", "error")
             })
         }else{
             axios.get(`${process.env.REACT_APP_BE_URL}/image/all/count`,{
@@ -133,7 +133,7 @@ function Images() {
                 setCount(res.data.count);
             }).catch(err=>{
                 if(err.response) showMsg(err.response.data.message, "error")
-                else alert(err)
+                else showMsg("Error!", "error")
             })
         }
     }  

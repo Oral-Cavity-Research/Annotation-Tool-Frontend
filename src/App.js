@@ -26,6 +26,7 @@ import Download from './pages/Dataset/Download';
 import Contacts from './pages/Dataset/Contacts';
 import Agreement from './pages/Dataset/Agreement';
 import Description from './pages/Dataset/Description';
+import Notice from './pages/Notice';
 
 function App() { 
   const dispatch = useDispatch();
@@ -56,6 +57,7 @@ function App() {
         <Route index element={<LoginPage/>}/>
         <Route path='/login' element={<LoginPage/>}/>
         <Route path='/signup' element={<SignuPage/>}/>
+        <Route path='/notice' element={<Notice/>}/>
         <Route path='/' element={<ProtectedRoute><Layout/></ProtectedRoute>}>
           <Route path='/home' element={<Home/>}>
             <Route index element={<Images/>}/>
