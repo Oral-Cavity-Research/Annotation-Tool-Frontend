@@ -26,6 +26,7 @@ import Download from './pages/Dataset/Download';
 import Contacts from './pages/Dataset/Contacts';
 import Agreement from './pages/Dataset/Agreement';
 import Description from './pages/Dataset/Description';
+import Imagedb from './pages/PublicDB/Imagedb';
 import Notice from './pages/Notice';
 
 function App() { 
@@ -79,7 +80,7 @@ function App() {
             <Route path='/admin/options' element={<Options/>}/>
           </Route>
         </Route>
-        {/* <Route path='/imagedb' element={<Imagedb/>}/> */}
+        <Route path='/view' element={<Imagedb/>}/>
         <Route path='/dataset' element={<PublicDBRoute/>}>
             <Route index element={<div/>}/>
             <Route  path='/dataset/download' element={<Download/>}/>

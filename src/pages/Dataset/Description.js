@@ -45,6 +45,7 @@ const Description = () => {
             <p>Imagewise_data.csv file contains information about individual images, including the image ID, category, clinical
             diagnosis, and the number of annotated regions for each image.</p>
             <p>Even if an OCA patient has a lesion on the left side of the oral cavity and the right side is not affected, the images of the left side may be categorized as OCA, while those of the right side may be categorized as healthy.</p>
+            <div className='formattedtable'>
             <table>
                 <tbody>
                     <tr>
@@ -69,10 +70,12 @@ const Description = () => {
                     </tr>
                 </tbody>
             </table>
+            </div>
             <hr/>
             <h3>Patientwise Data</h3>
             <p>Patientwise_data.csv file contains patient-level metadata, including age, gender and total image count per patient.
             Additionally, it includes binary indicators for risk factors such as smoking, chewing betel quid, and alcohol consumption.</p>
+            <div className='formattedtable'>
             <table>
                 <tbody>
                     <tr>
@@ -113,6 +116,7 @@ const Description = () => {
                     </tr>
                 </tbody>
             </table>
+            </div>
         </div>
         </div>
         <div style={{marginTop:'100px'}}></div>

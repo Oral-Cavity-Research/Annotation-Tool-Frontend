@@ -77,9 +77,9 @@ a.readmore:hover{background-color:#2f2f2f; background-image:none; text-shadow:0 
 .licenseBox{max-height: 50vh; overflow-y: auto; border:2px #dbdbdb solid; border-radius: 5px; padding: 20px; margin-bottom: 50px;}
 
 
-table {font-family: arial, sans-serif;border-collapse: collapse;width: 100%;margin-bottom: 50px;}
-td, th {border: 1px solid #dddddd;text-align: left;padding: 8px;font-size:1.154em;line-height:140%;}
-tr:nth-child(even) {background-color: #dddddd;}
+.formattedtable table {font-family: arial, sans-serif;border-collapse: collapse;width: 100%;margin-bottom: 50px;}
+.formattedtable td, .formattedtable th {border: 1px solid #dddddd;text-align: left;padding: 8px;font-size:1.154em;line-height:140%;}
+.formattedtable tr:nth-child(even) {background-color: #dddddd;}
 
 /* Footer */
 
