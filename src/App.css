@@ -316,8 +316,7 @@
 }
 
 .cardStyle {
-  max-width: 80%;
-  width: 60%; /* Set a fixed width */
+  width: 100%; /* Set a fixed width */
   margin: auto; /* Center the card horizontally */
   padding: 20px;
 }

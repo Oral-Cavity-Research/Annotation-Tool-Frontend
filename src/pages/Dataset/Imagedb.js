@@ -88,25 +88,9 @@ useEffect(() => {
     setPage(value);
 };
 
-const downloadZip = ()=>{
-  let url = `${process.env.REACT_APP_IMAGE_PATH}/all_images.zip`;
-  saveAs(url, 'all_images');
-}
-
-const goBack = () => {
-    navigate(-1);
-}
-
   return (
-    <div>
-
-  <Stack direction='row' justifyContent='space-between' m={3}>
-    <Button endIcon={<Download/>} size='small' variant='contained' color="primary" onClick={() => downloadZip()}>
-      database (400MB)
-    </Button>
-    <Button size='small' color="inherit" onClick={goBack}>Go Back</Button>
-  </Stack>
-      
+    <div className="bodywidth clear">
+    <div id="fulltext">      
       <FormGroup row sx={{justifyContent:'center', my:5}}>
         {options.map((option, index) => (
           <FormControlLabel
@@ -150,6 +134,7 @@ const goBack = () => {
         <Typography>Patients presenting to the Oral Medicine clinic, Teaching hospital Peradeniya, and the bystanders and relatives of patients  were recruited for this study.  Images inside the oral cavity were obtained by the dental surgeons in the clinic supervised by oral medicine specialists. Images were obtained using the camera of the mobile phones under the natural light/light source of the dental chair. Socio-demographic and clinical details of patients were obtained from medical records. Images were labeled, categorized, and annotated by two mid-career dental surgeons, supervised by two oral medicine specialists. </Typography>
       </Box>
       <NotificationBar status={status} setStatus={setStatus}/>
+    </div>
     </div>
   );
 };

@@ -39,6 +39,7 @@ const PublicDBRoute = () => {
                     {/* <NavButton path={"/dataset"} name={"Home"}>Home</NavButton>     */}
                     <NavButton path={"/dataset/description"} name={"Description"}>Description</NavButton>  
                     <NavButton path={"/dataset/download"} name={"Download"}>Download</NavButton>   
+                    <NavButton path={"/dataset/view"} name={"View"}>Download</NavButton>   
                     <NavButton path={"/dataset/contacts"} name={"Contacts"}>Contacts</NavButton>   
                 </Stack>
                 </nav>
@@ -52,6 +53,7 @@ const PublicDBRoute = () => {
                 <li><NavLink to={'/dataset/description'}>Home</NavLink></li>
                 <li><NavLink to={'/dataset/description'}>Dataset Description</NavLink></li>
                 <li><NavLink to={'/dataset/download'}>Downloads</NavLink></li>
+                <li><NavLink to={'/dataset/view'}>View</NavLink></li>
                 <li><NavLink to={'/dataset/contacts'}>Contacts</NavLink></li>
             </ul>
             </nav>
