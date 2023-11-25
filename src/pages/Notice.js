@@ -33,7 +33,7 @@ const Notice = () => {
                     <li><Typography>Users are permitted to review and observe the content without editing or downloading capabilities.</Typography></li>
                     <li><Typography>The purpose of this access level is to maintain data integrity and control modifications.</Typography></li>
                     <li><Typography>Please refrain from attempting to alter or download any information.</Typography></li>
-                    <li><Typography>For any required changes or downloads, contact the administrator via <span className="blue">ocr.tech.team@gmail.com</span></Typography></li>
+                    <li><Typography>For any required changes or downloads, contact the administrator via <span className="blue">oasis@eng.pdn.ac.lk</span></Typography></li>
                 </ol>
 
 

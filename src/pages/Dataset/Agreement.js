@@ -96,19 +96,19 @@ export default function Agreement() {
         <>
         <h1><strong>Email address already in use!</strong></h1>
         <br/>
-        <h2>Please use your passkey to download the dataset. If you have forgotten your passkey please request a new passkey from <span className='blue'>ocr.tech.team@gmail.com</span></h2>
+        <h2>Please use your passkey to download the dataset. If you have forgotten your passkey please request a new passkey from <span className='blue'>oasis@eng.pdn.ac.lk</span></h2>
         </>
         :
         <>
         <h1 style={{color:'green'}}><strong>User is Registered successfully!</strong></h1>
         <br/>
-        <h2>Your passkey has been sent to your email. If you haven't received your passkey, please contact us via <span className='blue'>ocr.tech.team@gmail.com</span></h2>
+        <h2>Your passkey has been sent to your email. If you haven't received your passkey, please contact us via <span className='blue'>oasis@eng.pdn.ac.lk</span></h2>
         </>
         } */}
         <>
         <h1><strong><span style={{color:'red'}}>Apologies!</span> Currently, access to download the dataset is limited to selected individuals.</strong></h1>
         <br/>
-        <h2>If you would like access, please email <span className='blue'>ocr.tech.team@gmail.com</span>. If you already have access, please go to the download page.</h2>
+        <h2>If you would like access, please email <span className='blue'>oasis@eng.pdn.ac.lk</span>. If you already have access, please go to the download page.</h2>
         </>
         <Button sx={{my:5}} variant='contained' onClick={()=>navigate("/dataset/download")}>Download Dataset</Button>
         </Box>

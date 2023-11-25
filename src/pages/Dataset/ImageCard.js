@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Card, Typography, Button, Stack } from '@mui/material';
+import { Grid, Card, Typography, Button, Stack, IconButton, Tooltip } from '@mui/material';
 import {saveAs} from "file-saver";
 import { stringToColor } from '../../components/Utils';
 import '../../App.css'
-import { Download } from '@mui/icons-material';
+import { Download, Visibility, VisibilityOff } from '@mui/icons-material';
 
-const ImageCard = ({createdAt, updatedAt, imagepath, imagename, masks, age, gender, clinical, risks}) => {
+const ImageCard = ({imagepath, imagename, masks, age, gender, clinical, risks}) => {
 
   const [imageWidth, setImageWidth] = useState(0);
+  const [addMasks, setAddMasks] = useState(false);
   const [polygons, setPolygons] = useState(<></>);
   const uniqueMasks = [];
   const masksSet = new Set();
@@ -19,21 +20,21 @@ const ImageCard = ({createdAt, updatedAt, imagepath, imagename, masks, age, gend
     }
   });
 
-  const downloadImage = (imagepath, imagename)=>{
+  const downloadfiles = () =>{
     let url = `${process.env.REACT_APP_IMAGE_PATH}/${imagepath}/${imagename}`;
     saveAs(url, imagename);
+
+    downloadJsonFile();
   }
 
-  // *** this needs to be modified
-  // const downloadAnnotation = (imagepath, imagename)=>{
-  // let url = `${process.env.REACT_APP_IMAGE_PATH}/${imagepath}/${imagename}`;
-  // saveAs(url, imagename);
-  // }
+  const toggleMasks = () =>{
+    setAddMasks(!addMasks)
+  }
 
   // Function to draw polygons in the SVG
   useEffect(()=>{
 
-    if (imageWidth === 0) return;
+    if (imageWidth === 0 || !addMasks) return;
 
     const svg = document.getElementById("polygonSVG");
     const svgWidth = svg.clientWidth;
@@ -50,7 +51,7 @@ const ImageCard = ({createdAt, updatedAt, imagepath, imagename, masks, age, gend
   
     setPolygons(regions)
 
-  },[imageWidth, imagename, masks])
+  },[imageWidth, imagename, masks, addMasks])
 
   // get the size of the image
   const get_dimensions = (img)=>{
@@ -63,9 +64,9 @@ const ImageCard = ({createdAt, updatedAt, imagepath, imagename, masks, age, gend
       image_name : imagename,
       clinical_diagnosis: clinical,
       age: age,
+      gender: gender,
       risks: risks,
-      annotation : masks,
-      createdAt, updatedAt
+      annotation : masks
     }
 
     const fileName = imagename.split('.').slice(0, -1).join('.') + '.json'
@@ -85,33 +86,45 @@ const ImageCard = ({createdAt, updatedAt, imagepath, imagename, masks, age, gend
     {/* Div for the First Grid */}
     <Grid item xs={12} md={4}>
     <div className='square_div'>
-        <svg id="polygonSVG">
-        {polygons}
-        </svg>
+        {addMasks && <svg id="polygonSVG">
+          {polygons}
+        </svg>}
         <img onLoad={(e)=>{get_dimensions(e)}} src={`${process.env.REACT_APP_IMAGE_PATH}/${imagepath}/${imagename}`} alt='Failed to load the image'/>
     </div>
     </Grid>
 
 
     {/* Second Grid for the List of Three Items */}
-    <Grid item xs={12} md={4} >
+    <Grid item xs={12} md={6}>
         <table style={{tableLayout:'fixed', width: "100%", wordWrap:'break-word'}}>
             <tbody>
+              <tr>
+                <td><Typography><b>Image ID: </b></Typography></td>
+                <td><Typography>{imagename}</Typography></td>
+              </tr>
               <tr>
                 <td><Typography><b>Age: </b></Typography></td>
                 <td><Typography>{age}</Typography></td>
               </tr>
               <tr>
                 <td><Typography><b>Gender: </b></Typography></td>
-                <td><Typography>{gender}</Typography></td>
+                <td><Typography>{gender === "M"? "Male": "Female"}</Typography></td>
               </tr>
               <tr>
                 <td><Typography><b>Clinical Diagnosis: </b></Typography></td>
                 <td><Typography>{clinical}</Typography></td>
               </tr>
               <tr>
-                <td><Typography><b>Risk Habits: </b></Typography></td>
-                <td><Typography></Typography></td>
+                <td valign='top'><Typography><b>Risk Habits: </b></Typography></td>
+                <td>
+                  {risks?.length > 0 && 
+                  <>
+                  <Typography>Alcohol: {risks[0]["alcohol"]}</Typography>
+                  <Typography>Betel Chewing: {risks[0]["betel_quid"]}</Typography>
+                  <Typography>Smoking: {risks[0]["smoking"]}</Typography>
+                  </>
+                  }
+                </td>
               </tr>
             </tbody>
           </table>
@@ -119,36 +132,33 @@ const ImageCard = ({createdAt, updatedAt, imagepath, imagename, masks, age, gend
 
 
     {/* Third Grid for the Masks */}
-    <Grid item xs={12} md={4}>
-    {uniqueMasks.length === 0 ? (
-      <Typography>No Annotations</Typography>
-  ) : (
-    <table style={{tableLayout:'fixed', width: "100%", wordWrap:'break-word'}}>
-      <tbody>
-    {uniqueMasks.map((mask, index) => (
-      <tr key={index}>
-          <td style={{width:'25px'}}><div
-            style={{
-              width: '16px',
-              height: '16px',
-              backgroundColor: stringToColor(mask.name),
-            }}
-          /></td>
-        <td><Typography>{mask.name}</Typography></td>
-        </tr>
-    ))}
-    </tbody>
-    </table>
-  )}
-    <Stack my={2} spacing={1} alignItems='flex-start' direction='column'>
-      <Button startIcon={<Download/>} size='small' variant="contained" color="inherit" onClick={() => downloadImage(imagepath, imagename)}>
-        Image
-      </Button>
-
-      <Button startIcon={<Download/>} size='small' variant="contained" color="inherit" onClick={downloadJsonFile}>
-        Annotations
-      </Button>
+    <Grid item xs={12} md={2}>
+    <Stack mb={2} spacing={1} alignItems='flex-start' direction='row'>
+      <Tooltip title='Toggle Mask Visibility'><IconButton onClick={toggleMasks}>{addMasks? <VisibilityOff/>:<Visibility/>}</IconButton></Tooltip>
+      <Tooltip title="Download Image and Annotations"><IconButton><Download onClick={downloadfiles}/></IconButton></Tooltip>
     </Stack>
+    {addMasks && <div>
+    {uniqueMasks.length === 0 ? (
+        <Typography>No Annotations</Typography>
+    ) : (
+      <table style={{tableLayout:'fixed', width: "100%", wordWrap:'break-word'}}>
+        <tbody>
+      {uniqueMasks.map((mask, index) => (
+        <tr key={index}>
+            <td style={{width:'25px', paddingTop:'5px', verticalAlign:'top'}}><div
+              style={{
+                width: '16px',
+                height: '16px',
+                backgroundColor: stringToColor(mask.name),
+              }}
+            /></td>
+          <td style={{verticalAlign:'top'}}><Typography>{mask.name}</Typography></td>
+          </tr>
+      ))}
+      </tbody>
+      </table>
+    )}
+    </div>}
     </Grid>
   </Grid>
 </Card>

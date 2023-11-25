@@ -81,6 +81,11 @@ function MenuBar() {
     navigate('/dataset/download');
   };
 
+  const handleGoToDescription = ()=>{
+    handleCloseNavMenu()
+    navigate('/dataset/download');
+  };
+
   const handleGoToAdmin = ()=>{
     handleCloseNavMenu()
     navigate('/admin');
@@ -155,8 +160,11 @@ function MenuBar() {
               <MenuItem onClick={handleGoToMyWork}>
                 <Typography textAlign="center">My Work</Typography>
               </MenuItem>
-              <MenuItem onClick={handleGoToDB}>
+              <MenuItem onClick={handleGoToDescription}>
                 <Typography textAlign="center">Dataset</Typography>
+              </MenuItem>
+              <MenuItem onClick={handleGoToDB}>
+                <Typography textAlign="center">Download</Typography>
               </MenuItem>
               <MenuItem onClick={handleGoToAdmin}>
                 <Typography textAlign="center">Admin</Typography>
@@ -168,7 +176,8 @@ function MenuBar() {
             <Button onClick={handleGoToHome} sx={{ my: 2, color: 'white', display: 'block' }}>Home</Button>
             <Button onClick={handleGoToMyWork} sx={{ my: 2, color: 'white', display: 'block' }}>My Work</Button>
             <Button onClick={handleGoToAdmin} sx={{ my: 2, color: 'white', display: 'block' }}>Admin</Button>
-            <Button onClick={handleGoToDB} sx={{ my: 2, color: 'white', display: 'block' }}>Dataset</Button>
+            <Button onClick={handleGoToDescription} sx={{ my: 2, color: 'white', display: 'block' }}>Dataset</Button>
+            <Button onClick={handleGoToDB} sx={{ my: 2, color: 'white', display: 'block' }}>Download</Button>
           </Box>
 
           <Stack direction='row' alignItems='flex-end' justifyContent='center' spacing={3}>

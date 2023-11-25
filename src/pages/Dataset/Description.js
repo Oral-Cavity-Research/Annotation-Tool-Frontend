@@ -11,21 +11,19 @@ const Description = () => {
         <h3>Dataset Summary</h3>
             <p>The dataset consists of 3,000 high-quality white light images (WLI) of oral cavities taken with mobile phone cameras from the Sri Lankan population. It includes four categories: healthy, benign, oral potentially malignant disorders (OPMD), and oral cancer (OCA). The annotations are in COCO format and cover the oral cavity region and lesion boundaries for each image. Additionally, patient metadata, such as age, gender, diagnosis, and risk factors like smoking, alcohol consumption, and betel quid chewing, is included.</p>
             <ul style={{marginLeft:'20px'}}>
-            <li><p><strong>Healthy.zip:</strong> This file contains information about individual images, including the image ID, category, clinical diagnosis, and the number of annotated regions for each image.</p>
+            <li><p><strong>Healthy.zip: </strong>Folder of healthy images that did not contain any visual changes to the mucosa.</p>
             </li>
-            <li><p><strong>Benign.zip:</strong> Benign lesions included those that did not fall into either of the above categories, and healthy images were those that did not contain any visual changes to the mucosa.</p>
+            <li><p><strong>Benign.zip: </strong>Folder of images containing benign lesions. Benign lesions included those that do not fall into Oral Submucosal Fibrosis (OSMF), leukoplakia, erythroplakia, and oral lichen planus (OLP).</p>
             </li>
-            <li><p><strong>OPMD.zip:</strong>  A group of clinically-defined conditions associated with a risk of progression to oral squamous carcinoma. The OPMDs in this dataset include oral submucosal fibrosis (OSMF), leukoplakia, erythroplakia, and oral lichen planus (OLP)</p>
+            <li><p><strong>OPMD.zip: </strong>Folder of OPMD images that include oral submucosal fibrosis (OSMF), leukoplakia, erythroplakia, and oral lichen planus (OLP).</p>
             </li>
-            <li><p><strong>OCA.zip:</strong> OCA included histopathologically confirmed oral squamous cell carcinomas.</p>
+            <li><p><strong>OCA.zip: </strong>Folder of histopathologically confirmed oral squamous cell carcinoma images.</p>
             </li>
-            <li><p><strong>Annotation.json:</strong> Annotations for the images are provided in the JSON (JavaScript Object Notation) file named Annotations.json.</p>
+            <li><p><strong>Annotation.json: </strong>Annotations for the images provided in the JSON (JavaScript Object Notation) file.</p>
             </li>
-            <li><p><strong>Imagewise_data.csv:</strong> This file contains information about individual images, including the image ID, category, clinical
-            diagnosis, and the number of annotated regions for each image.</p>
+            <li><p><strong>Imagewise_data.csv: </strong>File containing information about individual images, including the image ID, category, clinical diagnosis, and the number of annotated regions for each image.</p>
             </li>
-            <li><p><strong>Patientwise_data.csv:</strong> This file contains patient-level metadata, including age, gender and total image count per patient.
-            Additionally, it includes binary indicators for risk factors such as smoking, chewing betel quid, and alcohol consumption.</p>
+            <li><p><strong>Patientwise_data.csv: </strong>File containing patient-level metadata, including age, gender, and total image count per patient. Additionally, it includes binary indicators for risk factors such as smoking, chewing betel quid, and alcohol consumption.</p>
             </li>
             </ul>
             <hr/>
