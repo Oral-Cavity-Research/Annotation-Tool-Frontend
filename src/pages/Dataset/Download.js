@@ -42,10 +42,10 @@ const Download = () => {
                 See the <NavLink to={'/dataset/description'}>dataset description</NavLink> for more information.
             </p>
             <Stack direction='row' spacing={2}>
-                <ButtonBase><div className='custom-button' onClick={()=>handleClickOpen("healthy")}><img src={zip}/><div>Healthy.zip ( MB) </div></div></ButtonBase>
-                <ButtonBase><div className='custom-button' onClick={()=>handleClickOpen("benign")}><img src={zip}/><div>Benign.zip ( MB) </div></div></ButtonBase>
-                <ButtonBase><div className='custom-button' onClick={()=>handleClickOpen("opmd")}><img src={zip}/><div>OPMD.zip ( MB) </div></div></ButtonBase>
-                <ButtonBase><div className='custom-button' onClick={()=>handleClickOpen("oca")}><img src={zip}/><div>OCA.zip ( MB) </div></div></ButtonBase>
+                <ButtonBase><div className='custom-button' onClick={()=>handleClickOpen("healthy")}><img src={zip}/><div>Healthy.zip (1.2 GB) </div></div></ButtonBase>
+                <ButtonBase><div className='custom-button' onClick={()=>handleClickOpen("benign")}><img src={zip}/><div>Benign.zip (1.5 GB) </div></div></ButtonBase>
+                <ButtonBase><div className='custom-button' onClick={()=>handleClickOpen("opmd")}><img src={zip}/><div>OPMD.zip (2.6 GB) </div></div></ButtonBase>
+                <ButtonBase><div className='custom-button' onClick={()=>handleClickOpen("oca")}><img src={zip}/><div>OCA.zip (256 MB) </div></div></ButtonBase>
             </Stack>
             <hr/>
             <h3>Annotation Data</h3>

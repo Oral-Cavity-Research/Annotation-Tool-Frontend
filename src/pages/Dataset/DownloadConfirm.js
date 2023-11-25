@@ -14,7 +14,6 @@ import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { LoadingButton } from '@mui/lab';
 import {Stack } from '@mui/material';
 import axios from 'axios';
 
@@ -55,7 +54,6 @@ export default function DownloadConfirm({open, setOpen, type}) {
     const [passkey, setPasskey] = React.useState("");
     const [errorMsg, setErrorMsg] = React.useState("");
     const [successMsg, setSuccessMsg] = React.useState("");
-    const [loading, setLoading] = React.useState(false);
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
   
@@ -67,17 +65,16 @@ export default function DownloadConfirm({open, setOpen, type}) {
         setOpen(false);
         setSuccessMsg("");
         setErrorMsg("");
-        setLoading(false);
         setEmail("");
         setPasskey("");
     };
 
     const handleDownload = () => {
+      setErrorMsg("")
       if (email ==="" || passkey ===""){
         setErrorMsg("Please enter your email and passkey");
         return;
       }
-      setLoading(true);
       axios({
         method: 'post',
         url: `${process.env.REACT_APP_BE_URL}/dataset/session`,
@@ -99,8 +96,7 @@ export default function DownloadConfirm({open, setOpen, type}) {
         downloadLink.click();
         document.body.removeChild(downloadLink);
 
-        setSuccessMsg("Download started. Please check your browser download bar.");
-        // setLoading(false);
+        setSuccessMsg("Download started.");
       })
       .catch(function (error) {
           if(error.response?.data?.message){
@@ -161,7 +157,7 @@ export default function DownloadConfirm({open, setOpen, type}) {
             </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <LoadingButton loading={loading} variant='contained' color='primary' onClick={handleDownload}>Download</LoadingButton>
+          <Button variant='contained' color='primary' onClick={handleDownload}>Download</Button>
           <Button variant='contained' color='inherit' onClick={handleClose}>Close</Button>
         </DialogActions>
       </Dialog>

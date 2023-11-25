@@ -1,15 +1,17 @@
+import { Box, Stack } from "@mui/material";
+
 export default function AgreementNote() {
     return(
     <>
     
     <h1>OASIS Dataset End User License Agreement</h1>
     <br/>
-    <p>By signing this document the user, he or she who will make use of the dataset, agrees to the following terms:</p>
+    <p>By signing this document, the user, who will make use of the dataset, agrees to the following terms:</p>
 
     <ol style={{marginLeft:'20px'}}>
         <li>
             <h3>Commercial use</h3>
-            <p>The dataset may only be used for academic research. The dataset may not be used for any commercial purposes. Commercial purposes include, but are not limited to:</p>
+            <p>The dataset may only be used for academic research and may not be used for any commercial purposes. Commercial purposes include, but are not limited to:</p>
             <ul style={{marginLeft:'20px', marginBottom:'20px'}}>
                 <li>Training or proving the efficiency of commercial systems</li>
                 <li>Using screenshots of subjects from the database in advertisements</li>
@@ -55,9 +57,44 @@ export default function AgreementNote() {
 
         <li>
             <h3>Warranty</h3>
-            <p>The dataset comes without any warranty, the OASIS dataset administrators can not be held accountable for any damage (physical, financial or otherwise) caused by the use of the database.</p>
+            <p>The dataset comes without any warranty, the OASIS dataset administrators can not be held accountable for any damage (physical, financial, or otherwise) caused by the use of the database.</p>
         </li>
     </ol>
+    <Box pl={3} my={5}>
+            <p>User's Name:</p>
+            <div style={{width:'100%', marginBottom: '10px', borderBottom: '1px solid #ccc'}}/>
+            <p>User's Affiliation:</p>
+            <div style={{width:'100%', marginBottom: '10px', borderBottom: '1px solid #ccc'}}/>
+            <p>User's Address:</p>
+            <div style={{width:'100%', marginBottom: '10px', borderBottom: '1px solid #ccc'}}/>
+            <p>User's Website:</p>
+            <div style={{width:'100%', marginBottom: '10px', borderBottom: '1px solid #ccc'}}/>
+    </Box>
+    <Box pl={3}>
+        <p>Researcher 1 (Name, Email)</p>
+        <div style={{width:'100%', marginBottom: '10px', borderBottom: '1px solid #ccc'}}/>
+        <p>Researcher 2 (Name, Email)</p>
+        <div style={{width:'100%', marginBottom: '10px', borderBottom: '1px solid #ccc'}}/>
+        <p>Researcher 3 (Name, Email)</p>
+        <div style={{width:'100%', marginBottom: '10px', borderBottom: '1px solid #ccc'}}/>
+        <p>Researcher 4 (Name, Email)</p>
+        <div style={{width:'100%', marginBottom: '10px', borderBottom: '1px solid #ccc'}}/>
+        <p>Researcher 5 (Name, Email)</p>
+        <div style={{width:'100%', marginBottom: '10px', borderBottom: '1px solid #ccc'}}/>
+    </Box>
+    <Box pl={3}>
+        <Stack direction='row' justifyContent='space-between' spacing={10}  sx={{width:'100%'}}>
+            <Stack direction='column' alignItems='center' width={200}>
+                <div style={{width:'100%', marginTop: '100px', borderBottom: '1px solid #ccc'}}/>
+                <p>Signature</p>
+            </Stack>
+            <Stack direction='column' alignItems='center' width={200}>
+                <div style={{width:'100%', marginTop: '100px', borderBottom: '1px solid #ccc'}}/>
+                <p>Date</p>
+            </Stack>
+
+        </Stack>
+    </Box>
 
     </>
 )}

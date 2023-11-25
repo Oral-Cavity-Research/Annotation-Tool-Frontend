@@ -27,6 +27,12 @@ export default function Agreement() {
 
   const navigate = useNavigate();
 
+  const handleFileChange = (event) => {
+      const file = event.target.files[0];
+      // Do something with the selected file
+      console.log('Selected file:', file);
+  };
+
   const handleAgreement = (event) => {
     setAgreed(event.target.value);
   };
@@ -79,6 +85,7 @@ export default function Agreement() {
 
   return (
     <Box className="bodywidth clear">
+      <div id="fulltext">
       <Stepper activeStep={activeStep}>
         {steps.map((label, index) => {
           const stepProps = {};
@@ -141,6 +148,22 @@ export default function Agreement() {
                 <TextField size='small' inputProps={{ maxLength: 1000}} value={email} onChange={(e)=>setEmail(e.target.value)} required fullWidth label="Email"  helperText="A working email address to receive the passkey"/>
                 <TextField size='small' inputProps={{ maxLength: 1000}} value={affiliation} onChange={(e)=>setAffiliation(e.target.value)} required fullWidth label="Affiliation Webpage"  helperText="A webpage where your affiliation/position/email can be verified"/>
                 <TextField size='small' inputProps={{ maxLength: 1000}} value={purpose} onChange={(e)=>setPurpose(e.target.value)} required fullWidth label="Purpose of the study" multiline  helperText="A few sentences about how you intend to use the dataset"/>
+                <TextField
+                  type="file"
+                  label="Upload File"
+                  size='small'
+                  helperText='Upload the signed EULA in PDF format'
+                  onChange={handleFileChange}
+                  variant="outlined"
+                  fullWidth
+                  margin="normal"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  inputProps={{
+                    accept: '.pdf',
+                  }}
+                />
             </Stack>
             </>
             }
@@ -157,6 +180,7 @@ export default function Agreement() {
           <NotificationBar status={status} setStatus={setStatus}/>
         </>
       )}
+      </div>
     </Box>
   );
 }
