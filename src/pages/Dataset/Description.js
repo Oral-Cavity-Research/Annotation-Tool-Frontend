@@ -9,21 +9,21 @@ const Description = () => {
         <div className="bodywidth clear">
         <div id="fulltext">
         <h3>Dataset Summary</h3>
-            <p>The dataset consists of 3,000 high-quality white light images (WLI) of oral cavities taken with mobile phone cameras from the Sri Lankan population. It includes four categories: healthy, benign, oral potentially malignant disorders (OPMD), and oral cancer (OCA). The annotations are in COCO format and cover the oral cavity region and lesion boundaries for each image. Additionally, patient metadata, such as age, gender, diagnosis, and risk factors like smoking, alcohol consumption, and betel quid chewing, is included.</p>
+            <p>The dataset consists of 3,000 high-quality white light images (WLI) of oral cavities taken with mobile phone cameras from the Sri Lankan population. The WLI are categorized into healthy, benign, oral potentially malignant disorders (OPMD), and oral cancer (OCA) by domain experts. Each WLI contains annotations for oral cavity and lesion boundaries in COCO format. Additionally, patient metadata, such as age, sex, diagnosis, and risk factors like smoking, alcohol consumption, and betel quid chewing, is included in the meta-data files.</p>
             <ul style={{marginLeft:'20px'}}>
-            <li><p><strong>Healthy.zip: </strong>Folder of healthy images that did not contain any visual changes to the mucosa.</p>
+            <li><p><strong>Healthy.zip: </strong>Folder of images of the healthy oral mucosa.</p>
             </li>
-            <li><p><strong>Benign.zip: </strong>Folder of images containing benign lesions. Benign lesions included those that do not fall into Oral Submucosal Fibrosis (OSMF), leukoplakia, erythroplakia, and oral lichen planus (OLP).</p>
+            <li><p><strong>Benign.zip: </strong>Folder of images containing benign lesions in the oral mucosa.</p>
             </li>
-            <li><p><strong>OPMD.zip: </strong>Folder of OPMD images that include oral submucosal fibrosis (OSMF), leukoplakia, erythroplakia, and oral lichen planus (OLP).</p>
+            <li><p><strong>OPMD.zip: </strong>Folder of images with OPMD.</p>
             </li>
-            <li><p><strong>OCA.zip: </strong>Folder of histopathologically confirmed oral squamous cell carcinoma images.</p>
+            <li><p><strong>OCA.zip: </strong>Folder of images with histopathologically confirmed oral squamous cell carcinoma.</p>
             </li>
             <li><p><strong>Annotation.json: </strong>Annotations for the images provided in the JSON (JavaScript Object Notation) file.</p>
             </li>
-            <li><p><strong>Imagewise_data.csv: </strong>File containing information about individual images, including the image ID, category, clinical diagnosis, and the number of annotated regions for each image.</p>
+            <li><p><strong>Imagewise_data.csv: </strong>File including the image ID, category, clinical diagnosis, and the number of annotated regions for each image.</p>
             </li>
-            <li><p><strong>Patientwise_data.csv: </strong>File containing patient-level metadata, including age, gender, and total image count per patient. Additionally, it includes binary indicators for risk factors such as smoking, chewing betel quid, and alcohol consumption.</p>
+            <li><p><strong>Patientwise_data.csv: </strong>File containing patient-level metadata, including age, sex, and total image count per patient. Additionally, it includes binary indicators for risk factors such as smoking, chewing betel quid, and alcohol consumption.</p>
             </li>
             </ul>
             <hr/>
@@ -42,7 +42,7 @@ const Description = () => {
             <h3>Imagewise Data</h3>
             <p>Imagewise_data.csv file contains information about individual images, including the image ID, category, clinical
             diagnosis, and the number of annotated regions for each image.</p>
-            <p>Even if an OCA patient has a lesion on the left side of the oral cavity and the right side is not affected, the images of the left side may be categorized as OCA, while those of the right side may be categorized as healthy.</p>
+            <p>When an OCA patient has a lesion on the left side of the oral cavity and the right side is not affected, the images of the left side may be categorized as OCA, while those of the right side may be categorized as healthy.</p>
             <div className='formattedtable'>
             <table>
                 <tbody>
@@ -56,11 +56,11 @@ const Description = () => {
                     </tr>
                     <tr>
                         <td>Category</td>
-                        <td>Category based on the images (String)</td>
+                        <td>Category based on the clinical diagnosis of the images (String)</td>
                     </tr>
                     <tr>
                         <td>Clinical Diagnosis</td>
-                        <td>Additional diagnostic information recorded by dental surgeons supervised by specialists. (String)</td>
+                        <td>Additional diagnostic information recorded by dental surgeons supervised by specialists (String)</td>
                     </tr>
                     <tr>
                         <td>No of Regions</td>
@@ -71,7 +71,7 @@ const Description = () => {
             </div>
             <hr/>
             <h3>Patientwise Data</h3>
-            <p>Patientwise_data.csv file contains patient-level metadata, including age, gender and total image count per patient.
+            <p>Patientwise_data.csv file contains patient-level metadata, including age, sex and total image count per patient.
             Additionally, it includes binary indicators for risk factors such as smoking, chewing betel quid, and alcohol consumption.</p>
             <div className='formattedtable'>
             <table>
@@ -89,8 +89,8 @@ const Description = () => {
                         <td>Patients' age (Integer)</td>
                     </tr>
                     <tr>
-                        <td>Gender</td>
-                        <td>Patients' binary gender idenification (String)</td>
+                        <td>Sex</td>
+                        <td>Male / female status assigned at birth (String)</td>
                     </tr>
                     <tr>
                         <td>Smoking</td>
@@ -103,10 +103,6 @@ const Description = () => {
                     <tr>
                         <td>Alcohol</td>
                         <td>Indication of whether the patient uses alcohol (Boolean)</td>
-                    </tr>
-                    <tr>
-                        <td>Severity</td>
-                        <td>Category based on patient: Severe category for all images (String)</td>
                     </tr>
                     <tr>
                         <td>Image Count</td>

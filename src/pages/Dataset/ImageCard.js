@@ -107,7 +107,7 @@ const ImageCard = ({imagepath, imagename, masks, age, gender, clinical, risks}) 
                 <td><Typography>{age}</Typography></td>
               </tr>
               <tr>
-                <td><Typography><b>Gender: </b></Typography></td>
+                <td><Typography><b>Sex: </b></Typography></td>
                 <td><Typography>{gender === "M"? "Male": "Female"}</Typography></td>
               </tr>
               <tr>

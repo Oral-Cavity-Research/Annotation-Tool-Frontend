@@ -83,7 +83,7 @@ function MenuBar() {
 
   const handleGoToDescription = ()=>{
     handleCloseNavMenu()
-    navigate('/dataset/download');
+    navigate('/dataset/description');
   };
 
   const handleGoToAdmin = ()=>{

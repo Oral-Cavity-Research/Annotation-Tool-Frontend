@@ -27,6 +27,7 @@ const Imagedb = () => {
       setOpen(true)
       return;
     }
+    setData([])
     setLoading(true);
         axios.get(`${process.env.REACT_APP_BE_URL}/publicdb/image/filterimages`,{
             params: { page: page, category: filtOptions, limit: limit},
@@ -114,6 +115,13 @@ useEffect(()=>{
           />
         ))}
       </FormGroup>
+      <Stack direction='row' justifyContent='center' sx={{my:5}}>
+        { count === 0 ?
+            <Typography sx={{m:3}} variant='body2' color='GrayText'>{loading?"":`No ${filtOptions} Images`}</Typography>
+                :
+            <Pagination size='small' count={Math.ceil(count / 10)} page={page} onChange={changePage}></Pagination>
+        }
+      </Stack>
       
       <List>
       {data.map((item, index) => (        
@@ -129,15 +137,6 @@ useEffect(()=>{
       </ListItem>
     ))}
     </List>
-      
-
-      <Stack direction='row' justifyContent='center' sx={{my:5}}>
-        { count === 0 ?
-            <Typography sx={{m:3}} variant='body2' color='GrayText'>{loading?"":`No ${filtOptions} Images`}</Typography>
-                :
-            <Pagination size='small' count={Math.ceil(count / 10)} page={page} onChange={changePage}></Pagination>
-        }
-      </Stack>
       <Box p={5}>
         <Divider/>
         <br/>
