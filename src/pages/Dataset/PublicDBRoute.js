@@ -32,7 +32,7 @@ const PublicDBRoute = () => {
             <header id="mainheader" className="bodywidth clear"> <img src={icon} alt="" onClick={handleNavigate} className="logo"/>
                 <hgroup id="websitetitle">
                 <h1><span className="bold">OASIS</span>dataset</h1>
-                <h2>Annotated White Light Images of Oral Cancer</h2>
+                <h2>Annotated White Light Images of Oral Cavity</h2>
                 </hgroup>
                 <nav>
                 <Stack direction='row'>

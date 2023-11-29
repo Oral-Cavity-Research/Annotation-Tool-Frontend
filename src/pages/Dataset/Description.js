@@ -42,7 +42,7 @@ const Description = () => {
             <h3>Imagewise Data</h3>
             <p>Imagewise_data.csv file contains information about individual images, including the image ID, category, clinical
             diagnosis, and the number of annotated regions for each image.</p>
-            <p>When an OCA patient has a lesion on the left side of the oral cavity and the right side is not affected, the images of the left side may be categorized as OCA, while those of the right side may be categorized as healthy.</p>
+            <p>When an OCA patient has a lesion on the left side of the oral cavity and the right side is not affected, the images of the left side was categorized as OCA, while those of the right side was categorized as healthy.</p>
             <div className='formattedtable'>
             <table>
                 <tbody>
@@ -94,15 +94,15 @@ const Description = () => {
                     </tr>
                     <tr>
                         <td>Smoking</td>
-                        <td>Indication of whether the patient smokes (Boolean)</td>
+                        <td>Indication of whether the patient is a habitual smoker (Boolean)</td>
                     </tr>
                     <tr>
                         <td>Chewing_Betel_Quid</td>
-                        <td>Indication of whether the patient chews betel quid (Boolean)</td>
+                        <td>Indication of whether the patient is a habitual betel quid chewer (Boolean)</td>
                     </tr>
                     <tr>
                         <td>Alcohol</td>
-                        <td>Indication of whether the patient uses alcohol (Boolean)</td>
+                        <td>Indication of whether the patient is a habitual alcohol drinker (Boolean)</td>
                     </tr>
                     <tr>
                         <td>Image Count</td>
