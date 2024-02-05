@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {Box, Button, ButtonBase, ButtonGroup, Chip, Divider, Drawer, FormControlLabel, IconButton, Menu, Select, Stack, Switch, Typography} from '@mui/material';
+import {Box, Button, ButtonBase, ButtonGroup, Chip, Divider, Drawer, FormControlLabel, IconButton, Menu, Select, Stack, Switch, TextField, Typography} from '@mui/material';
 import RegionTable from './RegionTable';
 import Help from './Help';
 import ButtonPanel from './ButtonPanel';
@@ -198,6 +198,7 @@ const Canvas = ({imagedata, regionNames}) => {
   const [navigateTo, setNavigateTo] = useState({prev: null, next: null});
   const [publicAvailable, setPublicAvailable] = useState(imagedata.is_public)
   const [category, setCategory] = useState(imagedata.category)
+  const [clinicalDiagnosis, setClinicalDiagnosis] = useState(imagedata.clinical_diagnosis)
 
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
@@ -246,7 +247,7 @@ const Canvas = ({imagedata, regionNames}) => {
   const handleCategoryUpdate = ()=>{
     const prevCategory = data.category
     setData({...data, category})
-    axios.post(`${process.env.REACT_APP_BE_URL}/image/update/${data._id}`,
+    axios.post(`${process.env.REACT_APP_BE_URL}/image/update/category/${data._id}`,
     {
       category,
       prevCategory 
@@ -260,6 +261,26 @@ const Canvas = ({imagedata, regionNames}) => {
       if(err.response) showMsg(err.response.data?.message, "error")
       else showMsg("Category update failed", "error")
       setData({...data, category:prevCategory})
+    })
+  }
+
+  const handleClinicalDiagnosisUpdate = ()=>{
+    const prevClinicalDiagnosis = data.clinical_diagnosis
+    setData({...data, clinical_diagnosis:clinicalDiagnosis})
+    axios.post(`${process.env.REACT_APP_BE_URL}/image/update/clinicaldiagnosis/${data._id}`,
+    {
+      clinicalDiagnosis,
+      prevClinicalDiagnosis 
+    },
+    { headers: {
+        'Authorization': `Bearer ${userData.accessToken.token}`,
+        'email': userData.email,
+    }}).then(res=>{
+        showMsg("Clinical Diagnosis is Updated", "success")
+    }).catch(err=>{
+      if(err.response) showMsg(err.response.data?.message, "error")
+      else showMsg("Clinical Diagnosis update failed", "error")
+      setData({...data, clinical_diagnosis: prevClinicalDiagnosis})
     })
   }
   
@@ -931,6 +952,10 @@ const Canvas = ({imagedata, regionNames}) => {
     setCategory(event.target.value);
   }
 
+  const handleClinicalDiagnosisChange = (event)=>{
+    setClinicalDiagnosis(event.target.value);
+  }
+
 
   const downloadImage = ()=>{
     if(userData?.permissions?.includes(90)){
@@ -1063,9 +1088,9 @@ const Canvas = ({imagedata, regionNames}) => {
               <LoadingButton loadingPosition="end" loading={loadingNav} size='small' onClick={handleNext} color='inherit' disabled={navigateTo.next === null} endIcon={<NavigateNext/>} variant='contained'>Next</LoadingButton>
             </Stack>
           </Stack>
-          <Box sx={{p:1, my:2}}>
+          {/* <Box sx={{p:1, my:2}}>
             <Button fullWidth variant='contained' onClick={show_prediction} sx={{bgcolor:'var(--dark-color)'}} startIcon={<OnlinePrediction/>}>Prediction</Button>
-          </Box>
+          </Box> */}
           </Box>
           </div>
         </div>
@@ -1078,7 +1103,15 @@ const Canvas = ({imagedata, regionNames}) => {
           <Typography variant='body2' noWrap>{data.image_name}</Typography>
           <br/>
           <Typography variant='body2' noWrap>Clinical Diagnosis:</Typography>
-          <Typography variant='body2' noWrap>{data.clinical_diagnosis}</Typography>
+          {/* <Typography variant='body2' noWrap>{data.clinical_diagnosis}</Typography> */}
+          <Stack direction='row' alignItems='center' spacing={1}>
+            <TextField multiline value={clinicalDiagnosis} onChange={handleClinicalDiagnosisChange} size='small' variant='standard' fullWidth maxRows={4} />
+            <IconButton 
+              onClick={handleClinicalDiagnosisUpdate}
+              disabled={data.clinical_diagnosis === clinicalDiagnosis}
+              sx={{bgcolor:'var(--primary-color)', color:'white', "&:hover":{color:'var(--primary-color)'}}} size='small'>
+              <Check fontSize='small' /></IconButton>
+          </Stack>
           <br/>
           <Typography variant='body2' noWrap>Category:</Typography>
           <Stack direction='row' alignItems='center' spacing={1}>
@@ -1127,9 +1160,9 @@ const Canvas = ({imagedata, regionNames}) => {
               <LoadingButton loading={loadingNav} loadingPosition="end" size='small' onClick={handleNext} color='inherit' disabled={navigateTo.next === null} endIcon={<NavigateNext/>} fullWidth variant='contained'>Next</LoadingButton>
             </Stack>
           </Stack>
-          <Box sx={{bgcolor:'white', borderRadius:1, p:1, my:2}}>
+          {/* <Box sx={{bgcolor:'white', borderRadius:1, p:1, my:2}}>
             <Button fullWidth variant='contained' onClick={show_prediction} sx={{bgcolor:'var(--dark-color)'}} startIcon={<OnlinePrediction/>}>Prediction</Button>
-          </Box>
+          </Box> */}
           </Box>
         </Box>
         </div>
