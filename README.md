@@ -1,5 +1,7 @@
 # Annotation Tool React web application
-## Database of Annotated White Light Images for Oral Cancer Detection: Leveraging OASIS-Annotator a Web-Based Tool for Image Annotation
+OASIS-Annotator © 2023 is licensed under CC BY 4.0 
+
+## Annotated White Light Images for Oral Cancer Detection: Leveraging OASIS-Annotator a Web-Based Tool for Image Annotation
 
 ### Description
 The OASIS-Annotator (Oral Assessment and Screening Interactive System - Annotator) is a specialized and customized tool developed with the purpose of facilitating image viewing, annotation, and download. With the OASIS-Annotator, users are able to navigate through the extensive image collection and annotate them by applying customized labels according to their research requirements.
