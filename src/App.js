@@ -81,14 +81,14 @@ function App() {
           </Route>
         </Route>
         <Route path='/view' element={<Imagedb/>}/>
-        <Route path='/dataset' element={<PublicDBRoute/>}>
+        {/* <Route path='/dataset' element={<PublicDBRoute/>}>
             <Route index element={<Description/>}/>
             <Route  path='/dataset/download' element={<Download/>}/>
             <Route path='/dataset/description'  element={<Description/>}/>
             <Route path='/dataset/contacts'  element={<Contacts/>}/>
             <Route path='/dataset/agreement'  element={<Agreement/>}/>
             <Route path='/dataset/view'  element={<Imagedb/>}/>
-        </Route>
+        </Route> */}
         <Route path='/*' element={<NotFoundPage/>}/>
       </Route>
     )

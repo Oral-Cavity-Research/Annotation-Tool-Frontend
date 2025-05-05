@@ -1,13 +1,13 @@
 import React from 'react';
 import {IconButton, Tooltip, Box, Menu, MenuItem, ListItemIcon, ListItemText, Divider, Button, ButtonGroup, Badge} from '@mui/material';
-import {Preview,ZoomIn,ZoomOut,Close, HelpOutline, Style, Draw, Settings, OpenWith, Message, Download} from '@mui/icons-material';
+import {Preview,ZoomIn,ZoomOut,Close, HelpOutline, Style, Draw, Settings, OpenWith, Message, Download, ScatterPlot, Timeline} from '@mui/icons-material';
 import {ArrowUpward, ArrowDownward, ArrowBack, ArrowForward, Opacity, Check} from '@mui/icons-material';
 import {Label, LabelOff} from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
 
 const messageNeeded = ["Commented", "Changes Requested", "Reviewed"]
 
-const ButtonPanel = ({func, labelVisibility, readOnly, drawingMode, status}) => {
+const ButtonPanel = ({func, labelVisibility, readOnly, polygonMode, dotMode, status}) => {
 
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorSetNav, setAnchorSetNav] = React.useState(null);
@@ -39,18 +39,30 @@ const ButtonPanel = ({func, labelVisibility, readOnly, drawingMode, status}) => 
     return (
         <div>
         <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>     
-            {!readOnly && <Tooltip enterNextDelay={1000} title="Drawing mode on / off" placement="bottom-end" arrow><Button size='small' 
-            onClick={()=>func.setDrawingMode(!drawingMode)}
+            {!readOnly && <Tooltip enterNextDelay={1000} title="Drawing polygon mode on / off" placement="bottom-end" arrow><Button size='small' 
+            onClick={()=>func.setDrawingMode(!polygonMode, false)}
             sx={{
                 height: 40,
                 borderRadius: 1,
-                marginRight: 1,
-                bgcolor: drawingMode?"var(--dark-color)":"Background",
+                marginRight: 0.5,
+                bgcolor: polygonMode?"var(--dark-color)":"Background",
                 "&:hover": {
-                    backgroundColor: drawingMode?"var(--dark-color)":"Background"
+                    backgroundColor: polygonMode?"var(--dark-color)":"Background"
                 },
               }}
-            ><Draw fontSize='small' sx={{color:drawingMode?"white":'var(--dark-color)'}} /></Button></Tooltip>}
+            ><Timeline fontSize='small' sx={{color:polygonMode?"white":'var(--dark-color)'}} /></Button></Tooltip>}
+            {!readOnly && <Tooltip enterNextDelay={1000} title="Drawing dot mode on / off" placement="bottom-end" arrow><Button size='small' 
+            onClick={()=>func.setDrawingMode(false, !dotMode)}
+            sx={{
+                height: 40,
+                borderRadius: 1,
+                marginRight: 0.5,
+                bgcolor: dotMode?"var(--dark-color)":"Background",
+                "&:hover": {
+                    backgroundColor: dotMode?"var(--dark-color)":"Background"
+                },
+              }}
+            ><ScatterPlot fontSize='small' sx={{color:dotMode?"white":'var(--dark-color)'}} /></Button></Tooltip>}
             <ButtonGroup 
                 sx={{
                     height: 40,
@@ -294,9 +306,12 @@ const ButtonPanel = ({func, labelVisibility, readOnly, drawingMode, status}) => 
             
             {!readOnly && <Tooltip enterNextDelay={1000} title="Finish Drawing" placement="bottom-end" arrow><IconButton size='small' onClick={func.finish_drawing}><Check  fontSize='small' sx={{color:"var(--dark-color)"}}/></IconButton></Tooltip>}
             
-            {!readOnly && <Tooltip enterNextDelay={1000} title="Drawing mode on / off" placement="bottom-end" arrow><IconButton size='small' 
-            onClick={()=>func.setDrawingMode(!drawingMode)}
-            ><Draw fontSize='small' sx={{color:drawingMode?'primary.main':'var(--dark-color)'}} /></IconButton></Tooltip>}
+            {!readOnly && <Tooltip enterNextDelay={1000} title="Drawing polygon mode on / off" placement="bottom-end" arrow><IconButton size='small' 
+            onClick={()=>func.setDrawingMode(!polygonMode, false)}
+            ><Timeline fontSize='small' sx={{color:polygonMode?'primary.main':'var(--dark-color)'}} /></IconButton></Tooltip>}
+            {!readOnly && <Tooltip enterNextDelay={1000} title="Drawing dot mode on / off" placement="bottom-end" arrow><IconButton size='small' 
+            onClick={()=>func.setDrawingMode(false, !dotMode)}
+            ><ScatterPlot fontSize='small' sx={{color:dotMode?'primary.main':'var(--dark-color)'}} /></IconButton></Tooltip>}
             
           </Box>  
         </div>

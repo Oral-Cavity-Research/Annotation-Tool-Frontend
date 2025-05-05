@@ -11,8 +11,10 @@ const RegionTable = ({showPoints}) => {
               <tbody>
                 <tr>
                   <th>ID</th>
+                  <th>Shape</th>
                   <th>Region</th>
                   <th>Bounding Box</th>
+                  {/* <th>Points</th> */}
                 </tr>
                 {showPoints}
               </tbody>

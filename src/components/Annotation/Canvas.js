@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {Box, Button, ButtonBase, ButtonGroup, Chip, Divider, Drawer, FormControlLabel, IconButton, Menu, Select, Stack, Switch, TextField, Typography} from '@mui/material';
+import {Box, Button, ButtonBase, ButtonGroup, Chip,  Drawer,  IconButton, Menu, Select, Stack, Switch, TextField, Typography} from '@mui/material';
 import RegionTable from './RegionTable';
 import Help from './Help';
 import ButtonPanel from './ButtonPanel';
@@ -9,7 +9,7 @@ import axios from 'axios';
 import { stringToColor } from '../Utils';
 import Actions from './Actions';
 import EditHistory from './EditHistory';
-import {ArrowDropDown, Cancel, Check, Close, NavigateBefore, NavigateNext, OnlinePrediction, SaveAs, TextFields} from '@mui/icons-material';
+import {ArrowDropDown, Cancel, Check, Close, NavigateBefore, NavigateNext, SaveAs, TextFields} from '@mui/icons-material';
 import SaveChanges from './SaveChanges';
 import { useSelector} from 'react-redux';
 import { LoadingButton } from '@mui/lab';
@@ -17,7 +17,6 @@ import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import NotificationBar from '../NotificationBar';
 import Prediction from './Prediction';
-import {saveAs} from "file-saver";
 
 // global variables 
 // todo: check whether we could use useStates instead
@@ -36,6 +35,7 @@ var isDragging = false;
 var isSelected = false;
 var isDrawing = true ;
 var polygon
+var dot
 var canvas
 var ctx = null
 var selectedRegion
@@ -44,9 +44,9 @@ var selectedRegion
 const point = (x,y) => ({x,y});
 
 // draw circle around given point
-function drawCircle(ctx, pos,zoomLevel,size=4){
-  ctx.strokeStyle = "red";
-  ctx.fillStyle = "red";
+function drawCircle(ctx, pos, zoomLevel, size=2, color='red'){
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
   ctx.beginPath();
   ctx.arc((pos.x)*zoomLevel,(pos.y)*zoomLevel,size,0,Math.PI *2);
   ctx.fill();
@@ -56,6 +56,7 @@ function drawCircle(ctx, pos,zoomLevel,size=4){
 // polygon class
 class Polygon{
   constructor(ctx, color, type){
+    this.shape = 'polygon'
     this.ctx = ctx;
     this.isSelected = false;
     this.points = [];
@@ -81,7 +82,7 @@ class Polygon{
   }
   draw(opacity) {
       this.ctx.beginPath();
-      this.ctx.lineWidth = 6;
+      this.ctx.lineWidth = 2;
       this.ctx.strokeStyle = this.color;
       this.ctx.fillStyle = this.transcolor
       for (const p of this.points) { this.ctx.lineTo((p.x)*this.scale,(p.y)*this.scale) }
@@ -104,7 +105,7 @@ class Polygon{
     }
     if (index > -1) { return this.points[index] }
   }
-  update(opacity, drawingMode, defaultColor, defaultType){
+  update(opacity, polygonMode, dotMode, defaultColor, defaultType){
       // line following the cursor
       if(!this.completed && this.points.length !== 0){
         isDrawing = true
@@ -132,7 +133,7 @@ class Polygon{
         regions.push(polygon)
 
       // if not dragging and mouse button clicked and when other regions are not selected add a point
-      }else if (!isDragging && !isSelected && mouse.button && !this.completed && drawingMode) {
+      }else if (!isDragging && !isSelected && mouse.button && !this.completed && polygonMode) {
           this.addPoint(mouse);
           mouse.button = false;
       // if completed and dragging update the points
@@ -152,7 +153,7 @@ class Polygon{
 
       // indicate selection
       if(this.isSelected){
-        for (const p of this.points) { drawCircle(this.ctx, p, this.scale) }
+        for (const p of this.points) { drawCircle(this.ctx, p, this.scale, 4) }
         //var inside = this.isPointInPoly(mouse)
         if(this.activePoint ) mouse.cursor = "move"
       }
@@ -172,6 +173,101 @@ class Polygon{
   }
 }
 
+// dot class
+class Dot{
+  constructor(ctx, color, type){
+    this.shape = 'dot'
+    this.ctx = ctx;
+    this.isSelected = false;
+    this.points = [];
+    this.mouse = {lx: 0, ly: 0}
+    this.activePoint = undefined;
+    this.dragging = false;
+    this.completed = false;
+    this.markedForDeletion = false;
+    this.color = color;
+    this.transcolor =  color.replace(')', ', 0.6)').replace('rgb', 'rgba')
+    this.type = type;
+    this.scale = 1;
+  }
+  addPoint(p){ 
+    this.points.push(point((p.x)/this.scale,(p.y)/this.scale)) 
+    this.completed = true
+  }
+  
+  draw(opacity) {
+    for (const p of this.points) { drawCircle(this.ctx, p, this.scale, 5, this.color) }
+  }
+  closest(pos, dist = 8) {
+    var i = 0, index = -1;
+    dist *= dist;
+    for (const p of this.points) {
+        var x = pos.x - (p.x)*this.scale;
+        var y = pos.y - (p.y)*this.scale;
+        var d2 =  x * x + y * y;
+        if (d2 < dist) {
+            dist = d2;
+            index = i;
+        }
+        i++;
+    }
+    if (index > -1) { return this.points[index] }
+  }
+  update(opacity, polygonMode, dotMode, defaultColor, defaultType){
+      // line following the cursor
+      if(!this.completed && this.points.length !== 0){
+        isDrawing = true
+        // this.ctx.strokeStyle = this.color;
+        // this.ctx.beginPath();
+        // this.ctx.moveTo(mouse.x,mouse.y)
+        // this.ctx.lineTo((this.points[this.points.length-1].x)*this.scale,(this.points[this.points.length-1].y)*this.scale)
+        // this.ctx.stroke();
+      }else{
+        isDrawing = false;
+      }
+
+      // if not dragging get the closest point to mouse
+      if (!this.dragging) {  this.activePoint = this.closest(mouse) }
+
+      // if not dragging and mouse button clicked and when other regions are not selected add a point
+      if (!isDragging && !isSelected && mouse.button && !this.completed && dotMode) {
+          this.addPoint(mouse);
+          mouse.button = false;
+
+          dot = new Dot(ctx, defaultColor, defaultType)
+          dot.scale = this.scale;
+          regions.push(dot)
+
+      // if completed and dragging update the points
+      } else if(this.activePoint && this.completed && this.isSelected ) {
+          if (mouse.button) {
+              isDragging = true;
+              if(this.dragging) {
+                this.activePoint.x += (mouse.x)/this.scale - this.mouse.lx;
+                this.activePoint.y += (mouse.y)/this.scale - this.mouse.ly;
+              } else {this.dragging = true}
+          } else {
+            this.dragging = false
+            isDragging = false;
+          }
+      }
+      this.draw(opacity);
+
+      // indicate selection
+      if(this.isSelected){
+        for (const p of this.points) { drawCircle(this.ctx, p, this.scale, 4) }
+        //var inside = this.isPointInPoly(mouse)
+        if(this.activePoint ) mouse.cursor = "move"
+      }
+
+      this.mouse.lx = (mouse.x)/this.scale;
+      this.mouse.ly = (mouse.y)/this.scale;
+  }
+  show(opacity){
+    for (const p of this.points) { drawCircle(this.ctx, p, this.scale, 5, this.color) }
+  }
+}
+
 const Canvas = ({imagedata, regionNames}) => {  
   
   const [size, setSize] = useState({width: 1, height:1})
@@ -184,8 +280,9 @@ const Canvas = ({imagedata, regionNames}) => {
   const [opacity, setOpacity] = useState(false);
   const [coordinates, setCoordinates] = useState([]);
   const [content, setContent] = useState("Action");
-  const [labelVisibility, setLabelVisibility] = useState(true);
-  const [drawingMode, setDrawingMode] = useState(false);
+  const [labelVisibility, setLabelVisibility] = useState(false);
+  const [polygonMode, setPolygonMode] = useState(false);
+  const [dotMode, setDotMode] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [changed, setChanged] = useState({added:[] , same:[], deleted:[]});
@@ -351,6 +448,7 @@ const Canvas = ({imagedata, regionNames}) => {
           {
             "id":index,
             "name": region.type,
+            "shape": region.shape,
             "annotations": pointArray,
             "bbox": bbox_arr
           }
@@ -370,6 +468,8 @@ const Canvas = ({imagedata, regionNames}) => {
 
     var type = [];
     var bbox = [];
+    var shape = [];
+    var pointArrays = [];
     [...regions].forEach(region =>{
       if(region.completed){
         var pointArray = []
@@ -378,10 +478,12 @@ const Canvas = ({imagedata, regionNames}) => {
         var bbox_arr = [Math.round(Math.min(...all_x)), Math.round(Math.min(...all_y)), 
         Math.round(Math.max(...all_x)), Math.round(Math.max(...all_y))]
         for (const p of region.points) {
-          pointArray.push(Math.round(p.x),Math.round(p.y))
+          pointArray.push(Math.round(p.x), Math.round(p.y))
         }
   
+        // pointArrays.push(pointArray.toString())
         type.push(region.type)
+        shape.push(region.shape)
         bbox.push(bbox_arr.toString()) 
       }
     })
@@ -390,8 +492,10 @@ const Canvas = ({imagedata, regionNames}) => {
       type.map((points, index) =>
         <tr  key={index}>
           <td>{index+1}</td>
+          <td>{shape[index]}</td>
           <td>{type[index]}</td>
           <td>[{bbox[index]}]</td>
+          {/* <td>[{pointArrays[index]}]</td> */}
         </tr>
       )
     )
@@ -451,14 +555,22 @@ const Canvas = ({imagedata, regionNames}) => {
 
   const finish_drawing = () =>{
     [...regions].forEach(region => {
-      if(region.points.length < 3) region.markedForDeletion = true;
+      if(region.shape === 'polygon' && region.points.length < 3) region.markedForDeletion = true;
+      if(region.shape === 'dot' && region.points.length == 0) region.markedForDeletion = true;
       region.completed = true
       region.isSelected = false
     });
 
-    polygon = new Polygon(ctx, defaultSettings.color, defaultSettings.type)
-    polygon.scale = zoomLevel;
-    regions.push(polygon)
+    if(polygonMode){
+      polygon = new Polygon(ctx, defaultSettings.color, defaultSettings.type)
+      polygon.scale = zoomLevel;
+      regions.push(polygon)
+    }else if (dotMode){
+      dot = new Dot(ctx, defaultSettings.color, defaultSettings.type)
+      dot.scale = zoomLevel;
+      regions.push(dot)
+    }
+    
     redraw_canvas()
     redraw_ids()
     check_changes();
@@ -479,10 +591,9 @@ const Canvas = ({imagedata, regionNames}) => {
       [...regions].forEach(region => {
         if(!region.completed) region.markedForDeletion = true;
       });
-  
-      polygon = new Polygon(ctx, defaultSettings.color, defaultSettings.type)
-      polygon.scale = zoomLevel;
-      regions.push(polygon)
+
+      setDrawingMode(false, false)
+
       redraw_canvas()
       redraw_ids()
 
@@ -492,6 +603,14 @@ const Canvas = ({imagedata, regionNames}) => {
       delete_selected()
       redraw_canvas()
       redraw_ids()
+    }
+
+    if(e.key === "+") {
+      zoom_in()
+    }
+
+    if(e.key === "-") {
+      zoom_out()
     }
 
     if ( e.key === 'ArrowRight' 
@@ -527,7 +646,7 @@ const Canvas = ({imagedata, regionNames}) => {
 
   
     //if drawing don't select
-    if(isDrawing || drawingMode) return
+    if(isDrawing || polygonMode || dotMode) return
 
     var selectedIndex = -1;
     var i;
@@ -544,7 +663,7 @@ const Canvas = ({imagedata, regionNames}) => {
       // if a region is already selected that means
       // user needs to select another region or create a new region
       }else if(regions[i].isSelected){
-        if(regions[i].isPointInPoly(mouse)) selectedIndex = i;
+        if(regions[i].shape === 'polygon' && regions[i].isPointInPoly(mouse)) selectedIndex = i;
         regions[i].isSelected = false;
         selectedRegion = null;
         break
@@ -553,7 +672,7 @@ const Canvas = ({imagedata, regionNames}) => {
 
     // select the next unselected region
     for(i=selectedIndex+1;i<regions.length;i++){
-      if((regions[i].isPointInPoly(mouse)) && regions[i].completed){
+      if((regions[i].shape === 'polygon' && regions[i].isPointInPoly(mouse)) && regions[i].completed){
         regions[i].isSelected = true;
         isSelected = true;
         selectedRegion = regions[i]
@@ -597,7 +716,7 @@ const Canvas = ({imagedata, regionNames}) => {
   useEffect(() => {
     mouse.cursor = "default"
     finish_drawing();
-  }, [drawingMode]);
+  }, [polygonMode, dotMode]);
 
   useEffect(() => {
     check_changes();
@@ -662,12 +781,12 @@ const Canvas = ({imagedata, regionNames}) => {
     
     ctx.clearRect(0,0, canvas.width, canvas.height);
     
-    if(readOnly || !drawingMode) {mouse.cursor = "default"}
+    if(readOnly || !(polygonMode || dotMode)) {mouse.cursor = "default"}
     else {mouse.cursor = "crosshair"}
 
     regions = regions.filter(region => !region.markedForDeletion);
 
-    [...regions].forEach(region => {region.update(opacity, drawingMode, defaultSettings.color, defaultSettings.type)})
+    [...regions].forEach(region => {region.update(opacity, polygonMode, dotMode, defaultSettings.color, defaultSettings.type)})
 
     canvas.style.cursor = mouse.cursor;
 
@@ -709,22 +828,30 @@ const Canvas = ({imagedata, regionNames}) => {
     if(data){
       [...data.annotation].forEach(region=>{
         var type = region.name
-        polygon = new Polygon(ctx, stringToColor(type), type)
-        polygon.scale = initZoomLevel;
+        var shape = region.shape
+        var new_shape = null
+
+        if(shape === 'polygon'){
+          new_shape = new Polygon(ctx, stringToColor(type), type)
+        }else{
+          new_shape = new Dot(ctx, stringToColor(type), type)
+        }
+        
+        new_shape.scale = initZoomLevel;
         var points = []
         var oldAnnotations = region.annotations
         for(var i=0; i< oldAnnotations.length; i+=2){
           points.push(point(region.annotations[i], region.annotations[i+1]))
         }
-        polygon.points = points
-        polygon.completed = true;
-        regions.push(polygon)    
+        new_shape.points = points
+        new_shape.completed = true;
+        regions.push(new_shape)    
       })
     }
 
-    polygon = new Polygon(ctx, defaultSettings.color, defaultSettings.type)
-    polygon.scale = initZoomLevel;
-    regions.push(polygon)
+    // polygon = new Polygon(ctx, defaultSettings.color, defaultSettings.type)
+    // polygon.scale = initZoomLevel;
+    // regions.push(polygon)
 
     redraw_canvas()
     redraw_ids()
@@ -878,44 +1005,62 @@ const Canvas = ({imagedata, regionNames}) => {
 
     [...changed.added].forEach(region=>{
       var type = region.name
-      polygon = new Polygon(ctx,'rgb(0, 255, 0)', type)
-      polygon.scale = zoomLevel;
+      var shape = null
+      if(region.shape === 'polygon'){
+        shape = new Polygon(ctx,'rgb(0, 255, 0)', type)
+      }else{
+        shape = new Dot(ctx,'rgb(0, 255, 0)', type)
+      }
+  
+      shape.scale = zoomLevel;
       var points = []
       var oldAnnotations = region.annotations
       for(var i=0; i< oldAnnotations.length; i+=2){
         points.push(point(region.annotations[i], region.annotations[i+1]))
       }
-      polygon.points = points
-      polygon.completed = true;
-      diff.push(polygon)    
+      shape.points = points
+      shape.completed = true;
+      diff.push(shape)    
     });
 
     [...changed.deleted].forEach(region=>{
       var type = region.name
-      polygon = new Polygon(ctx,'rgb(255, 0, 0)', type)
-      polygon.scale = zoomLevel;
+      var shape = null
+      if(region.shape === 'polygon'){
+        shape = new Polygon(ctx,'rgb(255, 0, 0)', type)
+      }else{
+        shape = new Dot(ctx,'rgb(255, 0, 0)', type)
+      }
+      
+      shape.scale = zoomLevel;
       var points = []
       var oldAnnotations = region.annotations
       for(var i=0; i< oldAnnotations.length; i+=2){
         points.push(point(region.annotations[i], region.annotations[i+1]))
       }
-      polygon.points = points
-      polygon.completed = true;
-      diff.push(polygon)    
+      shape.points = points
+      shape.completed = true;
+      diff.push(shape)    
     });
 
     [...changed.same].forEach(region=>{
       var type = region.name
-      polygon = new Polygon(ctx,'rgb(224, 224, 224)', type)
-      polygon.scale = zoomLevel;
+      var shape = null
+      if(region.shape === 'polygon'){
+        shape = new Polygon(ctx,'rgb(224, 224, 224)', type)
+      }else{
+        shape = new Dot(ctx,'rgb(224, 224, 224)', type)
+      }
+      
+      shape.scale = zoomLevel;
       var points = []
       var oldAnnotations = region.annotations
       for(var i=0; i< oldAnnotations.length; i+=2){
         points.push(point(region.annotations[i], region.annotations[i+1]))
       }
-      polygon.points = points
-      polygon.completed = true;
-      diff.push(polygon)    
+      shape.points = points
+      shape.completed = true;
+      diff.push(shape)    
     });
 
     diff.forEach(region => {region.show(opacity)});
@@ -994,6 +1139,11 @@ const Canvas = ({imagedata, regionNames}) => {
     downloadImage();
   };
 
+  const setDrawingMode = (polygonState, dotState) =>{
+    setPolygonMode(polygonState)
+    setDotMode(dotState)
+  }
+
 
   return (
     <>
@@ -1027,7 +1177,7 @@ const Canvas = ({imagedata, regionNames}) => {
 
           {/******************* button pannel *************************/}
           <ButtonPanel func={{downloadJsonFile,finish_drawing,setDrawingMode,show_regions,show_history, zoom_in, zoom_out, move_selected, 
-          delete_selected, show_help, show_label, label_type, opacity_change, show_actions}} labelVisibility={labelVisibility} readOnly={readOnly} drawingMode={drawingMode} status={data.last_comment?.action}/>
+          delete_selected, show_help, show_label, label_type, opacity_change, show_actions}} labelVisibility={labelVisibility} readOnly={readOnly} polygonMode={polygonMode} dotMode={dotMode} status={data.last_comment?.action}/>
           
           {!readOnly &&
           <Box sx={{display: { xs: 'none', sm: 'block' } }} >
