@@ -141,6 +141,12 @@ const Options = () => {
                     <MenuItem  value={"regions"}>Annotation Regions</MenuItem>
                     <MenuItem  value={"locations"}>Location</MenuItem>
                     <MenuItem  value={"diagnosis"}>Clinical Diagnosis</MenuItem>
+                    <MenuItem  value={"filling_length"}>Filling Length</MenuItem>
+                    <MenuItem  value={"lateral_seal"}>Lateral Seal</MenuItem>
+                    <MenuItem  value={"irregularities"}>Irregularities</MenuItem>
+                    <MenuItem  value={"voids"}>Voids</MenuItem>
+                    <MenuItem  value={"seperated_instruments"}>Seperated Instruments</MenuItem>
+                    <MenuItem  value={"missed_canals"}>Missed Canals</MenuItem>
                     </Select>
                     <LoadingButton fullWidth type='submit' loading={state===2} variant='contained'>Update</LoadingButton>
                 </Stack>
@@ -150,8 +156,8 @@ const Options = () => {
                     :
                     option.length === 0? <Typography color='GrayText'>No Options</Typography>
                     :
-                    <FormGroup sx={{px:2, my:3}}>
-                        <Grid container>
+                    <FormGroup sx={{ px: 2, my: 3, width: '100%' }}>
+                        <Grid container spacing={2} sx={{ width: '100%' }}>
                         {option.map((item,index)=>{
                             return(
                                 <Grid item xs={12} sm={4} md={3} key={index}>
@@ -179,6 +185,12 @@ const Options = () => {
                             <MenuItem  value={"regions"}>Annotation Regions</MenuItem>
                             <MenuItem  value={"locations"}>Location</MenuItem>
                             <MenuItem  value={"diagnosis"}>Clinical Diagnosis</MenuItem>
+                            <MenuItem  value={"filling_length"}>Filling Length</MenuItem>
+                            <MenuItem  value={"lateral_seal"}>Lateral Seal</MenuItem>
+                            <MenuItem  value={"irregularities"}>Irregularities</MenuItem>
+                            <MenuItem  value={"voids"}>Voids</MenuItem>
+                            <MenuItem  value={"seperated_instruments"}>Seperated Instruments</MenuItem>
+                            <MenuItem  value={"missed_canals"}>Missed Canals</MenuItem>
                         </Select>
                         <LoadingButton type='submit' loading={state===1} variant='contained'>Add</LoadingButton>
                     </Stack>

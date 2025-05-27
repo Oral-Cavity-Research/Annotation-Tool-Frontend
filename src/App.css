@@ -200,6 +200,16 @@
   width: 100%;
   overflow: auto;
 } 
+
+.annotation-box{
+  position: absolute;
+  z-index: 100;
+  top: 10px;
+  right: 280px;
+  width: 200px;
+  padding: 5px;
+  border-radius: 3px;
+}
 /* .content_panel{
   height: 100%;
   width: 100%;

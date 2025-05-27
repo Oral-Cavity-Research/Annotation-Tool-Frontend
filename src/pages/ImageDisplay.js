@@ -14,6 +14,7 @@ function ImageDisplay() {
     const [loading, setLoading] = useState(true);
     const [status, setStatus] = useState({msg:"",severity:"success", open:false});
     const [regions, setRegions] = useState([]);
+    const [options, setOptions] = useState([]);
     const userData = useSelector(state => state.data);
 
 
@@ -42,9 +43,7 @@ function ImageDisplay() {
 
     const getOptions = ()=>{
         axios.post(`${process.env.REACT_APP_BE_URL}/option/get`,
-        {
-            option_names:["regions","diagnosis","locations"]
-        },
+        {},
         {
             headers: {
                 'Authorization': `Bearer ${userData.accessToken.token}`,
@@ -52,11 +51,20 @@ function ImageDisplay() {
             },
             withCredentials: true
         }).then(res=>{
-            var option1 = res.data?.find(item => item.name === "regions");
-            if(option1) {
-                option1 = option1.options.filter(item => item.active);
-                setRegions(option1);
-            }
+            // var option1 = res.data?.find(item => item.name === "regions");
+            // if(option1) {
+            //     option1 = option1.options.filter(item => item.active);
+            //     setRegions(option1);
+            //     console.log(option1)
+            // }
+
+            const filteredData = res.data?.map(item => ({
+                ...item,
+                options: item.options?.filter(opt => opt.active) || []
+            }));
+            setRegions(filteredData.find(item => item.name === "regions").options)
+            setOptions(filteredData)
+
         }).catch(err=>{
             if(err.response) showMsg(err.response.data.message, "error")
             else showMsg("Error!", "error")
@@ -77,7 +85,7 @@ function ImageDisplay() {
                     <CircularProgress size={100}/>
                 </Box>
                 </Box>
-                :<Canvas imagedata={data} regionNames={regions} diagnosis={[]} locations={[]}/>}
+                :<Canvas imagedata={data} regionNames={regions} options={options} diagnosis={[]} locations={[]}/>}
             </Box>
             <NotificationBar status={status} setStatus={setStatus}/>
         </div>

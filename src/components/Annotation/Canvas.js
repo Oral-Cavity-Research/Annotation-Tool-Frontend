@@ -9,7 +9,7 @@ import axios from 'axios';
 import { stringToColor } from '../Utils';
 import Actions from './Actions';
 import EditHistory from './EditHistory';
-import {ArrowDropDown, Cancel, Check, Close, NavigateBefore, NavigateNext, SaveAs, TextFields} from '@mui/icons-material';
+import {ArrowDropDown, Cancel, Check, Close, ContactlessOutlined, NavigateBefore, NavigateNext, SaveAs, TextFields} from '@mui/icons-material';
 import SaveChanges from './SaveChanges';
 import { useSelector} from 'react-redux';
 import { LoadingButton } from '@mui/lab';
@@ -55,7 +55,8 @@ function drawCircle(ctx, pos, zoomLevel, size=2, color='red'){
 
 // polygon class
 class Polygon{
-  constructor(ctx, color, type){
+  constructor(ctx, color, type, filling_length = '', lateral_seal = '', irregularities = '', 
+          voids = '', seperated_instruments = '', missed_canals = ''){
     this.shape = 'polygon'
     this.ctx = ctx;
     this.isSelected = false;
@@ -68,6 +69,12 @@ class Polygon{
     this.color = color;
     this.transcolor =  color.replace(')', ', 0.6)').replace('rgb', 'rgba')
     this.type = type;
+    this.filling_length = filling_length;
+    this.lateral_seal = lateral_seal;
+    this.irregularities = irregularities;
+    this.voids = voids;
+    this.seperated_instruments = seperated_instruments;
+    this.missed_canals = missed_canals;
     this.scale = 1;
   }
   addPoint(p){ 
@@ -175,7 +182,8 @@ class Polygon{
 
 // dot class
 class Dot{
-  constructor(ctx, color, type){
+  constructor(ctx, color, type, filling_length = '', lateral_seal = '', irregularities = '', 
+          voids = '', seperated_instruments = '', missed_canals = ''){
     this.shape = 'dot'
     this.ctx = ctx;
     this.isSelected = false;
@@ -188,6 +196,12 @@ class Dot{
     this.color = color;
     this.transcolor =  color.replace(')', ', 0.6)').replace('rgb', 'rgba')
     this.type = type;
+    this.filling_length = filling_length;
+    this.lateral_seal = lateral_seal;
+    this.irregularities = irregularities;
+    this.voids = voids;
+    this.seperated_instruments = seperated_instruments;
+    this.missed_canals = missed_canals;
     this.scale = 1;
   }
   addPoint(p){ 
@@ -268,7 +282,7 @@ class Dot{
   }
 }
 
-const Canvas = ({imagedata, regionNames}) => {  
+const Canvas = ({imagedata, regionNames, options}) => {  
   
   const [size, setSize] = useState({width: 1, height:1})
   const [data, setData] = useState(imagedata);
@@ -295,6 +309,9 @@ const Canvas = ({imagedata, regionNames}) => {
   const [navigateTo, setNavigateTo] = useState({prev: null, next: null});
   const [publicAvailable, setPublicAvailable] = useState(imagedata.is_public)
   const [category, setCategory] = useState(imagedata.category)
+  const [annotationOptions, setAnnotationOptions] = useState({
+    filling_length: "", lateral_seal: "", voids: "", seperated_instruments: "", irregularities: "", missed_canals: ""
+  })
   const [clinicalDiagnosis, setClinicalDiagnosis] = useState(imagedata.clinical_diagnosis)
 
   const open = Boolean(anchorEl);
@@ -425,6 +442,7 @@ const Canvas = ({imagedata, regionNames}) => {
     setSelectedIndex(index);
     setAnchorEl(null);
     set_types(regionNames[index].label);
+    check_changes()
   };
 
   const handleMenuClose = () => {
@@ -448,6 +466,12 @@ const Canvas = ({imagedata, regionNames}) => {
           {
             "id":index,
             "name": region.type,
+            "filling_length": region.filling_length,
+            "lateral_seal": region.lateral_seal,
+            "irregularities": region.irregularities,
+            "voids": region.voids,
+            "seperated_instruments": region.seperated_instruments,
+            "missed_canals": region.missed_canals,
             "shape": region.shape,
             "annotations": pointArray,
             "bbox": bbox_arr
@@ -659,6 +683,15 @@ const Canvas = ({imagedata, regionNames}) => {
         isSelected = true;
         regions[i].isSelected = true;
         selectedRegion = regions[i]
+        
+        setAnnotationOptions({
+          filling_length: selectedRegion.filling_length || "", 
+          lateral_seal: selectedRegion.lateral_seal || "", 
+          voids: selectedRegion.voids || "", 
+          seperated_instruments: selectedRegion.seperated_instruments || "", 
+          irregularities: selectedRegion.irregularities || "", 
+          missed_canals: selectedRegion.missed_canals || ""
+        })
         return
       // if a region is already selected that means
       // user needs to select another region or create a new region
@@ -676,6 +709,15 @@ const Canvas = ({imagedata, regionNames}) => {
         regions[i].isSelected = true;
         isSelected = true;
         selectedRegion = regions[i]
+        
+        setAnnotationOptions({
+          filling_length: selectedRegion.filling_length || "", 
+          lateral_seal: selectedRegion.lateral_seal || "", 
+          voids: selectedRegion.voids || "", 
+          seperated_instruments: selectedRegion.seperated_instruments || "", 
+          irregularities: selectedRegion.irregularities || "", 
+          missed_canals: selectedRegion.missed_canals || ""
+        })
         break
       }
     }
@@ -752,9 +794,12 @@ const Canvas = ({imagedata, regionNames}) => {
     const added =[]
 
     originalCoor.forEach(element => {
-      if(newCoor.some(e => 
-        e.name === element.name &&
-        e.annotations?.join("") === element.annotations?.join(""))
+      if(
+        newCoor.some(e => 
+        // e.name === element.name && e.filling_length === element.filling_length &&
+        // e.annotations?.join("") === element.annotations?.join("")
+        JSON.stringify(e) === JSON.stringify(element)
+      )
       ){
         same.push(element);
       }else{
@@ -764,8 +809,10 @@ const Canvas = ({imagedata, regionNames}) => {
 
     newCoor.forEach(element => {
       if(!originalCoor.some(e => 
-        e.name === element.name && 
-        e.annotations?.join("") === element.annotations?.join(""))
+        // e.name === element.name && e.filling_length === element.filling_length &&
+        // e.annotations?.join("") === element.annotations?.join("")
+        JSON.stringify(e) === JSON.stringify(element)
+      )
       ){
         added.push(element);
       }
@@ -832,9 +879,13 @@ const Canvas = ({imagedata, regionNames}) => {
         var new_shape = null
 
         if(shape === 'polygon'){
-          new_shape = new Polygon(ctx, stringToColor(type), type)
+          new_shape = new Polygon(ctx, stringToColor(type), type, 
+          region.filling_length, region.lateral_seal, region.irregularities, 
+          region.voids, region.seperated_instruments, region.missed_canals)
         }else{
-          new_shape = new Dot(ctx, stringToColor(type), type)
+          new_shape = new Dot(ctx, stringToColor(type), type,
+          region.filling_length, region.lateral_seal, region.irregularities, 
+          region.voids, region.seperated_instruments, region.missed_canals)
         }
         
         new_shape.scale = initZoomLevel;
@@ -1156,8 +1207,8 @@ const Canvas = ({imagedata, regionNames}) => {
           <ButtonBase aria-controls="lock-menu" sx={{cursor:'pointer', textAlign:'left', bgcolor:'white', p:1, borderRadius:1}}
             aria-expanded={open ? 'true' : undefined} onClick={handleClickListItem}>
             
-            <div className='color_square' style={{backgroundColor:stringToColor(regionNames[selectedIndex].label)}}></div>
-            <Typography noWrap sx={{width:'100px'}}>{regionNames[selectedIndex].label}</Typography>
+            <div className='color_square' style={{backgroundColor:stringToColor(selectedRegion?.type || regionNames[selectedIndex].label)}}></div>
+            <Typography noWrap sx={{width:'100px'}}>{ selectedRegion?.type || regionNames[selectedIndex].label}</Typography>
           
           </ButtonBase>
           }
@@ -1215,6 +1266,182 @@ const Canvas = ({imagedata, regionNames}) => {
         {/********************** working area **********************/}
         <div className="work_area">
         <div className='drawing'>
+          {
+            isSelected && 
+            <Box className='annotation-box' sx={{background: selectedRegion.color.replace(')', ', 0.2)').replace('rgb', 'rgba')}}>
+            <Stack direction='column' spacing={1}>
+              <Typography variant='body2' color='black' noWrap>Filling Length:</Typography>
+              <Select
+                  fullWidth
+                  variant= 'filled'
+                  value={annotationOptions.filling_length}
+                  size='small'
+                  onChange={(event)=>{
+                    selectedRegion.filling_length = event.target.value
+                    setAnnotationOptions({...annotationOptions, filling_length: event.target.value})
+                    check_changes()
+                  }}
+                  sx={{
+                    backgroundColor: 'white',
+                    '&:hover': {
+                      backgroundColor: 'white',
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: 'white',
+                    }
+                  }}
+                >
+                  <MenuItem value=""><em>N/A</em></MenuItem>
+                  {
+                    options.find(item => item.name === "filling_length").options.map((val, index)=>(
+                      <MenuItem key={index} value={val.value}>{val.label}</MenuItem>
+                    ))
+                  }
+              </Select>
+              <Typography variant='body2' color='black' noWrap>Lateral Seal:</Typography>
+              <Select
+                  fullWidth
+                  variant= 'filled'
+                  value={annotationOptions.lateral_seal}
+                  size='small'
+                  onChange={(event)=>{
+                    selectedRegion.lateral_seal = event.target.value
+                    setAnnotationOptions({...annotationOptions, lateral_seal: event.target.value})
+                    check_changes()
+                  }}
+                  sx={{
+                    backgroundColor: 'white',
+                    '&:hover': {
+                      backgroundColor: 'white',
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: 'white',
+                    }
+                  }}
+                >
+                  <MenuItem value=""><em>N/A</em></MenuItem>
+                  {
+                    options.find(item => item.name === "lateral_seal").options.map((val, index)=>(
+                      <MenuItem key={index} value={val.value}>{val.label}</MenuItem>
+                    ))
+                  }
+              </Select>
+              <Typography variant='body2' color='black' noWrap>Irregularities:</Typography>
+              <Select
+                  fullWidth
+                  variant= 'filled'
+                  value={annotationOptions.irregularities}
+                  size='small'
+                  onChange={(event)=>{
+                    selectedRegion.irregularities = event.target.value
+                    setAnnotationOptions({...annotationOptions, irregularities: event.target.value})
+                    check_changes()
+                  }}
+                  sx={{
+                    backgroundColor: 'white',
+                    '&:hover': {
+                      backgroundColor: 'white',
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: 'white',
+                    }
+                  }}
+                >
+                  <MenuItem value=""><em>N/A</em></MenuItem>
+                  {
+                    options.find(item => item.name === "irregularities").options.map((val, index)=>(
+                      <MenuItem key={index} value={val.value}>{val.label}</MenuItem>
+                    ))
+                  }
+              </Select>
+              <Typography variant='body2' color='black' noWrap>Voids:</Typography>
+              <Select
+                  fullWidth
+                  variant= 'filled'
+                  value={annotationOptions.voids}
+                  size='small'
+                  onChange={(event)=>{
+                    selectedRegion.voids = event.target.value
+                    setAnnotationOptions({...annotationOptions, voids: event.target.value})
+                    check_changes()
+                  }}
+                  sx={{
+                    backgroundColor: 'white',
+                    '&:hover': {
+                      backgroundColor: 'white',
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: 'white',
+                    }
+                  }}
+                >
+                  <MenuItem value=""><em>N/A</em></MenuItem>
+                  {
+                    options.find(item => item.name === "voids").options.map((val, index)=>(
+                      <MenuItem key={index} value={val.value}>{val.label}</MenuItem>
+                    ))
+                  }
+              </Select>
+              <Typography variant='body2' color='black' noWrap>Seperated Instruments:</Typography>
+              <Select
+                  fullWidth
+                  variant= 'filled'
+                  value={annotationOptions.seperated_instruments}
+                  size='small'
+                  onChange={(event)=>{
+                    selectedRegion.seperated_instruments = event.target.value
+                    setAnnotationOptions({...annotationOptions, seperated_instruments: event.target.value})
+                    check_changes()
+                  }}
+                  sx={{
+                    backgroundColor: 'white',
+                    '&:hover': {
+                      backgroundColor: 'white',
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: 'white',
+                    }
+                  }}
+                >
+                  <MenuItem value=""><em>N/A</em></MenuItem>
+                  {
+                    options.find(item => item.name === "seperated_instruments").options.map((val, index)=>(
+                      <MenuItem key={index} value={val.value}>{val.label}</MenuItem>
+                    ))
+                  }
+              </Select>
+              <Typography variant='body2' color='black' noWrap>Missed Canals:</Typography>
+              <Select
+                  fullWidth
+                  variant= 'filled'
+                  value={annotationOptions.missed_canals}
+                  size='small'
+                  onChange={(event)=>{
+                    selectedRegion.missed_canals = event.target.value
+                    setAnnotationOptions({...annotationOptions, missed_canals: event.target.value})
+                    check_changes()
+                  }}
+                  sx={{
+                    backgroundColor: 'white',
+                    '&:hover': {
+                      backgroundColor: 'white',
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: 'white',
+                    }
+                  }}
+                >
+                  <MenuItem value=""><em>N/A</em></MenuItem>
+                  {
+                    options.find(item => item.name === "missed_canals").options.map((val, index)=>(
+                      <MenuItem key={index} value={val.value}>{val.label}</MenuItem>
+                    ))
+                  }
+              </Select>
+            </Stack>
+            
+          </Box>  }
+
           <div className='drawing_area'>
           <canvas className='main_canvas' onDoubleClick={(e)=>handle_mouse(e)} onMouseMove={(e)=>{handle_mouse(e)}} onMouseDown={(e)=>{handle_mouse(e)}} onMouseUp={(e)=>{handle_mouse(e)}} ref={canvaRef} width={size.width} height={size.height}>Sorry, Canvas functionality is not supported.</canvas>
   
