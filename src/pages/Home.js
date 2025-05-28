@@ -1,6 +1,7 @@
 import React from 'react';
 import {Stack, Divider, ListItem, ListItemText, ListItemButton, Typography, Paper} from '@mui/material';
 import {NavLink, Outlet } from 'react-router-dom';
+import { HomeTwoTone} from '@mui/icons-material';
 
 const NavButton = ({path,name}) => (
     <ListItem disablePadding component={NavLink} to={path}
@@ -21,7 +22,9 @@ const Home = () => {
     return (
         <div className='body'>
         <div className='content'>
-            <Typography variant='h5'textTransform='uppercase' >Home</Typography>
+            <Stack direction='row' alignItems='end'>
+                <HomeTwoTone fontSize='large' sx={{color: 'rgb(17, 20, 53)'}}></HomeTwoTone><Typography variant='h5' fontWeight='bold' color='rgb(17, 20, 53)'>Home</Typography>
+            </Stack>
             <Paper sx={{p:2, my:2}}>
             <Stack direction='row' spacing={1}>
                 <NavButton path={"/home/images"} name={"Images"}>Images</NavButton>

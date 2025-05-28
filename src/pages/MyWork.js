@@ -2,6 +2,7 @@ import React from 'react';
 import {Stack, Divider, ListItem, ListItemText, ListItemButton, Typography, Paper} from '@mui/material';
 import {NavLink, Outlet } from 'react-router-dom';
 import { useSelector} from 'react-redux';
+import { AccountCircleTwoTone } from '@mui/icons-material';
 
 const NavButton = ({path,name}) => (
     <ListItem disablePadding component={NavLink} to={path}
@@ -25,7 +26,9 @@ const MyWork = () => {
     return (
         <div className='body'>
         <div className='content'>
-            <Typography variant='h5'textTransform='uppercase' >{userData.username? userData.username:"My Work"}</Typography>
+            <Stack direction='row' alignItems='end'>
+                <AccountCircleTwoTone fontSize='large' sx={{color: 'rgb(17, 20, 53)'}}></AccountCircleTwoTone><Typography variant='h5' fontWeight='bold' color='rgb(17, 20, 53)'>{userData.username? `${userData.username}'s Work`:"My Work"}</Typography>
+            </Stack>
             <Paper sx={{p:2, my:2}}>
             <Stack direction='row' spacing={1}>
                 <NavButton path={"/mywork/images"} name={"Images"}>Images</NavButton>
