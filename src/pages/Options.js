@@ -145,8 +145,6 @@ const Options = () => {
                     <MenuItem  value={"lateral_seal"}>Lateral Seal</MenuItem>
                     <MenuItem  value={"irregularities"}>Irregularities</MenuItem>
                     <MenuItem  value={"voids"}>Voids</MenuItem>
-                    <MenuItem  value={"seperated_instruments"}>Seperated Instruments</MenuItem>
-                    <MenuItem  value={"missed_canals"}>Missed Canals</MenuItem>
                     </Select>
                     <LoadingButton fullWidth type='submit' loading={state===2} variant='contained'>Update</LoadingButton>
                 </Stack>
@@ -189,8 +187,6 @@ const Options = () => {
                             <MenuItem  value={"lateral_seal"}>Lateral Seal</MenuItem>
                             <MenuItem  value={"irregularities"}>Irregularities</MenuItem>
                             <MenuItem  value={"voids"}>Voids</MenuItem>
-                            <MenuItem  value={"seperated_instruments"}>Seperated Instruments</MenuItem>
-                            <MenuItem  value={"missed_canals"}>Missed Canals</MenuItem>
                         </Select>
                         <LoadingButton type='submit' loading={state===1} variant='contained'>Add</LoadingButton>
                     </Stack>

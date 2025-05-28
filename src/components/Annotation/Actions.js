@@ -5,7 +5,7 @@ import {LoadingButton} from '@mui/lab';
 import { useSelector} from 'react-redux';
 import axios from 'axios';
 
-const messageNeeded = ["Comment", "Request Changes", "Review"]
+const messageNeeded = ["Comment", "Request Changes"]
 
 function Actions({showMsg, coordinates, data, unsaved, location, clinicalDiagnosis, setTogglePanel, setData}) {
 
