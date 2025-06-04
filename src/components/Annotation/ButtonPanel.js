@@ -1,6 +1,6 @@
 import React from 'react';
 import {IconButton, Tooltip, Box, Menu, MenuItem, ListItemIcon, ListItemText, Divider, Button, ButtonGroup, Badge} from '@mui/material';
-import {Preview,ZoomIn,ZoomOut,Close, HelpOutline, Style, Draw, Settings, OpenWith, Message, Download, ScatterPlot, Timeline} from '@mui/icons-material';
+import {Preview,ZoomIn,ZoomOut,Close, HelpOutline, Style, Draw, Settings, OpenWith, Message, Download, ScatterPlot, Timeline, VisibilityOff} from '@mui/icons-material';
 import {ArrowUpward, ArrowDownward, ArrowBack, ArrowForward, Opacity, Check} from '@mui/icons-material';
 import {Label, LabelOff} from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -193,6 +193,7 @@ const ButtonPanel = ({func, labelVisibility, readOnly, polygonMode, dotMode, sta
                 </Menu>
 
                 <Tooltip enterNextDelay={1000} title="Help" placement="bottom-end" arrow><Button size='small' onClick={func.show_help}><HelpOutline  fontSize='small' sx={{color:"var(--dark-color)"}}/></Button></Tooltip>
+                <Tooltip enterNextDelay={1000} title="Hide Annotations" placement="bottom-end" arrow><Button size='small' onClick={func.hideannotations}><VisibilityOff  fontSize='small' sx={{color:"var(--dark-color)"}}/></Button></Tooltip>
 
         </ButtonGroup>
         </Box>
@@ -301,6 +302,10 @@ const ButtonPanel = ({func, labelVisibility, readOnly, polygonMode, dotMode, sta
             <MenuItem onClick={func.show_help}>
                 <ListItemIcon> <HelpOutline fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
                 <ListItemText>Help</ListItemText>
+            </MenuItem>
+            <MenuItem onClick={func.hideannotations}>
+                <ListItemIcon> <VisibilityOff fontSize='small' sx={{color:"var(--dark-color)"}} /></ListItemIcon>
+                <ListItemText>Hide Annotations</ListItemText>
             </MenuItem>
             </Menu>
             

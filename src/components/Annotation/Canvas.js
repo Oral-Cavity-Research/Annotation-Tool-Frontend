@@ -544,6 +544,10 @@ const Canvas = ({imagedata, regionNames, options}) => {
     setTogglePanel(true)
   }
 
+  const hideannotations = () =>{
+    ctx.clearRect(0,0, canvas.width, canvas.height);
+  }
+
   const show_prediction = () =>{
     setContent("Prediction")
     setTogglePanel(true)
@@ -1219,7 +1223,7 @@ const Canvas = ({imagedata, regionNames, options}) => {
 
           {/******************* button pannel *************************/}
           <ButtonPanel func={{downloadJsonFile,finish_drawing,setDrawingMode,show_regions,show_history, zoom_in, zoom_out, move_selected, 
-          delete_selected, show_help, show_label, label_type, opacity_change, show_actions}} labelVisibility={labelVisibility} readOnly={readOnly} polygonMode={polygonMode} dotMode={dotMode} status={data.last_comment?.action}/>
+          delete_selected, show_help, show_label, label_type, opacity_change, show_actions, hideannotations}} labelVisibility={labelVisibility} readOnly={readOnly} polygonMode={polygonMode} dotMode={dotMode} status={data.last_comment?.action}/>
           
           {!readOnly &&
           <Box sx={{display: { xs: 'none', sm: 'block' } }} >
